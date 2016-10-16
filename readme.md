@@ -1,5 +1,43 @@
-![Open Growth](http://i.imgur.com/SXFa36n.gif)
+![Open Growth](http://i.imgur.com/Pug4ybX.gif)
 
-Transform salesman into sales heroes.
+> Transform salesman into sales heroes.
 Replace sales outreach with a Machine Learning engine.
 No more sales spam.
+
+## ❤️  Delight Your Customers
+
+> **Sendgrid + ScaleAPI + PubNub + MonkeyLearn + Twilio**
+
+The modern growth engine asks your customers to connect,
+only when they are ready.
+This is the natural approach.
+Invite your customers to connect directly with your experts.
+When the customer is ready,
+they will initiate the conversation with your team of experts.
+You provide valuable messages over SMS/Voice/Email/Social.
+
+## Signals Trigger Delights
+
+Your customers need information.
+Your team of experts can help!
+Start by sending relevant details to your customers.
+Signals are points in time that indicates customer activity.
+Send delights and information to your customers in realtime.
+
+| Signal > | Delight ML Foresight >   | Reaction >   | Connect to Expert    |
+| -------- | ------------------------ | ------------ | -------------------- |
+
+## Install Open Growth
+
+```shell
+sudo npm install -g opengrowth  ## Open Growth CLI
+```
+
+## Start Project
+
+```shell
+opengrowth init growth
+cd growth
+```
+
+Directories and files have been generated for you.

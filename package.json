@@ -1,0 +1,36 @@
+{
+  "name": "Open Growth",
+  "version": "0.0.1",
+  "description": "Open Growth - An open source project for developers at API companies to delight your customers with ML/AI.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pubnub/open-growth.git"
+  },
+  "keywords": [
+    "saas",
+    "growth",
+    "salesforce",
+    "machine learning",
+    "ml",
+    "clearbit",
+    "monkeylearn",
+    "pubnub",
+    "scaleapi",
+    "twilio",
+    "facebook",
+    "twitter",
+    "sendgrid"
+  ],
+  "author": "PubNub",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pubnub/open-growht/issues"
+  },
+  "homepage": "https://github.com/pubnub/open-growht#readme",
+  "devDependencies": {},
+  "dependencies": {}
+}

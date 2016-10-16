@@ -1,0 +1,33 @@
+{
+  "name": "Open Growth",
+  "description": "Open Growth - An open source project for developers at API companies to delight your customers with ML/AI",
+  "main": "index.js",
+  "authors": [
+    "PubNub"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "saas",
+    "growth",
+    "salesforce",
+    "machine learning",
+    "ml",
+    "clearbit",
+    "monkeylearn",
+    "pubnub",
+    "scaleapi",
+    "twilio",
+    "facebook",
+    "twitter",
+    "sendgrid"
+  ],
+  "homepage": "https://github.com/pubnub/open-chat-framework",
+  "private": false,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
