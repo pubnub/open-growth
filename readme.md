@@ -3,6 +3,8 @@
 > Transform salesman into sales heroes.
 Replace sales outreach with a Machine Learning engine.
 No more sales spam.
+Open Growth is an open source project for developers at 
+API companies to delight your customers with ML/AI.
 
 ## ❤️  Delight Your Customers
 
