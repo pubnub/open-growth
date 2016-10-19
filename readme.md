@@ -68,7 +68,7 @@ Data Channels are logs of signals, events and prospects.
  - `opengrowth.propsects` - list of augmented propspect profiles.
 
 
- ## Analytics Keys
+## Analytics Keys
 
   - `signals`
   - `delights`
@@ -78,3 +78,10 @@ Data Channels are logs of signals, events and prospects.
 Hourly, Daily and Monthly counts are available as well.
 The first hour of May 2016 can be fetched with this key:
 `opengrowth-analytics.signals.2016-05-01-00`.
+
+```javascript
+// Get Total Signals Value
+opengrowth.analytics.signals( total => {
+    console.log(`Total signals {total}.`);
+} );
+```
