@@ -18,6 +18,20 @@ When the customer is ready,
 they will initiate the conversation with your team of experts.
 You provide valuable messages over SMS/Voice/Email/Social.
 
+## ♻️  Presentation Link
+
+How does Open Growth work?
+
+[Google Slide Presentation](https://docs.google.com/presentation/d/1AwuSLz5Cm2psVG1_0sdiMhrHSjmQe-bzVnXZJGMfxdY/edit?usp=sharing)
+
+## ☀️  Capabilities
+
+ - CLI programmable growth engine
+    - Export to SQL for Data Mining (sqldump)
+    - List Signals and associated cURL commands.
+    - Analytics
+ - GUI (coming soon)
+
 ## Signals Trigger Delights
 
 Your customers need information.
@@ -38,8 +52,29 @@ sudo npm install -g opengrowth  ## Open Growth CLI
 ## Start Project
 
 ```shell
-opengrowth init growth
-cd growth
+opengrowth setup
 ```
 
-Directories and files have been generated for you.
+Follow the setup guide to create your custome rules engine.
+You'll be prompted to create your accounts on developer API compaines.
+
+## Data Channels
+
+Data Channels are logs of signals, events and prospects.
+
+ - `opengrowth.signals`   - when a prospect does something, run rules engine.
+ - `opengrowth.delights`  - multi-channel message sent to prospect.
+ - `opengrowth.reactions` - prospect requests to meet with sales.
+ - `opengrowth.propsects` - list of augmented propspect profiles.
+
+
+ ## Analytics Keys
+
+  - `signals`
+  - `delights`
+  - `reactions`
+  - `prospects`
+
+Hourly, Daily and Monthly counts are available as well.
+The first hour of May 2016 can be fetched with this key:
+`opengrowth-analytics.signals.2016-05-01-00`.
