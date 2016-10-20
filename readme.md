@@ -20,7 +20,10 @@ You provide valuable messages over SMS/Voice/Email/Social.
 
 ## ♻️  Presentation Link
 
-How does Open Growth work? [Google Slide Presentation](https://docs.google.com/presentation/d/1AwuSLz5Cm2psVG1_0sdiMhrHSjmQe-bzVnXZJGMfxdY/edit?usp=sharing)
+[Google Slide Presentation](https://docs.google.com/presentation/d/1AwuSLz5Cm2psVG1_0sdiMhrHSjmQe-bzVnXZJGMfxdY/edit?usp=sharing)
+
+How does Open Growth work?
+Check out the presentation in google slides.
 
 ![Open Growth Presentation](http://i.imgur.com/XV0Tcxn.gif)
 
