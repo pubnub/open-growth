@@ -18,9 +18,10 @@ When the customer is ready,
 they will initiate the conversation with your team of experts.
 You provide valuable messages over SMS/Voice/Email/Social.
 
-## ♻️  Presentation Link
+## ♻️  Presentation and Docs Resources
 
-[Google Slide Presentation](https://docs.google.com/presentation/d/1AwuSLz5Cm2psVG1_0sdiMhrHSjmQe-bzVnXZJGMfxdY/edit?usp=sharing)
+ - [Google Slide Presentation](https://docs.google.com/presentation/d/1AwuSLz5Cm2psVG1_0sdiMhrHSjmQe-bzVnXZJGMfxdY/edit?usp=sharing)
+ - [Signals and Delights Spreadsheet](https://docs.google.com/spreadsheets/d/1nqer8pzLd00f0XljlNipYQxsjMZq3p6WVv1XzM4ulB0/edit#gid=0)
 
 How does Open Growth work?
 Check out the presentation in google slides.
