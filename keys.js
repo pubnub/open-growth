@@ -1,7 +1,10 @@
 // api keys
 opengrowth.keys = {
-    twilio   : {}
-,   sendgrid : {}
-,   scaleapi : {}
-,   twitter  : {}
+    twilio      : { appkey    : '', appsecret : '' }
+,   twitter     : { appkey    : '', appsecret : '' }
+,   pubnub      : { subscribe : '', publish : '', secret : '' }
+,   scaleapi    : { appkey    : '' }
+,   clearbit    : { appkey    : '' }
+,   monkeylearn : { appkey    : '' }
+,   sendgrid    : { appkey    : '' }
 };
