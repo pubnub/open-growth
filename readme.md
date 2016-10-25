@@ -41,6 +41,8 @@ There are several aspects for Open Growth.
  3. Analytics - SQL, GoogleAnalytics, KV Counters
  4. ML Classifier Training & Clearbit
  5. LeadEngine - Add Emails to Top-of-Funnel `#future-feature`
+ 6. Marketing Website using GitHub Pages Jekyll
+ 7. Wizard for Open Growth Easy Install
 
 ## 📅  Timeline
 
@@ -116,6 +118,7 @@ opengrowth.analytics.signals( total => {
 ### SQL Schema
 
 ```sql
+## Open Growth
 CREATE DATABASE opengrowth
     DEFAULT CHARACTER SET utf8
     DEFAULT COLLATE utf8_general_ci;
