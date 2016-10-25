@@ -120,12 +120,38 @@ CREATE DATABASE opengrowth
     DEFAULT CHARACTER SET utf8
     DEFAULT COLLATE utf8_general_ci;
 
+## Signals
 CREATE TABLE signals (
     id      INTEGER PRIMARY KEY ASC AUTOINCREMENT
 ,   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ,   name    VARCHAR(100) NOT NULL
 );
-CREATE INDEX        signal_created ON stream(created);
-CREATE INDEX        signal_name    ON stream(created);
-CREATE UNIQUE INDEX signal_id      ON stream(id);
+CREATE INDEX        signal_created ON signals(created);
+CREATE INDEX        signal_name    ON signals(name);
+CREATE UNIQUE INDEX signal_id      ON signals(id);
+
+## Delights
+CREATE TABLE delights (
+    id      INTEGER PRIMARY KEY ASC AUTOINCREMENT
+,   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+,   name    VARCHAR(100) NOT NULL
+);
+CREATE INDEX        delight_created ON delights(created);
+CREATE INDEX        delight_name    ON delights(name);
+CREATE UNIQUE INDEX delight_id      ON delights(id);
+
+## Reactions
+CREATE TABLE reactions (
+    id         INTEGER PRIMARY KEY ASC AUTOINCREMENT
+,   created    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+,   signal     VARCHAR(100) NOT NULL
+,   delight    VARCHAR(100) NOT NULL
+,   signal_id  INTEGER
+,   delight_id INTEGER
+,   FOREIGN KEY (signal_id) REFERENCES signals(id)
+,   FOREIGN KEY (delight_id) REFERENCES delights(id)
+);
+CREATE INDEX        reaction_created ON reactions(created);
+CREATE UNIQUE INDEX reaction_id      ON reactions(id);
+
 ```
