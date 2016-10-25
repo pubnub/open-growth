@@ -45,7 +45,7 @@ There are several aspects for Open Growth.
 ## 📅  Timeline
 
  - October 24th - UseCase ML Classifier Training & Clearbit Complete
- - October 31st - CLI, DelightEngine and Analytics Complete
+ - October 31st - CLI, DelightEngine and Analytics Get/Set Complete
  - November 7th - SalesDashboard - Phase 1 Complete
  - November 14th - Signals Generated and Handled
  - November 21st - SalesConnect - Phase 1 Complete
