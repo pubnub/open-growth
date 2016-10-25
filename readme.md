@@ -125,16 +125,23 @@ CREATE TABLE signals (
     id      INTEGER PRIMARY KEY ASC AUTOINCREMENT
 ,   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ,   name    VARCHAR(100) NOT NULL
+,   email   VARCHAR(120) NOT NULL
+,   expert  VARCHAR(120)
 );
 CREATE INDEX        signal_created ON signals(created);
 CREATE INDEX        signal_name    ON signals(name);
+CREATE INDEX        signal_email   ON signals(email);
+CREATE INDEX        signal_expert  ON signals(expert);
 CREATE UNIQUE INDEX signal_id      ON signals(id);
 
 ## Delights
 CREATE TABLE delights (
-    id      INTEGER PRIMARY KEY ASC AUTOINCREMENT
-,   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-,   name    VARCHAR(100) NOT NULL
+    id        INTEGER PRIMARY KEY ASC AUTOINCREMENT
+,   created   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+,   name      VARCHAR(100) NOT NULL
+,   message   TEXT
+,   signal_id INTEGER
+,   FOREIGN KEY (signal_id) REFERENCES signals(id)
 );
 CREATE INDEX        delight_created ON delights(created);
 CREATE INDEX        delight_name    ON delights(name);
@@ -153,5 +160,4 @@ CREATE TABLE reactions (
 );
 CREATE INDEX        reaction_created ON reactions(created);
 CREATE UNIQUE INDEX reaction_id      ON reactions(id);
-
 ```
