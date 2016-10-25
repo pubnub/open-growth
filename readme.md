@@ -112,3 +112,20 @@ opengrowth.analytics.signals( total => {
     console.log(`Total signals ${total}.`);
 } );
 ```
+
+### SQL Schema
+
+```sql
+CREATE DATABASE opengrowth
+    DEFAULT CHARACTER SET utf8
+    DEFAULT COLLATE utf8_general_ci;
+
+CREATE TABLE signals (
+    id      INTEGER PRIMARY KEY ASC AUTOINCREMENT
+,   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+,   name    VARCHAR(100) NOT NULL
+);
+CREATE INDEX        signal_created ON stream(created);
+CREATE INDEX        signal_name    ON stream(created);
+CREATE UNIQUE INDEX signal_id      ON stream(id);
+```
