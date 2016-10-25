@@ -28,6 +28,29 @@ Check out the presentation in google slides.
 
 ![Open Growth Presentation](http://i.imgur.com/XV0Tcxn.gif)
 
+## 🚧  Roadmap
+
+There are several aspects for Open Growth.
+
+ 1. Signal Generation - 20 signals with monitoring with Librato Metrics
+ 2. Signal Reaction - 20 reactions with monitoring with Librato Metrics
+ 2. CLI - Deploy & Status Command
+ 2. DelightEngine on BLOCKS - Delights and ProfileBuilding with Tests
+ 3. SalesDashboard - List of actions for the Salesman
+ 3. SalesConnect - Landing page for Connecting
+ 3. Analytics - SQL, GoogleAnalytics, KV Counters
+ 4. ML Classifier Training & Clearbit
+ 5. LeadEngine - Add Emails to Top-of-Funnel `#future-feature`
+
+## 📅  Timeline
+
+ - October 24th - UseCase ML Classifier Training & Clearbit Complete
+ - October 31st - CLI, DelightEngine and Analytics Complete
+ - November 7th - SalesDashboard - Phase 1 Complete
+ - November 14th - Signals Generated and Handled
+ - November 21st - SalesConnect - Phase 1 Complete
+ - November 28th - **Test Live 🎉** after Thanksgiving
+
 ## ☀️  Capabilities
 
  - CLI programmable growth engine
