@@ -6,6 +6,7 @@ export default request => {
 
     // TODO de-duplicate (prevent duplicate signals from activiating)
     // TODO track signal analytics with total/yr/mm/day/hour
+    // TODO librato
     // TODO special track signal "reaction" for extra metrics
     // TODO track sent delights
     // TODO send to SQL DB
@@ -50,37 +51,51 @@ opengrowth.track = ( signal, message, handle ) => {
 // Vendors
 opengrowth.delight = {};
 
-// Send Emails
-opengrowth.delight.email = ( signal, message, email, subject ) => {
+// Send Emails with Pardot
+opengrowth.delight.pardot.email = ( signal, message, email, subject ) => {
     opengrowth.track( signal, message, email );
     // ⚠️  opengrowth.keys.sendgrid.apikey
     // TODO send email with pardot/sendgrid
 };
 
-// Send SMS
-opengrowth.delight.sms = ( signal, message, phone ) => {
+// Send Emails with SendGrid
+opengrowth.delight.sendgrid.email = ( signal, message, email, subject ) => {
+    opengrowth.track( signal, message, email );
+    // ⚠️  opengrowth.keys.sendgrid.apikey
+    // TODO send email with pardot/sendgrid
+};
+
+// Send SMS with RingCentral
+opengrowth.delight.ringcentral.sms = ( signal, message, phone ) => {
+    opengrowth.track( signal, message, phone );
+    // ⚠️  opengrowth.keys.ringcentral.apikey
+    // TODO send SMS on RingCentral
+};
+
+// Send SMS with Twilio
+opengrowth.delight.twilio.sms = ( signal, message, phone ) => {
     opengrowth.track( signal, message, phone );
     // ⚠️  opengrowth.keys.twilio.apikey
-    // TODO send SMS on Twilio/or other
+    // TODO send SMS on Twilio
 };
 
 // Tweet at Customer
-opengrowth.delight.tweet = ( signal, message, handle ) => {
-    opengrowth.track( signal, message, handle );
+opengrowth.delight.twitter.tweet = ( signal, message ) => {
+    opengrowth.track( signal, message );
     // ⚠️  opengrowth.keys.twitter.keys
     // TODO Tweet on Twitter
 };
 
 // Post to Customer on LinkedIn
-opengrowth.delight.linkedin = ( signal, message, handle ) => {
-    opengrowth.track( signal, message, handle );
+opengrowth.delight.linkedin.post = ( signal, message ) => {
+    opengrowth.track( signal, message );
     // ⚠️  opengrowth.keys.linkedin.keys
     // TODO Post on LinkedIn
 };
 
 // Post on Customer's Wall on Facebook
-opengrowth.delight.facebook = ( signal, message, handle ) => {
-    opengrowth.track( signal, message, handle );
+opengrowth.delight.facebook.post = ( signal, message ) => {
+    opengrowth.track( signal, message );
     // ⚠️  opengrowth.keys.facebook.keys
     // TODO FB Post
 };
