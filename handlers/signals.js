@@ -86,6 +86,13 @@ opengrowth.delight.twitter.tweet = ( signal, message ) => {
     // TODO Tweet on Twitter
 };
 
+// Send Snap to User
+opengrowth.delight.snapchat.snap = ( signal, message, userid ) => {
+    opengrowth.track( signal, message, userid );
+    // ⚠️  opengrowth.keys.snapchat.a-thing...
+    // TODO Send a Snap 
+};
+
 // Post to Customer on LinkedIn
 opengrowth.delight.linkedin.post = ( signal, message ) => {
     opengrowth.track( signal, message );
