@@ -137,6 +137,22 @@ CREATE INDEX        signal_email   ON signals(email);
 CREATE INDEX        signal_expert  ON signals(expert);
 CREATE UNIQUE INDEX signal_id      ON signals(id);
 
+## Signals 3 Store
+CREATE TABLE signals_3store (
+    created    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+,   signal_id  INTEGER
+,   email      VARCHAR(120) NOT NULL
+,   predicate  VARCHAR(100) NOT NULL
+,   object     VARCHAR(100) NOT NULL
+);
+CREATE INDEX        signal_created          ON signals_3store(created);
+CREATE INDEX        signal_signal_id        ON signals_3store(signal_id);
+CREATE INDEX        signal_email            ON signals_3store(email);
+CREATE INDEX        signal_predicate        ON signals_3store(predicate);
+CREATE INDEX        signal_object           ON signals_3store(object);
+CREATE INDEX        signal_email_predicate  ON signals_3store(email,predicate);
+CREATE INDEX        signal_signal_predicate ON signals_3store(signal_id,predicate);
+
 ## Delights
 CREATE TABLE delights (
     id        INTEGER PRIMARY KEY ASC AUTOINCREMENT
