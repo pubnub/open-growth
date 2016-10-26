@@ -119,6 +119,6 @@ opengrowth.analytics.signals( total => {
 
 See `schema.sql` file.
 Tables include `signals`,
-`signals_3store`_,
+`signals3store`,
 `delights` and
 `reactions`.

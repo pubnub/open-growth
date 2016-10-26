@@ -1,9 +1,10 @@
-## Open Growth DB
+-- Open Growth DB
 CREATE DATABASE IF NOT EXISTS opengrowth
     DEFAULT CHARACTER SET utf8
     DEFAULT COLLATE utf8_general_ci;
 
-## Signals
+-- Signals
+-- Meaningful customer activity log
 CREATE TABLE IF NOT EXISTS signals (
     id      INTEGER PRIMARY KEY ASC AUTOINCREMENT
 ,   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -17,23 +18,25 @@ CREATE INDEX        signal_email   ON signals(email);
 CREATE INDEX        signal_expert  ON signals(expert);
 CREATE UNIQUE INDEX signal_id      ON signals(id);
 
-## Signals 3 Store
-CREATE TABLE IF NOT EXISTS signals_3store (
+-- Signals 3 Store
+-- Meta data from a signal.
+CREATE TABLE IF NOT EXISTS signals3store (
     created    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ,   signal_id  INTEGER
 ,   email      VARCHAR(120) NOT NULL
 ,   predicate  VARCHAR(100) NOT NULL
 ,   object     VARCHAR(100) NOT NULL
 );
-CREATE INDEX signal_created          ON signals_3store(created);
-CREATE INDEX signal_signal_id        ON signals_3store(signal_id);
-CREATE INDEX signal_email            ON signals_3store(email);
-CREATE INDEX signal_predicate        ON signals_3store(predicate);
-CREATE INDEX signal_object           ON signals_3store(object);
-CREATE INDEX signal_email_predicate  ON signals_3store(email,predicate);
-CREATE INDEX signal_signal_predicate ON signals_3store(signal_id,predicate);
+CREATE INDEX signal_created          ON signals3store(created);
+CREATE INDEX signal_signal_id        ON signals3store(signal_id);
+CREATE INDEX signal_email            ON signals3store(email);
+CREATE INDEX signal_predicate        ON signals3store(predicate);
+CREATE INDEX signal_object           ON signals3store(object);
+CREATE INDEX signal_email_predicate  ON signals3store(email,predicate);
+CREATE INDEX signal_signal_predicate ON signals3store(signal_id,predicate);
 
-## Delights
+-- Delights
+-- Sending an email, sms, tweet, etc.
 CREATE TABLE IF NOT EXISTS delights (
     id        INTEGER PRIMARY KEY ASC AUTOINCREMENT
 ,   created   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -46,7 +49,8 @@ CREATE INDEX        delight_created ON delights(created);
 CREATE INDEX        delight_name    ON delights(name);
 CREATE UNIQUE INDEX delight_id      ON delights(id);
 
-## Reactions
+-- Reactions
+-- Customer clicks a CTA and requests to connect.
 CREATE TABLE IF NOT EXISTS reactions (
     id         INTEGER PRIMARY KEY ASC AUTOINCREMENT
 ,   created    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -59,4 +63,3 @@ CREATE TABLE IF NOT EXISTS reactions (
 );
 CREATE INDEX        reaction_created ON reactions(created);
 CREATE UNIQUE INDEX reaction_id      ON reactions(id);
-
