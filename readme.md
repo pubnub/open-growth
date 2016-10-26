@@ -61,6 +61,23 @@ There are several aspects for Open Growth.
     - Analytics
  - GUI (coming soon)
 
+## API `keys.js` file
+
+```javascript
+// api keys
+opengrowth.keys = {
+    twilio      : { appkey    : '', appsecret : '' }
+,   twitter     : { appkey    : '', appsecret : '' }
+,   pubnub      : { subscribe : '', publish : '', secret : '' }
+,   librato     : { email     : '', secret : '' }
+,   scaleapi    : { appkey    : '' }
+,   clearbit    : { appkey    : '' }
+,   monkeylearn : { appkey    : '' }
+,   sendgrid    : { appkey    : '' }
+};
+```
+
+
 ## Signals Trigger Delights
 
 Your customers need information.
