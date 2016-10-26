@@ -19,7 +19,7 @@ CREATE INDEX        signal_expert  ON signals(expert);
 CREATE UNIQUE INDEX signal_id      ON signals(id);
 
 -- Signals 3 Store
--- Meta data from a signal.
+-- Meta data from a signal
 CREATE TABLE IF NOT EXISTS signals3store (
     created    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ,   signal_id  INTEGER
@@ -36,7 +36,7 @@ CREATE INDEX signal_email_predicate  ON signals3store(email,predicate);
 CREATE INDEX signal_signal_predicate ON signals3store(signal_id,predicate);
 
 -- Delights
--- Sending an email, sms, tweet, etc.
+-- Sending an email, sms, tweet, etc
 CREATE TABLE IF NOT EXISTS delights (
     id        INTEGER PRIMARY KEY ASC AUTOINCREMENT
 ,   created   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -50,7 +50,7 @@ CREATE INDEX        delight_name    ON delights(name);
 CREATE UNIQUE INDEX delight_id      ON delights(id);
 
 -- Reactions
--- Customer clicks a CTA and requests to connect.
+-- Customer clicks a CTA and requests to connect
 CREATE TABLE IF NOT EXISTS reactions (
     id         INTEGER PRIMARY KEY ASC AUTOINCREMENT
 ,   created    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP

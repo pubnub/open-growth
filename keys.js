@@ -7,4 +7,5 @@ opengrowth.keys = {
 ,   clearbit    : { appkey    : '' }
 ,   monkeylearn : { appkey    : '' }
 ,   sendgrid    : { appkey    : '' }
+,   librato     : { email     : '', secret : '' }
 };
