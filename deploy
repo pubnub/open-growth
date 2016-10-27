@@ -69,7 +69,7 @@ function upload() {
         ,   code      : $scope.code
         ,   channels  : "opengrowth.signals"
         ,   event     : "js-before-publish"
-        ,   type      : "js-before-publish"
+        ,   type      : "js"
         ,   log_level : "debug"
         ,   name      : "Open Growt Signalh Handler"
         ,   output    : "opengrowth.debug"
