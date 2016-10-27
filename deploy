@@ -7,42 +7,45 @@ const http    = require('request-promise');
 const gulp    = require('gulp');
 const appkeys = require('./keys.json');
 
-// TODO - create file (concat)
-// TODO - upload to EH
-// TODO - restart BLOCK
+// TODO - GET/MAKE BLOCK labled "Open Growth"
+// TODO - ...
 // TODO - wait for BLOCK to boot
 // TODO - test BLOCK
-// TODO /user/298833/account/298833
-//      /app/334158/key/226891/block/2071/editor/2010
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Main
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 var $scope = {};
 
-// Login to Global Admin Dashboard
 pubnub_login( appkeys.pubnub.email, appkeys.pubnub.password ).then( login => {
+    // Logged into Global Admin Dashboard
+    console.log( 'Logged In!', login.result.user_id );
     $scope.login = login.result;
     return build();
-} ).then( code => {
-    $scope.code = code;
+} ).then( result => {
+    // Built Event Handler
+    console.log( 'Built Event Handler!', result.length );
+    $scope.code = result;
     return upload();
 } ).then( result => {
-    console.log('uploaded!',result);
+    // Uploaded EH Code
+    console.log( 'Uploaded!', result );
     return restart();
 } ).then( result => {
-    console.log('restarting!',result);
+    // Sent Restart Signal
+    console.log( 'Restarting!', result );
 } );
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Build Event Handler Code
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function build() {
-    var buffer = "";
+    var buffer = ''
+    var keys   = 'opengrowth.keys = ' + JSON.stringify(appkeys) + ';'
     return new Promise( ( resolve, reject ) => {
         gulp.src(['./handlers/signals.js','./signals/*.js'])
-        .on( 'end',   data  => { resolve(buffer) } )
-        .on( 'error', error => { reject(error)   } )
+        .on( 'end',   data  => { resolve(buffer + keys) } )
+        .on( 'error', error => { reject(error)          } )
         .on( 'data',  bytes => {
             buffer += bytes.contents.toString().trim();
         } );
