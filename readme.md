@@ -61,20 +61,19 @@ There are several aspects for Open Growth.
     - Analytics
  - GUI (coming soon)
 
-## API `keys.js` file
+## API `keys.js` JSON File
 
-```javascript
-// api keys
-opengrowth.keys = {
-    twilio      : { appkey    : '', appsecret : '' }
-,   twitter     : { appkey    : '', appsecret : '' }
-,   pubnub      : { subscribe : '', publish : '', secret : '' }
-,   librato     : { email     : '', secret : '' }
-,   scaleapi    : { appkey    : '' }
-,   clearbit    : { appkey    : '' }
-,   monkeylearn : { appkey    : '' }
-,   sendgrid    : { appkey    : '' }
-};
+```json
+{
+    "twilio"      : { "appkey"    : "", "appsecret" : "" }
+,   "twitter"     : { "appkey"    : "", "appsecret" : "" }
+,   "pubnub"      : { "email"     : "", "password"  : "", "subscribe" : "", "publish" : "", "secret" : "" }
+,   "librato"     : { "email"     : "", "secret"    : "" }
+,   "scaleapi"    : { "appkey"    : "" }
+,   "clearbit"    : { "appkey"    : "" }
+,   "monkeylearn" : { "appkey"    : "" }
+,   "sendgrid"    : { "appkey"    : "" }
+}
 ```
 
 

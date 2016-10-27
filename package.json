@@ -1,5 +1,5 @@
 {
-  "name": "Open Growth",
+  "name": "opengrowth",
   "version": "0.0.1",
   "description": "Open Growth - An open source project for developers at API companies to delight your customers with ML/AI.",
   "main": "index.js",
@@ -32,5 +32,9 @@
   },
   "homepage": "https://github.com/pubnub/open-growht#readme",
   "devDependencies": {},
-  "dependencies": {}
+  "dependencies": {
+    "request" : "latest"
+  , "request-promise" : "latest"
+  , "gulp" : "latest"
+  }
 }

@@ -1,3 +1,130 @@
-#!/usr/bin/python
+#!/usr/local/bin/node
 
-## command line for deploying and maintaining open growth.
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Libs
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+const http    = require('request-promise');
+const gulp    = require('gulp');
+const appkeys = require('./keys.json');
+
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Main
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+build().then( code => {
+    console.log(code);
+} );
+0&&pubnub_login( appkeys.pubnub.email, appkeys.pubnub.password ).then( login => {
+    const token = login.token;
+    console.log('did',login);
+    // TODO
+    // TODO - create file (concat)
+    // TODO /user/298833/account/298833
+    //      /app/334158/key/226891/block/2071/editor/2010
+    // TODO - upload to EH
+    // TODO - restart BLOCK
+    return 
+} );
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Build Event Handler Code
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function build() {
+    var buffer = "";
+    return new Promise( ( resolve, reject ) => {
+        gulp.src(['./handlers/signals.js','./signals/*.js'])
+        .on( 'end',   data  => { resolve(buffer) } )
+        .on( 'error', error => { reject(error)   } )
+        .on( 'data',  bytes => {
+            buffer += bytes.contents.toString().trim();
+        } );
+    } );
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Login to PubNub
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function pubnub_login( email, password ) {
+    return http({
+        method : 'POST'
+    ,   uri    : 'https://admin.pubnub.com/api/me'
+    ,   body   : { 'email' : email, 'password' : password }
+    ,   json   : true
+    }).catch( error => {
+        console.error( 'error', error );
+    } );
+}
+
+
+/*
+import os
+import re
+import uuid
+import json
+import urllib
+import base64
+import random
+import datetime
+import requests
+
+## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+## Main
+## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+def main():
+    access = apikeys()
+    print(access)
+    print(access['pubnub'])
+    pntoken = pubnub_login(
+        access['pubnub']['email'],
+        access['pubnub']['password']
+    )
+    print(pntoken)
+
+## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+## HTTP Requests
+## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.poolmanager import PoolManager
+import ssl
+
+class https(HTTPAdapter):
+    def init_poolmanager( self, connections, maxsize, block=False ):
+        self.poolmanager = PoolManager(
+            num_pools=connections,
+            maxsize=maxsize,
+            block=block,
+            ssl_version=ssl.PROTOCOL_TLSv1
+        )
+
+def http( url, body, headers={} ):
+    s = requests.Session()
+    s.mount( 'https://', https() )
+    return s.post( url, body )
+
+## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+## Load API Keys File
+## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+def apikeys():
+    with open('keys.json') as data_file:
+        return json.load(data_file) 
+
+
+    #print(http( url, body ))
+    print(requests.get( url, verify=False ))
+    return None
+
+
+
+
+    #print(url)
+    #print(body)
+    #resp = urllib.request.urlopen( url, str.encode(body) ).read()
+    #print(resp)
+    #return json.loads(urllib.urlopen( url, body ).read())
+
+## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+## Run Main
+## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+if __name__ == "__main__": main()
+*/
