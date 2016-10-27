@@ -25,7 +25,7 @@ export default request => {
     // TODO Get Clearbit/MonkeyLearn
     // TODO from KV or build from scratch.
     return opengrowth.customer(email).then( customer => {
-        opengrowth.signals["*"]( request, customer, signal );
+        opengrowth.signals["*"]( customer, signal );
         return opengrowth.signals[signal]( request, customer );
     } );
 }
@@ -34,14 +34,18 @@ export default request => {
 // Signals
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.signals = {};
+// Alert! This failes on BLOCKS - BUG being patched.
+// Directly access the signals dictionary for now.
+/*
 opengrowth.on      = ( signal, callback ) => {
     opengrowth.signals[signal] = callback;
-}
+};*/
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Customer Fetch
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.customer = (email) => {
+    // TODO
     // check kv store
     // if not cached, build with Clearbit and MonkeyLearn
     // return promise
