@@ -11,6 +11,10 @@ const appkeys = require('./keys.json');
 // TODO - ...
 // TODO - wait for BLOCK to boot
 // TODO - test BLOCK
+// TODO - show DEBUG output
+// TODO - 
+// TODO - print Signal cURLS and JS Functions for reporing a signal
+// TODO - 
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Main
