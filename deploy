@@ -7,23 +7,31 @@ const http    = require('request-promise');
 const gulp    = require('gulp');
 const appkeys = require('./keys.json');
 
+// TODO - create file (concat)
+// TODO - upload to EH
+// TODO - restart BLOCK
+// TODO - wait for BLOCK to boot
+// TODO - test BLOCK
+// TODO /user/298833/account/298833
+//      /app/334158/key/226891/block/2071/editor/2010
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Main
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-build().then( code => {
-    console.log(code);
-} );
-0&&pubnub_login( appkeys.pubnub.email, appkeys.pubnub.password ).then( login => {
-    const token = login.token;
-    console.log('did',login);
-    // TODO
-    // TODO - create file (concat)
-    // TODO /user/298833/account/298833
-    //      /app/334158/key/226891/block/2071/editor/2010
-    // TODO - upload to EH
-    // TODO - restart BLOCK
-    return 
+var $scope = {};
+
+// Login to Global Admin Dashboard
+pubnub_login( appkeys.pubnub.email, appkeys.pubnub.password ).then( login => {
+    $scope.login = login.result;
+    return build();
+} ).then( code => {
+    $scope.code = code;
+    return upload();
+} ).then( result => {
+    console.log('uploaded!',result);
+    return restart();
+} ).then( result => {
+    console.log('restarting!',result);
 } );
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -42,6 +50,51 @@ function build() {
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Upload Event Handler Code
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function upload() {
+    return http({
+        method  : 'PUT'
+    ,   json    : true
+    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
+                  '/blocks/key/226891/event_handler/2010'
+    ,   headers : { 'X-Session-Token' : $scope.login.token }
+    ,   body    : {
+            key_id    : 226891
+        ,   block_id  : 2071
+        ,   id        : 2010
+        ,   code      : $scope.code
+        ,   channels  : "opengrowth.signals"
+        ,   event     : "js-before-publish"
+        ,   type      : "js-before-publish"
+        ,   log_level : "debug"
+        ,   name      : "Open Growt Signalh Handler"
+        ,   output    : "opengrowth.debug"
+        }
+    }).catch( error => {
+        console.error( 'error', error );
+    } );
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Restart Event Handler
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function restart() {
+//curl --data ''  \
+    //-H 'Content-Type: application/json'                                   \
+    return http({
+        method  : 'POST'
+    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
+                  '/blocks/key/226891/block/2071/start'
+    ,   body    : { block_id : 2071, key_id : 226891, action : "start" }
+    ,   headers : { 'X-Session-Token' : $scope.login.token }
+    ,   json    : true
+    }).catch( error => {
+        console.error( 'error', error );
+    } );
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Login to PubNub
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function pubnub_login( email, password ) {
@@ -54,77 +107,3 @@ function pubnub_login( email, password ) {
         console.error( 'error', error );
     } );
 }
-
-
-/*
-import os
-import re
-import uuid
-import json
-import urllib
-import base64
-import random
-import datetime
-import requests
-
-## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-## Main
-## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-def main():
-    access = apikeys()
-    print(access)
-    print(access['pubnub'])
-    pntoken = pubnub_login(
-        access['pubnub']['email'],
-        access['pubnub']['password']
-    )
-    print(pntoken)
-
-## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-## HTTP Requests
-## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-import requests
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.poolmanager import PoolManager
-import ssl
-
-class https(HTTPAdapter):
-    def init_poolmanager( self, connections, maxsize, block=False ):
-        self.poolmanager = PoolManager(
-            num_pools=connections,
-            maxsize=maxsize,
-            block=block,
-            ssl_version=ssl.PROTOCOL_TLSv1
-        )
-
-def http( url, body, headers={} ):
-    s = requests.Session()
-    s.mount( 'https://', https() )
-    return s.post( url, body )
-
-## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-## Load API Keys File
-## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-def apikeys():
-    with open('keys.json') as data_file:
-        return json.load(data_file) 
-
-
-    #print(http( url, body ))
-    print(requests.get( url, verify=False ))
-    return None
-
-
-
-
-    #print(url)
-    #print(body)
-    #resp = urllib.request.urlopen( url, str.encode(body) ).read()
-    #print(resp)
-    #return json.loads(urllib.urlopen( url, body ).read())
-
-## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-## Run Main
-## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-if __name__ == "__main__": main()
-*/
