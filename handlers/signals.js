@@ -4,6 +4,11 @@
 var opengrowth = {};
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Libs
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+const http = require('xhr');
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Open Growth Signals Handler
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 export default request => {
@@ -14,18 +19,18 @@ export default request => {
     // TODO de-duplicate (prevent duplicate signals from activiating)
     // TODO track signal analytics with total/yr/mm/day/hour
     // TODO librato
-    // TODO special track signal "reaction" for extra metrics
+    // TODO special track signal 'reaction' for extra metrics
     // TODO track sent delights
     // TODO send to SQL DB
 
-    // TODO Augment/Extend "SYNC" User Profile KV Entry
+    // TODO Augment/Extend 'SYNC' User Profile KV Entry
     //      with all new keys supplied in the signal data
     //      so we have a progressively built profile.
 
     // TODO Get Clearbit/MonkeyLearn
     // TODO from KV or build from scratch.
     return opengrowth.customer(email).then( customer => {
-        opengrowth.signals["*"]( customer, signal );
+        opengrowth.signals['*']( customer, signal );
         return opengrowth.signals[signal]( request, customer );
     } );
 }
@@ -57,9 +62,30 @@ opengrowth.customer = (email) => {
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Analytical Tracking of Delights
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-opengrowth.track = ( signal, message, handle ) => {
+opengrowth.track = (key) => {
+    // 
     // TODO
-    // increment KV for `delight.${signal}`.
+    // increment KV for `opengrowth.${key}`.
+    // increment KV for `opengrowth.${key}.yyyy`.
+    // increment KV for `opengrowth.${key}.yyyy_mm`.
+    // increment KV for `opengrowth.${key}.yyyy_mm_dd`.
+    // increment KV for `opengrowth.${key}.yyyy_mm_dd_hh`.
+
+    // increment Librato for `opengrowth.${key}`.
+    xhr.fetch('https://metrics-api.librato.com/v1/metrics').then((serverResponse) => {
+        // handle server response
+    }).catch((err) => {
+        // handle request failure
+    });
+};
+opengrowth.track.signal = ( signal, data ) => {
+    // TODO
+    // TODO log signal
+    // TODO 
+};
+opengrowth.track.delight = ( delight, signal, data ) => {
+};
+opengrowth.track.reaction = (key) => {
 };
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

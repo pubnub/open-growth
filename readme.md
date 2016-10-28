@@ -6,6 +6,8 @@ No more sales spam.
 Open Growth is an open source project for developers at 
 API companies to delight your customers with ML/AI.
 
+![Deploy V1 Example](http://i.imgur.com/NuobuFP.gif)
+
 ## ❤️  Delight Your Customers
 
 > **Sendgrid + ScaleAPI + PubNub + MonkeyLearn + Twilio**

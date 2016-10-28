@@ -7,7 +7,7 @@ const http    = require('request-promise');
 const gulp    = require('gulp');
 const appkeys = require('./keys.json');
 
-// TODO - GET/MAKE BLOCK labled "Open Growth"
+// TODO - GET/MAKE BLOCK labled 'Open Growth'
 // TODO - ...
 // TODO - wait for BLOCK to boot
 // TODO - test BLOCK
@@ -52,14 +52,13 @@ pubnub_login( appkeys.pubnub.email, appkeys.pubnub.password ).then( login => {
     const pub = appkeys.pubnub.publish;
     const sub = appkeys.pubnub.subscribe;
     const chn = 'opengrowth.signals';
-    const msg = '\\{"signal":"test","email":"stephen@pubnub.com"\\}';
+    const msg = `\\{"signal":"test","email":"stephen@pubnub.com"\\}`;
 
     // Done Printing Instructions
     console.log(`
         ## Try it out!
         curl 'https://ps.pubnub.com/subscribe/${sub}/${chn}/0/-1' &
         curl 'https://ps.pubnub.com/publish/${pub}/${sub}/0/${chn}/0/${msg}'
-        echo
     `);
 
 } );
@@ -95,12 +94,12 @@ function upload() {
         ,   block_id  : 2071
         ,   id        : 2010
         ,   code      : $scope.code
-        ,   channels  : "opengrowth.signals"
-        ,   event     : "js-before-publish"
-        ,   type      : "js"
-        ,   log_level : "debug"
-        ,   name      : "Open Growt Signalh Handler"
-        ,   output    : "opengrowth.debug"
+        ,   channels  : 'opengrowth.signals'
+        ,   event     : 'js-before-publish'
+        ,   type      : 'js'
+        ,   log_level : 'debug'
+        ,   name      : 'Open Growt Signalh Handler'
+        ,   output    : 'opengrowth.debug'
         }
     }).catch( error => {
         console.error( 'error', error );
@@ -124,7 +123,7 @@ function restart() {
         method  : 'POST'
     ,   uri     : 'https://admin.pubnub.com/api/v1' + 
                   '/blocks/key/226891/block/2071/start'
-    ,   body    : { block_id : 2071, key_id : 226891, action : "start" }
+    ,   body    : { block_id : 2071, key_id : 226891, action : 'start' }
     ,   headers : { 'X-Session-Token' : $scope.login.token }
     ,   json    : true
     }).catch( error => {
