@@ -7,6 +7,8 @@ var opengrowth = {};
 // Libs
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 const http = require('xhr');
+const kvdb = require("kvstore");
+const auth = require('codec/auth');
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Open Growth Signals Handler
@@ -15,6 +17,11 @@ export default request => {
     const message = request.message;
     const signal  = message.signal;
     const email   = message.email;
+
+    // Save a Stat!
+    opengrowth.track(`signals.${signal}`).then( (result) => {
+        console.log( 'Libratted:', result );
+    } );
 
     // TODO de-duplicate (prevent duplicate signals from activiating)
     // TODO track signal analytics with total/yr/mm/day/hour
@@ -63,29 +70,89 @@ opengrowth.customer = (email) => {
 // Analytical Tracking of Delights
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.track = (key) => {
-    // 
-    // TODO
     // increment KV for `opengrowth.${key}`.
-    // increment KV for `opengrowth.${key}.yyyy`.
     // increment KV for `opengrowth.${key}.yyyy_mm`.
     // increment KV for `opengrowth.${key}.yyyy_mm_dd`.
     // increment KV for `opengrowth.${key}.yyyy_mm_dd_hh`.
+    // increment KV for `opengrowth.${key}.yyyy_mm_dd_hh_mm`.
 
-    // increment Librato for `opengrowth.${key}`.
-    xhr.fetch('https://metrics-api.librato.com/v1/metrics').then((serverResponse) => {
-        // handle server response
-    }).catch((err) => {
-        // handle request failure
+    // Counter Key
+    const time = new Date();
+    const y    = time.getFullYear();
+    const m    = time.getMonth();
+    const d    = time.getDate();
+    const h    = time.getHours();
+    const min  = time.getMinutes();
+
+    // Increment KV Counters
+    var counter = `opengrowth.${key}.${y}_${m}_${d}_${h}_${min}`;
+    return kvdb.incrCounter( counter, 1 ).then( () => {
+        return kvdb.getCounter(counter);
+    } ).then( (value) => {
+        console.log('did the thing:', counter, value);
+
+        // Record Resolutions
+        kvdb.incrCounter( `opengrowth.${key}.${y}_${m}`,           1 );
+        kvdb.incrCounter( `opengrowth.${key}.${y}_${m}_${d}`,      1 );
+        kvdb.incrCounter( `opengrowth.${key}.${y}_${m}_${d}_${h}`, 1 );
+
+        // Librato
+        return opengrowth.track.librato( `opengrowth.${key}`, value );
+    } );
+};
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Librato
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+opengrowth.track.librato = ( key, value ) => {
+    // Skip if missing your Librato API Keys
+    if (!opengrowth.keys.librato.email || !opengrowth.keys.librato.secret)
+        return (new Promise()).resolve('Librato disabled. No API Key.');
+
+    // Librato for `opengrowth.${key}`.
+    const data = [
+        `source=pubnub-blocks`
+    ,   `period=60`
+    ,   `gauges[0][name]=${key}`
+    ,   `gauges[0][value]=${value}`
+    ].join('&');
+
+    // B64 Encode Auth Header
+    const libauth = auth.basic(
+        opengrowth.keys.librato.email
+    ,   opengrowth.keys.librato.secret
+    );
+
+    // Create Auth Header
+    const headers = {
+        'Authorization' : libauth
+    ,   'Content-Type'  : 'application/x-www-form-urlencoded'
+    };
+
+    // Send Recording to Librato
+    return http.fetch( 'https://metrics-api.librato.com/v1/metrics', {
+        method  : 'POST'
+    ,   body    : data
+    ,   headers : headers
+    } ).catch((err) => {
+        console.log( 'Librato Error:', err );
     });
 };
+
 opengrowth.track.signal = ( signal, data ) => {
     // TODO
-    // TODO log signal
+    // TODO log signal to MySQL
     // TODO 
 };
 opengrowth.track.delight = ( delight, signal, data ) => {
+    // TODO
+    // TODO log delight to MySQL
+    // TODO 
 };
 opengrowth.track.reaction = (key) => {
+    // TODO
+    // TODO log reaction to MySQL
+    // TODO 
 };
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
