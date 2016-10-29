@@ -18,9 +18,9 @@ export default request => {
     const signal  = message.signal;
     const email   = message.email;
 
-    // Save a Stat!
-    opengrowth.track(`signals.${signal}`).then( (result) => {
-        //console.log( 'Libratted:', result );
+    // Record the signal!
+    opengrowth.track.signal( signal, message ).then( (result) => {
+        //console.log( 'MySQLed and Libratted:', result );
     } );
 
     // TODO de-duplicate (prevent duplicate signals from activiating)
@@ -70,12 +70,6 @@ opengrowth.customer = (email) => {
 // Analytical Tracking of Delights
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.track = (key) => {
-    // increment KV for `opengrowth.${key}`.
-    // increment KV for `opengrowth.${key}.yyyy_mm`.
-    // increment KV for `opengrowth.${key}.yyyy_mm_dd`.
-    // increment KV for `opengrowth.${key}.yyyy_mm_dd_hh`.
-    // increment KV for `opengrowth.${key}.yyyy_mm_dd_hh_mm`.
-
     // Counter Key
     const time = new Date();
     const y    = time.getFullYear();
@@ -89,8 +83,6 @@ opengrowth.track = (key) => {
     return kvdb.incrCounter( counter, 1 ).then( () => {
         return kvdb.getCounter(counter);
     } ).then( (value) => {
-        //console.log('did the thing:', counter, value);
-
         // Record Resolutions
         kvdb.incrCounter( `opengrowth.${key}.${y}_${m}`,           1 );
         kvdb.incrCounter( `opengrowth.${key}.${y}_${m}_${d}`,      1 );
@@ -139,17 +131,34 @@ opengrowth.track.librato = ( key, value ) => {
     });
 };
 
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Track Signals Received
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.track.signal = ( signal, data ) => {
+    return opengrowth.track(`signals.${signal}`);
+    //.then( (result) => {
+        //console.log( 'Libratted:', result );
+    //} );
     // TODO
     // TODO log signal to MySQL
     // TODO 
 };
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Track Delights Sent
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.track.delight = ( delight, signal, data ) => {
+    return opengrowth.track(`delights.${delight}`);
     // TODO
     // TODO log delight to MySQL
     // TODO 
 };
-opengrowth.track.reaction = (key) => {
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Track Reactions
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+opengrowth.track.reaction = (what_goes_here) => {
+    return opengrowth.track(`reactions`);
     // TODO
     // TODO log reaction to MySQL
     // TODO 
@@ -164,8 +173,13 @@ opengrowth.delight = {};
 // Send Emails with Pardot
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.delight.pardot = {};
-opengrowth.delight.pardot.email = ( signal, message, email, subject ) => {
-    opengrowth.track( signal, message, email );
+opengrowth.delight.pardot.email = ( signal, email, subject, message ) => {
+    // Record Delight Activity
+    opengrowth.track.delight( 'pardot.email', signal, {
+        email   : email
+    ,   subject : subject
+    ,   message : message
+    } );
     // ⚠️  opengrowth.keys.sendgrid.apikey
     // TODO send email with pardot/sendgrid
 };
@@ -174,8 +188,13 @@ opengrowth.delight.pardot.email = ( signal, message, email, subject ) => {
 // Send Emails with SendGrid
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.delight.sendgrid = {};
-opengrowth.delight.sendgrid.email = ( signal, message, email, subject ) => {
-    opengrowth.track( signal, message, email );
+opengrowth.delight.sendgrid.email = ( signal, email, subject, message ) => {
+    // Record Delight Activity
+    opengrowth.track.delight( 'sendgrid.email', signal, {
+        email   : email
+    ,   subject : subject
+    ,   message : message
+    } );
     // ⚠️  opengrowth.keys.sendgrid.apikey
     // TODO send email with pardot/sendgrid
 };
@@ -184,8 +203,13 @@ opengrowth.delight.sendgrid.email = ( signal, message, email, subject ) => {
 // Send SMS with RingCentral
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.delight.ringcentral = {};
-opengrowth.delight.ringcentral.sms = ( signal, message, phone ) => {
-    opengrowth.track( signal, message, phone );
+opengrowth.delight.ringcentral.sms = ( signal, email, phone, message ) => {
+    // Record Delight Activity
+    opengrowth.track.delight( 'ringcentral.sms', signal, {
+        email   : email
+    ,   phone   : phone
+    ,   message : message
+    } );
     // ⚠️  opengrowth.keys.ringcentral.apikey
     // TODO send SMS on RingCentral
 };
@@ -194,8 +218,13 @@ opengrowth.delight.ringcentral.sms = ( signal, message, phone ) => {
 // Send SMS with Twilio
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.delight.twilio = {};
-opengrowth.delight.twilio.sms = ( signal, message, phone ) => {
-    opengrowth.track( signal, message, phone );
+opengrowth.delight.twilio.sms = ( signal, email, phone, message ) => {
+    // Record Delight Activity
+    opengrowth.track.delight( 'twilio.sms', signal, {
+        email   : email
+    ,   phone   : phone
+    ,   message : message
+    } );
     // ⚠️  opengrowth.keys.twilio.apikey
     // TODO send SMS on Twilio
 };
@@ -204,8 +233,13 @@ opengrowth.delight.twilio.sms = ( signal, message, phone ) => {
 // Tweet at Customer
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.delight.twitter = {};
-opengrowth.delight.twitter.tweet = ( signal, message ) => {
-    opengrowth.track( signal, message );
+opengrowth.delight.twitter.tweet = ( signal, email, handle, message ) => {
+    // Record Delight Activity
+    opengrowth.track.delight( 'twitter.tweet', signal, {
+        email   : email
+    ,   handle  : handle
+    ,   message : message
+    } );
     // ⚠️  opengrowth.keys.twitter.keys
     // TODO Tweet on Twitter
 };
@@ -214,8 +248,13 @@ opengrowth.delight.twitter.tweet = ( signal, message ) => {
 // Send Snap to User
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.delight.snapchat = {};
-opengrowth.delight.snapchat.snap = ( signal, message, userid ) => {
-    opengrowth.track( signal, message, userid );
+opengrowth.delight.snapchat.snap = ( signal, email, userid, message ) => {
+    // Record Delight Activity
+    opengrowth.track.delight( 'snapchat.snap', signal, {
+        email   : email
+    ,   userid  : userid
+    ,   message : message
+    } );
     // ⚠️  opengrowth.keys.snapchat.a-thing...
     // TODO Send a Snap 
 };
@@ -224,8 +263,13 @@ opengrowth.delight.snapchat.snap = ( signal, message, userid ) => {
 // Post to Customer on LinkedIn
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.delight.linkedin = {};
-opengrowth.delight.linkedin.post = ( signal, message ) => {
-    opengrowth.track( signal, message );
+opengrowth.delight.linkedin.post = ( signal, email, handle, message ) => {
+    // Record Delight Activity
+    opengrowth.track.delight( 'linkedin.post', signal, {
+        email   : email
+    ,   handle  : handle
+    ,   message : message
+    } );
     // ⚠️  opengrowth.keys.linkedin.keys
     // TODO Post on LinkedIn
 };
@@ -234,8 +278,13 @@ opengrowth.delight.linkedin.post = ( signal, message ) => {
 // Post on Customer's Wall on Facebook
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.delight.facebook = {};
-opengrowth.delight.facebook.post = ( signal, message ) => {
-    opengrowth.track( signal, message );
+opengrowth.delight.facebook.post = ( signal, email, handle, message ) => {
+    // Record Delight Activity
+    opengrowth.track.delight( 'facebook.post', signal, {
+        email   : email
+    ,   handle  : handle
+    ,   message : message
+    } );
     // ⚠️  opengrowth.keys.facebook.keys
     // TODO FB Post
 };
