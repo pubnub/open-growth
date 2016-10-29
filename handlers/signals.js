@@ -20,7 +20,7 @@ export default request => {
 
     // Save a Stat!
     opengrowth.track(`signals.${signal}`).then( (result) => {
-        console.log( 'Libratted:', result );
+        //console.log( 'Libratted:', result );
     } );
 
     // TODO de-duplicate (prevent duplicate signals from activiating)
@@ -89,7 +89,7 @@ opengrowth.track = (key) => {
     return kvdb.incrCounter( counter, 1 ).then( () => {
         return kvdb.getCounter(counter);
     } ).then( (value) => {
-        console.log('did the thing:', counter, value);
+        //console.log('did the thing:', counter, value);
 
         // Record Resolutions
         kvdb.incrCounter( `opengrowth.${key}.${y}_${m}`,           1 );
@@ -135,7 +135,7 @@ opengrowth.track.librato = ( key, value ) => {
     ,   body    : data
     ,   headers : headers
     } ).catch((err) => {
-        console.log( 'Librato Error:', err );
+        //console.log( 'Librato Error:', err );
     });
 };
 
