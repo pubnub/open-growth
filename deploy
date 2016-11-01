@@ -100,7 +100,7 @@ function upload() {
         ,   event     : 'js-before-publish'
         ,   type      : 'js'
         ,   log_level : 'debug'
-        ,   name      : 'Open Growt Signalh Handler'
+        ,   name      : 'Open Growth Signal Handler'
         ,   output    : 'opengrowth.debug'
         }
     }).catch( error => {
