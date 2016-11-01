@@ -1,0 +1,10 @@
+{
+    "twilio"      : { "appkey"    : "", "appsecret" : "" }
+,   "twitter"     : { "appkey"    : "", "appsecret" : "" }
+,   "pubnub"      : { "email"     : "", "password" : "", "subscribe" : "", "publish" : "", "secret" : "" }
+,   "librato"     : { "email"     : "", "secret" : "" }
+,   "scaleapi"    : { "appkey"    : "" }
+,   "clearbit"    : { "appkey"    : "" }
+,   "monkeylearn" : { "appkey"    : "" }
+,   "sendgrid"    : { "appkey"    : "" }
+}
