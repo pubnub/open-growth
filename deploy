@@ -72,7 +72,7 @@ function build() {
     var buffer = ''
     var keys   = 'opengrowth.keys = ' + JSON.stringify(appkeys) + ';'
     return new Promise( ( resolve, reject ) => {
-        gulp.src(['./handlers/signals.js','./signals/*.js'])
+        gulp.src(['./handlers/signals.js','./delights/*.js','./signals/*.js'])
         .on( 'end',   data  => { resolve(buffer + keys) } )
         .on( 'error', error => { reject(error)          } )
         .on( 'data',  bytes => {
