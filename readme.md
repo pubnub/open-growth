@@ -40,6 +40,13 @@ Check out the presentation in google slides.
 
 ![Open Growth Presentation](http://i.imgur.com/XV0Tcxn.gif)
 
+## 💡  Syndication
+
+ - **Growth** Hackers
+ - ProductHunt
+ - HackerNews
+ - High Scalability
+
 ## 🚧  Roadmap
 
 There are several aspects for Open Growth.
