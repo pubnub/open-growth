@@ -25,6 +25,7 @@ You provide valuable messages over SMS/Voice/Email/Social.
  - **Delight**Engine ❤️  Delight your customers in realtime
     - Setup Wizard and Control Panel
     - JavaScript Development Guide and Documentation Website
+    - Signal Handlers and Signal Generators
  - **Sales**Connect ❤️  Customers connect with your sales team in realtime
     - Sales Dashboards and Customer Connect Pages
  - **Lead**Engine ❤️  Find prospects in realtime
