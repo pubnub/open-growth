@@ -20,6 +20,16 @@ When the customer is ready,
 they will initiate the conversation with your team of experts.
 You provide valuable messages over SMS/Voice/Email/Social.
 
+## ☀️  Products in Development
+
+ - **Delight**Engine ❤️  Delight your customers in realtime
+    - Setup Wizard and Control Panel
+    - JavaScript Development Guide and Documentation Website
+ - **Sales**Connect ❤️  Customers connect with your sales team in realtime
+    - Sales Dashboards and Customer Connect Pages
+ - **Lead**Engine ❤️  Find prospects in realtime
+    - Finds prospects and sends them to **Delight**Engine
+
 ## ♻️  Presentation and Docs Resources
 
  - [Google Slide Presentation](https://docs.google.com/presentation/d/1AwuSLz5Cm2psVG1_0sdiMhrHSjmQe-bzVnXZJGMfxdY/edit?usp=sharing)
@@ -50,18 +60,10 @@ There are several aspects for Open Growth.
 
  - October 24th - UseCase ML Classifier Training & Clearbit Complete
  - October 31st - CLI, **Delight**Engine and Analytics Get/Set Complete
- - November 7th - **Sales**Dashboard - Phase 1 Complete
+ - November 7th - Dashboard for **Sales**Connect - Phase 1 Complete
  - November 14th - Signals Generated and Handlers
  - November 21st - **Sales**Connect - Phase 1 Complete
  - November 28th - **Test Live 🎉** after Thanksgiving
-
-## ☀️  Capabilities
-
- - CLI programmable growth engine
-    - Export to SQL for Data Mining (sqldump)
-    - List Signals and associated cURL commands.
-    - Analytics
- - GUI (coming soon)
 
 ## API `keys.js` JSON File
 
@@ -77,7 +79,6 @@ There are several aspects for Open Growth.
 ,   "sendgrid"    : { "appkey"    : "" }
 }
 ```
-
 
 ## Signals Trigger Delights
 
@@ -113,7 +114,6 @@ Data Channels are logs of signals, events and prospects.
  - `opengrowth.delights`  - multi-channel message sent to prospect.
  - `opengrowth.reactions` - prospect requests to meet with sales.
  - `opengrowth.propsects` - list of augmented propspect profiles.
-
 
 ## Analytics Keys
 

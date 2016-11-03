@@ -8,7 +8,7 @@ opengrowth.signals.test = ( request, customer, name ) => {
     //    request
     //,   customer.email
     //);
-    // return request.ok({test:true});
+    //return request.ok({ test:true, twitter:true });
 
     // SendGrid Test
     opengrowth.delight.sendgrid.email(
@@ -16,5 +16,5 @@ opengrowth.signals.test = ( request, customer, name ) => {
     ,   customer.email
     ,   request.message.subject
     );
-    return request.ok({test:true});
+    return request.ok({ test:true, sendgrid:true });
 };
