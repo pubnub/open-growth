@@ -1,7 +1,6 @@
-<title>Open Growth</title>
-<h1>Open Growth</h1>
+# Open Growth
 
-Visit <a href="https://github.com/pubnub/open-growth">Open Growth</a> on Github.
+Visit [Open Growth](https://github.com/pubnub/open-growth) on Github.
 
 <div style="text-align:center">
     <img src="http://i.imgur.com/XV0Tcxn.gif" style="width:80%">
