@@ -1,6 +1,6 @@
-opengrowth.signals.reaction = ( signal, customer, name ) => {
+opengrowth.signals.reaction = ( request, customer ) => {
     // customer param is automatically
     // augmented with clearbit and monkeylearn
     //console.log(customer);
-    return signal.ok();
+    return request.ok();
 };

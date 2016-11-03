@@ -35,23 +35,36 @@ export default request => {
     //      so we have a progressively built profile.
 
     // TODO Get Clearbit/MonkeyLearn
-    // TODO from KV or build from scratch.
+    // TODO from KV or build from scratch and save in KV.
     return opengrowth.customer(email).then( customer => {
+
+        // Run any.js for '*'
         opengrowth.signals['*']( customer, signal );
+
+        // TODO Untracked Signals!!!
+        //      push to librato
+        if (!opengrowth.signals[signal]) return request.ok();
+
+        // Run the signal in /signals/ directory
         return opengrowth.signals[signal]( request, customer );
+
     } );
 }
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Ways to Connect with your Customers
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+opengrowth.delight = {};
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Modules that Augment and Enhance with ML and AI
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+opengrowth.modules = {};
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Signals
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.signals = {};
-// Alert! This failes on BLOCKS - BUG being patched.
-// Directly access the signals dictionary for now.
-/*
-opengrowth.on      = ( signal, callback ) => {
-    opengrowth.signals[signal] = callback;
-};*/
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Customer Fetch
@@ -89,47 +102,10 @@ opengrowth.track = (key) => {
         kvdb.incrCounter( `opengrowth.${key}.${y}_${m}_${d}_${h}`, 1 );
 
         // Librato
-        return opengrowth.track.librato( `opengrowth.${key}`, value );
+        return opengrowth.modules.librato( `opengrowth.${key}`, value );
     } );
 };
 
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Librato
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-opengrowth.track.librato = ( key, value ) => {
-    // Skip if missing your Librato API Keys
-    if (!opengrowth.keys.librato.email || !opengrowth.keys.librato.secret)
-        return (new Promise()).resolve('Librato disabled. No API Key.');
-
-    // Librato for `opengrowth.${key}`.
-    const data = [
-        `source=pubnub-blocks`
-    ,   `period=60`
-    ,   `gauges[0][name]=${key}`
-    ,   `gauges[0][value]=${value}`
-    ].join('&');
-
-    // B64 Encode Auth Header
-    const libauth = auth.basic(
-        opengrowth.keys.librato.email
-    ,   opengrowth.keys.librato.secret
-    );
-
-    // Create Auth Header
-    const headers = {
-        'Authorization' : libauth
-    ,   'Content-Type'  : 'application/x-www-form-urlencoded'
-    };
-
-    // Send Recording to Librato
-    return http.fetch( 'https://metrics-api.librato.com/v1/metrics', {
-        method  : 'POST'
-    ,   body    : data
-    ,   headers : headers
-    } ).catch((err) => {
-        //console.log( 'Librato Error:', err );
-    });
-};
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Track Signals Received
@@ -163,21 +139,5 @@ opengrowth.track.reaction = (what_goes_here) => {
     // TODO log reaction to MySQL
     // TODO 
 };
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Ways to Connect with your Customers
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-opengrowth.delight = {};
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Modules that Augment and Enhance with ML and AI
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-opengrowth.modules = {};
-
-
-
-
-
-
 
 
