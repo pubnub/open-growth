@@ -43,9 +43,14 @@ Check out the presentation in google slides.
 ## 💡  Syndication
 
  - **Growth** Hackers
+    - Growth Hackers Theme Pack uses ideas from GH to for a serios of signal handlers.
+    - https://projects.growthhackers.com/app/s/Gj9d43BdwAeX-DHg
  - ProductHunt
+    - ProductHunt Signal Generator
  - HackerNews
+    - HN Signal Generator
  - High Scalability
+    - Globally POP Powered ❤️  **Delight**Engine
 
 ## 🚧  Roadmap
 
