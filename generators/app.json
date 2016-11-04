@@ -1,0 +1,8 @@
+{
+  "name": "Open Growth Heroku",
+  "description": "A barebones Node.js app for Heroku",
+  "repository": "https://github.com/pubnub/open-growth",
+  "logo": "http://node-js-sample.herokuapp.com/node.svg",
+  "keywords": ["node", "express", "static"],
+  "image": "heroku/nodejs"
+}
