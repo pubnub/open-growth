@@ -1,0 +1,5 @@
+hackernews: node hackernews.js
+producthunt: node producthunt.js
+slashdot: node slashdot.js
+salesforce: node salesforce.js
+linkedin: node linkedin.js
