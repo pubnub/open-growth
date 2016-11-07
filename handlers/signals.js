@@ -6,9 +6,13 @@ var opengrowth = {};
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Libs
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-const http = require('xhr');
-const kvdb = require("kvstore");
-const auth = require('codec/auth');
+const xhr    = require('xhr');
+const kvdb   = require('kvstore');
+const auth   = require('codec/auth');
+const base64 = require('codec/base64');
+const crypto = require('crypto');
+const pubnub = require('pubnub');
+const query  = require('codec/query_string');
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Open Growth Signals Handler

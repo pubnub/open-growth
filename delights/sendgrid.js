@@ -22,11 +22,6 @@ opengrowth.delight.sendgrid.email = ( request, email, subject ) => {
     // sendgrid sender email address
     var senderAddress = opengrowth.keys.sendgrid.sender;
 
-    // xhr module for remote http requests
-    var xhr = require('xhr');
-
-    var query = require('codec/query_string');
-
     try {
 
         // create a HTTP GET request to the sendgrid API

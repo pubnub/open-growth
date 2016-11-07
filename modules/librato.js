@@ -27,7 +27,7 @@ opengrowth.modules.librato = ( key, value ) => {
     };
 
     // Send Recording to Librato
-    return http.fetch( 'https://metrics-api.librato.com/v1/metrics', {
+    return xhr.fetch( 'https://metrics-api.librato.com/v1/metrics', {
         method  : 'POST'
     ,   body    : data
     ,   headers : headers

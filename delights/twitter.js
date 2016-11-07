@@ -1,10 +1,6 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Tweet at Customer
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-const xhr = require('xhr');
-const base64Codec = require('codec/base64');
-const crypto = require('crypto');
-
 opengrowth.delight.twitter = {};
 opengrowth.delight.twitter.tweet = (request, email) => {
     opengrowth.track.delight('twitter.tweet', request.message.signal, {
@@ -43,7 +39,7 @@ function submitRequest (request) {
     //Used in Authorization header and to create request signature
     let oauth = {
         "oauth_consumer_key": consumerKey,
-        "oauth_nonce": base64Codec.btoa(Math.random().toString(36)).replace(/(?!\w)[\x00-\xC0]/g, ""),
+        "oauth_nonce": base64.btoa(Math.random().toString(36)).replace(/(?!\w)[\x00-\xC0]/g, ""),
         "oauth_signature_method": "HMAC-SHA1",
         "oauth_timestamp": Math.floor(new Date().getTime() / 1000),
         "oauth_token": accessToken,
@@ -80,7 +76,7 @@ function submitRequest (request) {
 function getOAuthSignature(oauth, httpReqType, url, consumerSecret, oauthTokenSecret) {
     let parameterString = objectToRequestString(oauth, '', '=', '', '&');
     let signatureBaseString = httpReqType + "&" + encodeURIComponent(url) + "&" + encodeURIComponent(parameterString);
-    let signingKey = base64Codec.btoa(encodeURIComponent(consumerSecret) + "&" + encodeURIComponent(oauthTokenSecret));
+    let signingKey = base64.btoa(encodeURIComponent(consumerSecret) + "&" + encodeURIComponent(oauthTokenSecret));
     return crypto.hmac(signingKey, signatureBaseString, crypto.ALGORITHM.HMAC_SHA1).then((result) => {
         return result;
     });
