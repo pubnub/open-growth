@@ -38,6 +38,6 @@ opengrowth.signals.test = ( request, customer, name ) => {
     // {
     //     "signal" : "test",
     //     "text":"Text via Open Growth! www.pubnub.com",
-    //     "recipientPhone":"12017093200"
+    //     "recipientPhone":"a phone number"
     // }
 };
