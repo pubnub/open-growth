@@ -5,12 +5,12 @@
 opengrowth.delight.facebook = {};
 
 //post a status update to the company page
-opengrowth.delight.facebook.post = ( request, email ) => {
-	// Record Delight Activity
-    opengrowth.track.delight( 'facebook.post', request, {
-        email     : email
-    ,   content   : request.content
-    } );
+opengrowth.delight.facebook.post = (request, email) => {
+    // Record Delight Activity
+    opengrowth.track.delight('facebook.post', request, {
+        email: email,
+        content: request.content
+    });
 
     let accessToken = opengrowth.keys.facebook.accessToken;
     let pageId = opengrowth.keys.facebook.pageId;
@@ -23,33 +23,29 @@ opengrowth.delight.facebook.post = ( request, email ) => {
 
     let http_options = {
         "method": "POST",
-        "headers": {
-        	"Host": "graph.facebook.com",
-        	"Cache-Control": "no-cache",
-			"Content-Type": "application/x-www-form-urlencoded"
-        },
         "body": `message=${status}&access_token=${accessToken}`
     };
-	return xhr.fetch(url, http_options).then((response) => {
-        console.log(response);
+    return xhr.fetch(url, http_options).then((response) => {
         return request.ok();
+    }).catch((error) => {
+        return request.abort();
     });
 };
 
 //reply to public posts that contain the company's name
-opengrowth.delight.facebook.replyPublic = ( request, email ) => {
-	// Record Delight Activity
-    opengrowth.track.delight( 'facebook.replyPublic', request, {
-        email     : email
-    ,   content   : request.content
-    } );
+opengrowth.delight.facebook.replyPublic = (request, email) => {
+    // Record Delight Activity
+    opengrowth.track.delight('facebook.replyPublic', request, {
+        email: email,
+        content: request.content
+    });
 };
 
 //reply to incoming private messages sent to the company page
-opengrowth.delight.facebook.replyPrivate = ( request, email ) => {
-	// Record Delight Activity
-    opengrowth.track.delight( 'facebook.replyPrivate', request, {
-        email     : email
-    ,   content   : request.content
-    } );
+opengrowth.delight.facebook.replyPrivate = (request, email) => {
+    // Record Delight Activity
+    opengrowth.track.delight('facebook.replyPrivate', request, {
+        email: email,
+        content: request.content
+    });
 };
