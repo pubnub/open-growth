@@ -11,8 +11,8 @@ opengrowth.signals.test = ( request, customer, name ) => {
     // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // blocks test payload
     // {
-    //     "signal" : "test",
-    //     "tweet" : "Tweet via Open Growth #pubnub"
+    //     "signal": "test",
+    //     "tweet": "Tweet via Open Growth #pubnub"
     // }
 
     //sendgrid test
@@ -31,13 +31,24 @@ opengrowth.signals.test = ( request, customer, name ) => {
 
     //ringcentral test
     // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    opengrowth.delight.ringcentral.sms(request, customer.email, customer.given_name, customer.location);
+    // opengrowth.delight.ringcentral.sms(request, customer.email, customer.given_name, customer.location);
+    // return request.ok({test:true});
+    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    // blocks test payload
+    // {
+    //     "signal": "test",
+    //     "text": "Text via Open Growth! www.pubnub.com",
+    //     "recipientPhone": "a_phone_number"
+    // }
+
+    //facebook test
+    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    opengrowth.delight.facebook.post(request, customer.email);
     return request.ok({test:true});
     // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // blocks test payload
     // {
-    //     "signal" : "test",
-    //     "text":"Text via Open Growth! www.pubnub.com",
-    //     "recipientPhone":"a phone number"
+    //     "signal": "test",
+    //     "content": "Page status update via Open Growth #pubnub"
     // }
 };
