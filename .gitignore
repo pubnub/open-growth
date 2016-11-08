@@ -1,4 +1,5 @@
 .DS_Store
 keys.js
 keys.json
+.env
 node_modules
