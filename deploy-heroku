@@ -1,0 +1,6 @@
+#!/bin/bash
+git subtree push --prefix generators heroku master
+
+# heroku ps:scale salesforce=1
+# heroku ps:scale hackernews=1
+# heroku ps:scale stackoverflow=1
