@@ -75,12 +75,26 @@ opengrowth.customer = (email) => {
     // TODO check kv store
     // TODO check kv store
     // TODO check kv store
+    const usecase_classifier = 'cl_Lyv9HzfF';
     return new Promise( ( resolve, reject ) => {
         opengrowth.modules.clearbit.lookup(email).then( customer => {
+
+            const description = (customer.company||{}).description;
             // TODO SAVE KV STORE
             // TODO SAVE KV STORE
-            // TODO SAVE KV STORE
-            resolve(customer);
+            if (!description) return resolve(customer);
+
+            opengrowth.modules.monkeylearn.classify(
+                description,
+                usecase_classifier
+            ).then( usecase => {
+                // TODO SAVE KV STORE
+                // TODO SAVE KV STORE
+                // TODO SAVE KV STORE
+                customer.email   = email;
+                customer.usecase = usecase;
+                resolve(customer);
+            } );
         } );
     } );
 };
