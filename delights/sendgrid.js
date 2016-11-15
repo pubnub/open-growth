@@ -2,7 +2,9 @@
 // Send Emails with SendGrid
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.delight.sendgrid = {};
-opengrowth.delight.sendgrid.email = ( signal, message, email, subject ) => {
+opengrowth.delight.sendgrid.email = (
+    signal, message, email, name, subject
+) => {
 
     // Record Delight Activity
     opengrowth.track.delight( 'sendgrid.email', signal, {
@@ -32,7 +34,7 @@ opengrowth.delight.sendgrid.email = ( signal, message, email, subject ) => {
     ,   subject  : subject
     ,   text     : message
     })).catch( (info) => {
-        // console.log( 'Sendgrid Failed', info );
+       console.log( 'Sendgrid Failed', info );
     });
 
 };

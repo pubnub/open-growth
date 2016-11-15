@@ -2,12 +2,7 @@ opengrowth.signals.signup = ( request, customer ) => {
     // Name
     var name = '';
     try       { name = customer.person.name.fullName }
-    catch (e) { name = 'there' }
-
-    // Photo
-    var photo = '';
-    try       { photo = customer.person.avatar }
-    catch (e) { photo = '' }
+    catch (e) { name = '' }
 
     // City
     var city = '';
@@ -24,24 +19,31 @@ opengrowth.signals.signup = ( request, customer ) => {
     try       { title = customer.person.employment.title }
     catch (e) { title = '' }
 
-    const message = `
-        Hi ${name}!
-        I am Pubbot, an Artificial Intelligence alive in PubNub BLOCKS.
-        ${city    && 'I see you are in ' + city + '.'}
-        ${company && 'You work at '  + company + '.'}
-        ${title   && 'You are ' + title + '.'}
-        You should visit us some time!
-        I will send you helpful tips.
-        <br><img src='${photo}'>
-    `;
+    const message =
+        `Email generated for ${JSON.stringify(request.message)} \r\n\r\n` +
+        `Hi ${name || 'there'}! ` +
+        `I am Pubbot, an Artificial Intelligence alive in PubNub BLOCKS. ` +
+        `${city    ? 'I see you are in ' + city    + '.' : ''} ` +
+        `${company ? 'You work at '      + company + '.' : ''} ` +
+        `${title   ? 'You are the '      + title   + '.' : ''} ` +
+        `${city == 'San Francsico' ? 'You should visit us some time! ':''}` +
+        `I will send you helpful tips at times. `;
 
-    const email   = 'open.growth.activity@pubnub.com';
-    const subject = 'PubNub';
-    opengrowth.delight.sendgrid.email = ( 'signup', message, email, subject );
+    // Send Email
+    //const email   = request.message.email;
+    //const email   = 'blum.stephen@gmail.com';
+    const email   = 'open-growth-activity@pubnub.com';
+    const subject = `Hi ${name || 'there'}!`;
+    opengrowth.delight.sendgrid.email(
+        'signup', message, email, name, subject
+    );
+
+    // Signal Complete
     return request.ok({
         signup   : true
+    ,   email    : request.message.email
+    ,   message  : message
     //,   customer : customer
     //,   reqmsg   : request.message
-    ,   message  : message
     });
 };
