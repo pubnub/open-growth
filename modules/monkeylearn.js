@@ -23,7 +23,6 @@ opengrowth.modules.monkeylearn.classify = ( input, classifier ) => {
         xhr.fetch( url, {
             method  : 'POST'
         ,   body    : data
-        ,   timeout : 5000
         ,   headers : { 'Authorization' : libauth }
         } ).then( response => {
             resolve(JSON.parse(response.body).result[0][0]);
