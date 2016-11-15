@@ -23,9 +23,7 @@ export default request => {
     const email   = message.email;
 
     // Record the signal!
-    opengrowth.track.signal( signal, message ).then( (result) => {
-        //console.log( 'MySQLed and Libratted:', result );
-    } );
+    opengrowth.track.signal( signal, message );//.then( (result) => {} );
 
     // TODO de-duplicate (prevent duplicate signals from activiating)
     // TODO track signal analytics with total/yr/mm/day/hour
@@ -74,12 +72,16 @@ opengrowth.signals = {};
 // Customer Fetch
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.customer = (email) => {
-    // TODO
-    // check kv store
-    // if not cached, build with Clearbit and MonkeyLearn
-    // return promise
+    // TODO check kv store
+    // TODO check kv store
+    // TODO check kv store
     return new Promise( ( resolve, reject ) => {
-        resolve({ clearbit: email });
+        opengrowth.modules.clearbit.lookup(email).then( customer => {
+            // TODO SAVE KV STORE
+            // TODO SAVE KV STORE
+            // TODO SAVE KV STORE
+            resolve(customer);
+        } );
     } );
 };
 

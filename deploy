@@ -54,7 +54,7 @@ pubnub_login( appkeys.pubnub.email, appkeys.pubnub.password ).then( login => {
     const pub = appkeys.pubnub.publish;
     const sub = appkeys.pubnub.subscribe;
     const chn = 'opengrowth.signals';
-    const msg = `\\{"signal":"test","email":"stephen@pubnub.com"\\}`;
+    const msg = `\\{"signal":"signup","email":"stephen@pubnub.com"\\}`;
 
     // Done Printing Instructions
     console.log(`

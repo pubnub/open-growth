@@ -43,7 +43,7 @@ opengrowth.signals.test = ( request, customer, name ) => {
 
     //facebook test
     // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    opengrowth.delight.facebook.post(request, customer.email);
+    //opengrowth.delight.facebook.post(request, customer.email);
     return request.ok({test:true});
     // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // blocks test payload
