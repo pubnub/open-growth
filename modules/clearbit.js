@@ -19,6 +19,7 @@ opengrowth.modules.clearbit.lookup = (email) => {
     return new Promise( ( resolve, reject ) => {
         xhr.fetch( url, {
             method  : 'GET'
+        ,   timeout : 7000
         ,   headers : { 'Authorization' : libauth }
         } ).then( response => {
             resolve(JSON.parse(response.body));
