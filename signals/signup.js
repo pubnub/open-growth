@@ -25,15 +25,16 @@ opengrowth.signals.signup = ( request, customer ) => {
     catch (e) { usecase = '' }
 
     const message =
-    `Email generated for ${JSON.stringify(request.message)} \r\n\r\n` +
     `Hi ${name || 'there'}! ` +
     `I am PubNubBot, an Artificial Intelligence alive in PubNub BLOCKS. ` +
     `${usecase ? 'I can answer your realtime ' + usecase + ' questions.' : ''} ` +
+    `${(city || company || title) ? 'I know a little about you.' : ''} ` +
     `${city    ? 'I see you are in '  + city    + '.' : ''} ` +
     `${company ? 'You work at '       + company + '.' : ''} ` +
     `${title   ? 'You are the '       + title   + '.' : ''} ` +
-    `${city == 'San Francsico' ? 'You should visit us some time! ':''}` +
-    `I will send you helpful tips at times. `;
+    `${city == 'San Francsico' ? 'You should visit our SF office! ':''}` +
+    `\n\r\n\rI will send you helpful tips at times.\n\r\n\r` +
+    `Email generated with JSON: \r\n${JSON.stringify(customer)}`;
 
     // Send Email
     //const email   = request.message.email;
