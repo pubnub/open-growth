@@ -1,5 +1,9 @@
 ![Open Growth](http://i.imgur.com/Pug4ybX.gif)
 
+# Open Growth 
+
+### grow your business 10x by automating tedious workforce tasks using machines
+
 > Transform salesman into sales heroes.
 Replace sales outreach with a Machine Learning engine.
 No more sales spam.
