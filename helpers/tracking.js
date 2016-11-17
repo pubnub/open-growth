@@ -35,7 +35,7 @@ opengrowth.track.signal = ( signal, data ) => {
         //console.log( 'Libratted:', result );
     //} );
     // TODO
-    // TODO log signal to MySQL
+    // TODO log signal to MySQL / segmentIO
     // TODO 
 };
 

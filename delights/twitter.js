@@ -2,38 +2,28 @@
 // Tweet at Customer
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.delight.twitter = {};
-opengrowth.delight.twitter.tweet = (request, email) => {
+opengrowth.delight.twitter.tweet = ( request, tweet ) => {
     opengrowth.track.delight('twitter.tweet', request.message.signal, {
-        email   : email
+        email   : request.message.email
     ,   message : request.message.message
     });
-    return submitRequest(request);
+    return submitRequest( request, tweet );
 };
-opengrowth.delight.twitter.deleteTweet = (request, email) => {
-    opengrowth.track.delight('twitter.deleteTweet', request.message.signal, {
-        email   : email
-    ,   id      : request.message.id
-    });
-    return submitRequest(request);
-};
-
-function submitRequest (request) {
+function submitRequest ( request, tweet ) {
     const consumerKey = opengrowth.keys.twitter.consumerKey;
     const consumerSecret = opengrowth.keys.twitter.consumerSecret;
     const accessToken = opengrowth.keys.twitter.accessToken;
     const oauthTokenSecret = opengrowth.keys.twitter.oauthTokenSecret;
 
+    // Skip if no Twitter API Keys
+    if (!(consumerKey && consumerSecret && accessToken && oauthTokenSecret))
+        return (new Promise()).resolve('Twitter disabled. No API Keys.');
+
     const httpReqType = "POST";
     const contentType = "application/x-www-form-urlencoded";
-    let url;
-    if (request.message.tweet) url = "https://api.twitter.com/1.1/statuses/update.json";
-    if (request.message.delete) url = `https://api.twitter.com/1.1/statuses/destroy/${request.message.id}.json`;
+    const url         = "https://api.twitter.com/1.1/statuses/update.json";
 
-    if (!request.message.tweet && !request.message.delete) {
-        return request.abort({ "400": "400: Bad Request" });
-    }
-
-    let tweetContent = request.message.tweet || "";
+    let tweetContent = tweet || "";
     let content = tweetContent ? "status=" + encodeURIComponent(tweetContent) : "";
 
     //Used in Authorization header and to create request signature
@@ -45,8 +35,6 @@ function submitRequest (request) {
         "oauth_token": accessToken,
         "status": tweetContent
     };
-
-    if (request.message.delete) delete oauth.status; //there is no status when deleting a Tweet
     
     return getOAuthSignature(oauth, httpReqType, url, consumerSecret, oauthTokenSecret).then((result) => {
         oauth.oauth_signature = result;
@@ -62,13 +50,8 @@ function submitRequest (request) {
             "body": content
         };
         
-        return xhr.fetch(url, http_options).then((response) => response.json()).then((response) => {
-            //the successfully posted/deleted Tweet's id can be referenced here with response.id_str
-            return request.ok();
-        });
-    })
-    .catch((error) => {
-        return request.abort({ "500": "500: Internal server error" });
+        return xhr.fetch( url, http_options ).then((response) => response.json());
+    }).catch((error) => {
     });
 };
 
