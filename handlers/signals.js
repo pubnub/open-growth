@@ -71,13 +71,17 @@ opengrowth.signals = {};
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Customer Fetch
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-opengrowth.customer = (email) => {
+opengrowth.customer = ( email, signal ) => {
     // TODO check kv store
     // TODO check kv store
     // TODO check kv store
     const usecase_classifier = 'cl_Lyv9HzfF';
     return new Promise( ( resolve, reject ) => {
         opengrowth.modules.clearbit.lookup(email).then( customer => {
+
+            // keep track of details
+            customer.email  = email;
+            customer.signal = signal;
 
             const description = (customer.company||{}).description;
             // TODO SAVE KV STORE

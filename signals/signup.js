@@ -24,17 +24,24 @@ opengrowth.signals.signup = ( request, customer ) => {
     try       { usecase = customer.usecase.label }
     catch (e) { usecase = '' }
 
+    // Avatar
+    var avatar = '';
+    try       { avatar = customer.person.avatar }
+    catch (e) { avatar = '' }
+
     const message =
     `Hi ${name || 'there'}! ` +
     `I am PubNubBot, an Artificial Intelligence alive in PubNub BLOCKS. ` +
-    `${usecase ? 'I can answer your realtime ' + usecase + ' questions.' : ''} ` +
-    `${(city || company || title) ? 'I know a little about you.' : ''} ` +
-    `${city    ? 'I see you are in '  + city    + '.' : ''} ` +
-    `${company ? 'You work at '       + company + '.' : ''} ` +
-    `${title   ? 'You are the '       + title   + '.' : ''} ` +
-    `${city == 'San Francsico' ? 'You should visit our SF office! ':''}` +
-    `\n\r\n\rI will send you helpful tips at times.\n\r\n\r` +
-    `Email generated with JSON: \r\n${JSON.stringify(customer)}`;
+    `${usecase ? 'I can help you with realtime ' + usecase + ' and more.' : ''} ` +
+    `${(city || company && title) ? 'I know a little about you.' : ''} ` +
+    `${city    ? 'I see you are in ' + city + '.' : ''} ` +
+    `${title   ? 'You are the ' + title + (company?'at '+company:'') + '.' : ''} ` +
+    `${company ? 'What is new at ' + company + '?' : ''} ` +
+    `${(city||'').indexOf('San') > 0 ? 'You should visit our SF office! ':''}` +
+    `<p><p>I will send you helpful tips at times.` +
+    `<p><p>${avatar  ? '<img height=100 src="'+avatar+'">' : '' }` +
+    `<p><p>Email generated with JSON:` +
+    `<p><p> <pre>${JSON.stringify(customer)}</pre>`;
 
     // Send Email
     //const email   = request.message.email;
