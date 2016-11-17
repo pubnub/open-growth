@@ -40,19 +40,20 @@ opengrowth.signals.signup = ( request, customer ) => {
     `${city    ? 'I see you are in ' + city + '.' : ''} ` +
     `${title   ? 'You are the ' + title + (company?'at '+company:'') + '.' : ''} ` +
     `${company ? 'What is new at ' + company + '?' : ''} ` +
-    `${(city||'').indexOf('San') > 0 ? 'You should visit our SF office! ':''}` +
+    `${(city||'').indexOf('San') >= 0 ? 'You should visit our SF office! ':''}` +
     `<p><p>I will send you helpful tips at times.` +
     `<p><p>${avatar  ? '<img height=100 src="'+avatar+'">' : '' }` +
     `<p><p>Email generated with JSON:` +
     `<p><p> <pre>${JSON.stringify(customer)}</pre>`;
 
+    // Debug show Message
+    console.log(message);
 
     // Send Email
     //const email   = request.message.email;
     //const email   = 'blum.stephen@gmail.com';
     const email   = 'open-growth-activity@pubnub.com';
     const subject = `Hi ${name || 'there'}!`;
-    console.log({message:message,subject:subject,email:email});
     opengrowth.delight.sendgrid.email(
         'signup', message, email, name, subject
     );
