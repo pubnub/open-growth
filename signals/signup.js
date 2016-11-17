@@ -1,5 +1,6 @@
 opengrowth.signals.signup = ( request, customer ) => {
     // Name
+    //console.log('33333HYEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE');
     var name = '';
     try       { name = customer.person.name.fullName }
     catch (e) { name = '' }
@@ -32,6 +33,8 @@ opengrowth.signals.signup = ( request, customer ) => {
     const message =
     `Hi ${name || 'there'}! ` +
     `I am PubNubBot, an Artificial Intelligence alive in PubNub BLOCKS. ` +
+    `Welcome to the Programmable Network.` +
+    `<p><p>` +
     `${usecase ? 'I can help you with realtime ' + usecase + ' and more.' : ''} ` +
     `${(city || company && title) ? 'I know a little about you.' : ''} ` +
     `${city    ? 'I see you are in ' + city + '.' : ''} ` +
@@ -43,21 +46,14 @@ opengrowth.signals.signup = ( request, customer ) => {
     `<p><p>Email generated with JSON:` +
     `<p><p> <pre>${JSON.stringify(customer)}</pre>`;
 
+
     // Send Email
     //const email   = request.message.email;
     //const email   = 'blum.stephen@gmail.com';
     const email   = 'open-growth-activity@pubnub.com';
     const subject = `Hi ${name || 'there'}!`;
+    console.log({message:message,subject:subject,email:email});
     opengrowth.delight.sendgrid.email(
         'signup', message, email, name, subject
     );
-
-    // Signal Complete
-    return request.ok({
-        signup   : true
-    ,   email    : request.message.email
-    ,   message  : message
-    //,   customer : customer
-    //,   reqmsg   : request.message
-    });
 };

@@ -5,7 +5,7 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 const http    = require('request-promise');
 const gulp    = require('gulp');
-const appkeys = require('./keys.json');
+const apikeys = require('./keys.json');
 
 
 
@@ -21,59 +21,96 @@ const appkeys = require('./keys.json');
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Main
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-var $scope = {};
+var $scope = {
+    key_id      : 226891
+,   block_id    : 2071
+,   signals_id  : 2010
+,   delights_id : 2521
+};
 
-pubnub_login( appkeys.pubnub.email, appkeys.pubnub.password ).then( login => {
+pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password ).then( login => {
 
-    // Logged into Global Admin Dashboard
     console.log( 'Logged In!', login.result.user_id );
     $scope.login = login.result;
-    return build();
+
+    // Build Signals Handler
+    return build_signals();
 
 } ).then( result => {
 
-    // Built Event Handler
-    console.log( 'Built Event Handler!', result.length );
-    $scope.code = result;
-    return upload();
+    console.log( 'Built Signals Handler!', result.length );
+    $scope.signals_code = result;
+
+    // Build Delights Handler
+    return build_delights();
 
 } ).then( result => {
 
-    // Uploaded EH Code
-    console.log( 'Uploaded!', result );
+    console.log( 'Built Delights Handler!', result.length );
+    $scope.delights_code = result;
+
+    // Upload Signals
+    return upload_signals_handler();
+
+} ).then( result => {
+
+    console.log( 'Uploaded Signals Handler!', result );
+
+    // Upload Delights
+    return upload_delights_handler();
+
+} ).then( result => {
+
+    console.log( 'Uploaded Delights Handler!', result );
+
+    // Sent Restart Signal
     return restart();
 
 } ).then( result => {
 
-    // Sent Restart Signal
     console.log( 'Restarting!', result );
+
+    // Print Instructions
     return instructions();
 
 } ).then( result => {
 
-    const pub = appkeys.pubnub.publish;
-    const sub = appkeys.pubnub.subscribe;
-    const chn = 'opengrowth.signals';
-    const msg = `\\{"signal":"signup","email":"stephen@pubnub.com"\\}`;
-
-    // Done Printing Instructions
-    console.log(`
-        ## Try it out!
-        curl 'https://ps.pubnub.com/subscribe/${sub}/${chn}/0/-1' &
-        curl 'https://ps.pubnub.com/publish/${pub}/${sub}/0/${chn}/0/${msg}'
-    `);
+    // Done!
 
 } );
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Build Event Handler Code
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function build() {
+function build_signals() {
     var buffer = ''
-    var keys   = 'opengrowth.keys = ' + JSON.stringify(appkeys) + ';'
+    var keys   = 'opengrowth.keys = ' + JSON.stringify(apikeys) + ';'
     return new Promise( ( resolve, reject ) => {
         gulp.src([
             './handlers/signals.js'
+        ,   './helpers/*.js'
+        ,   './modules/*.js'
+        //,   './delights/*.js'
+        //,   './signals/*.js'
+        ])
+        .on( 'end',   data  => { resolve(buffer + keys) } )
+        .on( 'error', error => { reject(error)          } )
+        .on( 'data',  bytes => {
+            buffer += bytes.contents.toString().trim();
+        } );
+    } );
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Build Event Handler Code
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function build_delights() {
+    var buffer = ''
+    var keys   = 'opengrowth.keys = ' + JSON.stringify(apikeys) + ';'
+    return new Promise( ( resolve, reject ) => {
+        gulp.src([
+            './handlers/delights.js'
+        ,   './helpers/*.js'
         ,   './modules/*.js'
         ,   './delights/*.js'
         ,   './signals/*.js'
@@ -87,26 +124,55 @@ function build() {
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Upload Event Handler Code
+// Upload Signals Handler Code
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function upload() {
+function upload_signals_handler() {
     return http({
         method  : 'PUT'
     ,   json    : true
     ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  '/blocks/key/226891/event_handler/2010'
+                  `/blocks/key/${$scope.key_id}/`   +
+                  `event_handler/${$scope.signals_id}`
     ,   headers : { 'X-Session-Token' : $scope.login.token }
     ,   body    : {
-            key_id    : 226891
-        ,   block_id  : 2071
-        ,   id        : 2010
-        ,   code      : $scope.code
+            key_id    : $scope.key_id
+        ,   block_id  : $scope.block_id
+        ,   id        : $scope.signals_id
+        ,   code      : $scope.signals_code
         ,   channels  : 'opengrowth.signals'
         ,   event     : 'js-before-publish'
         ,   type      : 'js'
         ,   log_level : 'debug'
         ,   name      : 'Open Growth Signal Handler'
-        ,   output    : 'opengrowth.debug'
+        ,   output    : 'opengrowth.signals-info'
+        }
+    }).catch( error => {
+        console.error( 'error', error );
+    } );
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Upload Delights Handler Code
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function upload_delights_handler() {
+    return http({
+        method  : 'PUT'
+    ,   json    : true
+    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
+                  `/blocks/key/${$scope.key_id}/`   +
+                  `event_handler/${$scope.delights_id}`
+    ,   headers : { 'X-Session-Token' : $scope.login.token }
+    ,   body    : {
+            key_id    : $scope.key_id
+        ,   block_id  : $scope.block_id
+        ,   id        : $scope.delights_id
+        ,   code      : $scope.delights_code
+        ,   channels  : 'opengrowth.signals'
+        ,   event     : 'js-after-publish'
+        ,   type      : 'js'
+        ,   log_level : 'debug'
+        ,   name      : 'Open Growth Delights Handler'
+        ,   output    : 'opengrowth.delights-info'
         }
     }).catch( error => {
         console.error( 'error', error );
@@ -117,20 +183,33 @@ function upload() {
 // Print cURL Example
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function instructions() {
-    
+    const pub = apikeys.pubnub.publish;
+    const sub = apikeys.pubnub.subscribe;
+    const chn = 'opengrowth.signals';
+    const msg = `\\{"signal":"signup","email":"stephen@pubnub.com"\\}`;
+
+    // Done Printing Instructions
+    console.log(`
+        ## Try it out!
+        curl 'https://ps.pubnub.com/subscribe/${sub}/${chn}/0/-1' &
+        curl 'https://ps.pubnub.com/publish/${pub}/${sub}/0/${chn}/0/${msg}'
+    `);
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Restart Event Handler
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function restart() {
-//curl --data ''  \
-    //-H 'Content-Type: application/json'                                   \
     return http({
         method  : 'POST'
     ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  '/blocks/key/226891/block/2071/start'
-    ,   body    : { block_id : 2071, key_id : 226891, action : 'start' }
+                  `/blocks/key/${$scope.key_id}/`   +
+                  `block/${$scope.block_id}/start`
+    ,   body    : {
+            block_id : $scope.block_id
+        ,   key_id   : $scope.key_id
+        ,   action   : 'start' 
+    }
     ,   headers : { 'X-Session-Token' : $scope.login.token }
     ,   json    : true
     }).catch( error => {
