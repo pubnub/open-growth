@@ -1,7 +1,7 @@
 ####### requirements.txt #######
 
-feedparser == 5.2.1
-monkeylearn == 0.3.5
-pubnub == 3.9.0
-peewee == 2.8.5
-APScheduler == 3.0.0
+feedparser==5.2.1
+monkeylearn==0.3.5
+pubnub==3.9.0
+peewee==2.8.5
+APScheduler==3.0.0
