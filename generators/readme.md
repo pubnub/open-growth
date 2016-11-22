@@ -1,7 +1,7 @@
 # Open Growth Generators
 
 Generators provide signals to your signal handlers.
-This signals can be used to send delights to your customers!
+These signals can be used to send delights to your customers!
 
 `Signal Generator` `>` `Signal Processor`
 
@@ -30,13 +30,13 @@ heroku config:set OTHER=YOUR OTHER KEY HERE
 
 ### Adding a Heroku Worker
 
- 1. Add `your_generator_name: python yourfile.py` to `Procefile`.
+ 1. Add `your_generator_name: python yourfile.py` to `Procfile`.
  2. Setup your script to run in a runloop or find a way to run Cron style.
- 3. Git Commint and then run `./deploy-heroku`.
+ 3. Git Commit and then run `./deploy-heroku`.
  4. Start your worker by running `heroku ps:scale your_generator_name=1`.
 
 ### Adding a Heroku Web HTTP Endpoint
 
  1. Copy `salesforce.js` to `yourfile.js` Must be JavaScript for Web HTTP Endpoint.
  2. Edit the Endpoint Details in the file to accept `GET` or `POST` requests.
- 3. Git Commint and then run `./deploy-heroku`.
+ 3. Git Commit and then run `./deploy-heroku`.

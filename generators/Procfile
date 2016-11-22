@@ -1,1 +1,2 @@
-web: node web.js
+#web: node web.js
+tc_scrape_proc: python tc_hourly.py

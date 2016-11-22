@@ -3,3 +3,4 @@ keys.js
 keys.json
 .env
 node_modules
+*.pyc
