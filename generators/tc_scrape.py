@@ -25,25 +25,20 @@ def db_bulk_upsert(items):
 # Makes a list of the new articles that have not yet been processed
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 def get_new_articles():
-    print "getting new articles"
     # Get the RSS feed's XML. Stop executing if there is no connection.
     try:
         xml = feedparser.parse('http://feeds.feedburner.com/TechCrunch/')
     except:
-        print 'exiting'
         exit()
-    print 'got xml'
+
     new_articles = []
     for article_url in xml.entries:
         new_articles.append(article_url)
 
     # Get a list of articles we have already analyzed
     old_articles = cfg.Article.select()
-    print "got old articles"
-    print len(old_articles)
-    print old_articles
+
     for article in old_articles:
-        print article
         if article.url not in [a.id for a in new_articles]:
             # Remove expired articles from DB (if no longer in rss feed)
             q = cfg.Article.delete().where(cfg.Article.url == article.url)
@@ -51,7 +46,6 @@ def get_new_articles():
         else:
             # Remove already analyzed articles from the list to be analyzed
             new_articles = [a for a in new_articles if a.id != article.url]
-    print "returning new articles"
     return new_articles
 
 
@@ -59,7 +53,6 @@ def get_new_articles():
 # Scrapes the text contents out of each article that will be analized
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 def get_article_contents(new_articles):
-    print "getting article contents"
     article_dicts_list = []
     for article_xml in new_articles:
         opener = urllib.FancyURLopener({})
@@ -103,7 +96,6 @@ def get_article_contents(new_articles):
             "content": result.encode('utf8').decode('utf8')
         })
 
-    print "returning article contents"
     return article_dicts_list
 
 
@@ -121,7 +113,6 @@ def listify_article_texts(article_dicts_list):
 # Extract keywords and get sentiment analysis of new articles with MonkeyLearn
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 def monkey_learn(texts, article_dicts_list):
-    print "monkeylearning"
     if not texts:
         return None
 
@@ -157,7 +148,6 @@ def monkey_learn(texts, article_dicts_list):
 # Publish Js objects of analysis results for new articles, 1 by 1, to PubNub
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 def pn_publish(ml_results):
-    print "pn publishing"
     if not ml_results:
         return
 
@@ -168,7 +158,6 @@ def pn_publish(ml_results):
 
 
 def main():
-    print "main ing"
     # Get all newly published articles since last scrape
     new_articles = get_new_articles()
 
@@ -187,4 +176,3 @@ def main():
     # add newly analyzed articles to DB
     if article_dicts_list:
         db_bulk_upsert(article_dicts_list)
-    print "donezo"

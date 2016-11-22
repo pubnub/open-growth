@@ -13,7 +13,7 @@ PN_CHANNEL = os.environ['PN_CHANNEL']
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # DB Reference
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-db = SqliteDatabase(':memory:')
+db = SqliteDatabase('articles.sqlite')
 db.connect()
 
 
