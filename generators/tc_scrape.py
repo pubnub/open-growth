@@ -30,15 +30,16 @@ def get_new_articles():
     try:
         xml = feedparser.parse('http://feeds.feedburner.com/TechCrunch/')
     except:
+        print 'exiting'
         exit()
-
+    print 'got xml'
     new_articles = []
     for article_url in xml.entries:
         new_articles.append(article_url)
 
     # Get a list of articles we have already analyzed
     old_articles = cfg.Article.select()
-
+    print "got old articles"
     for article in old_articles:
         if article.url not in [a.id for a in new_articles]:
             # Remove expired articles from DB (if no longer in rss feed)
