@@ -138,6 +138,12 @@ def monkey_learn(texts, article_dicts_list):
             "keyword_extraction": extraction.result[i]
         }
 
+        # remove keyword position indicies
+        for kw in ml_result['keyword_extraction']:
+            if kw.get('positions_in_text'):
+                del kw['positions_in_text']
+
+        # convert dictionaries to JSON strings
         ml_results.append(json.dumps(ml_result, separators=(',', ': ')))
 
     # Return a list of JSON strings of results, 1 string per article
