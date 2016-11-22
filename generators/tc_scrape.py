@@ -42,6 +42,7 @@ def get_new_articles():
     print "got old articles"
     print old_articles
     for article in old_articles:
+        print article
         if article.url not in [a.id for a in new_articles]:
             # Remove expired articles from DB (if no longer in rss feed)
             q = cfg.Article.delete().where(cfg.Article.url == article.url)
