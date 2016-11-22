@@ -1,2 +1,3 @@
 web: node web.js
 tc_scrape_proc: python tc_hourly.py
+run_tc: python -c 'import tc_scrape; tc_scrape.main()'
