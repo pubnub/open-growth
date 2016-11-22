@@ -40,6 +40,7 @@ def get_new_articles():
     # Get a list of articles we have already analyzed
     old_articles = cfg.Article.select()
     print "got old articles"
+    print old_articles
     for article in old_articles:
         if article.url not in [a.id for a in new_articles]:
             # Remove expired articles from DB (if no longer in rss feed)
