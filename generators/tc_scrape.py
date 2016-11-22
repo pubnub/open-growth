@@ -40,6 +40,7 @@ def get_new_articles():
     # Get a list of articles we have already analyzed
     old_articles = cfg.Article.select()
     print "got old articles"
+    print len(old_articles)
     print old_articles
     for article in old_articles:
         print article
