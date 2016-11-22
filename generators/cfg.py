@@ -4,10 +4,10 @@ from peewee import *
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Keys
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-MONKEYLEARN_TOKEN = os.environ['MONKEYLEARN_TOKEN']
-PN_SUB = os.environ['PN_SUB']
-PN_PUB = os.environ['PN_PUB']
-PN_CHANNEL = os.environ['PN_CHANNEL']
+MONKEYLEARN_TOKEN =	os.environ['MONKEYLEARN_TOKEN']
+PN_SUB =			os.environ['PN_SUB']
+PN_PUB =			os.environ['PN_PUB']
+PN_CHANNEL =		os.environ['PN_CHANNEL']
 
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
