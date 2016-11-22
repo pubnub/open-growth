@@ -39,6 +39,9 @@ opengrowth.delight.facebook.replyPublic = (request, email) => {
         email: email,
         content: request.content
     });
+    //TODO: Set up webhooks add-on in facebook application config panel
+    //Will POST to a URL
+    console.log(JSON.parse(request.message.body));
 };
 
 //reply to incoming private messages sent to the company page
@@ -48,4 +51,7 @@ opengrowth.delight.facebook.replyPrivate = (request, email) => {
         email: email,
         content: request.content
     });
+    //TODO: Set up webhooks add-on in facebook application config panel
+    //Will POST to a URL
+    console.log(JSON.parse(request.message.body));
 };

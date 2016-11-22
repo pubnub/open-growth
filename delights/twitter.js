@@ -1,29 +1,41 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Tweet at Customer
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 opengrowth.delight.twitter = {};
-opengrowth.delight.twitter.tweet = ( request, tweet ) => {
+
+opengrowth.delight.twitter.tweet = (request, email) => {
     opengrowth.track.delight('twitter.tweet', request.message.signal, {
-        email   : request.message.email
-    ,   message : request.message.message
+        email: email,
+        message: request.message.message
     });
-    return submitRequest( request, tweet );
+    return submitRequest(request);
 };
-function submitRequest ( request, tweet ) {
+opengrowth.delight.twitter.deleteTweet = (request, email) => {
+    opengrowth.track.delight('twitter.deleteTweet', request.message.signal, {
+        email: email,
+        id: request.message.id
+    });
+    return submitRequest(request);
+};
+
+function submitRequest(request) {
     const consumerKey = opengrowth.keys.twitter.consumerKey;
     const consumerSecret = opengrowth.keys.twitter.consumerSecret;
     const accessToken = opengrowth.keys.twitter.accessToken;
     const oauthTokenSecret = opengrowth.keys.twitter.oauthTokenSecret;
 
-    // Skip if no Twitter API Keys
-    if (!(consumerKey && consumerSecret && accessToken && oauthTokenSecret))
-        return (new Promise()).resolve('Twitter disabled. No API Keys.');
-
     const httpReqType = "POST";
     const contentType = "application/x-www-form-urlencoded";
-    const url         = "https://api.twitter.com/1.1/statuses/update.json";
+    let url;
+    if (request.message.tweet) url = "https://api.twitter.com/1.1/statuses/update.json";
+    if (request.message.delete) url = `https://api.twitter.com/1.1/statuses/destroy/${request.message.id}.json`;
 
-    let tweetContent = tweet || "";
+    if (!request.message.tweet && !request.message.delete) {
+        return request.abort({ "400": "400: Bad Request" });
+    }
+
+    let tweetContent = request.message.tweet || "";
     let content = tweetContent ? "status=" + encodeURIComponent(tweetContent) : "";
 
     //Used in Authorization header and to create request signature
@@ -35,24 +47,31 @@ function submitRequest ( request, tweet ) {
         "oauth_token": accessToken,
         "status": tweetContent
     };
-    
-    return getOAuthSignature(oauth, httpReqType, url, consumerSecret, oauthTokenSecret).then((result) => {
-        oauth.oauth_signature = result;
-        delete oauth.status; //this is required to make the signature but not the Auth header
-        let authHeaderString = objectToRequestString(oauth, 'OAuth ', '="', '"', ', ');
 
-        let http_options = {
-            "method": httpReqType,
-            "headers": {
-                "Content-Type": contentType,
-                "Authorization": authHeaderString
-            },
-            "body": content
-        };
-        
-        return xhr.fetch( url, http_options ).then((response) => response.json());
-    }).catch((error) => {
-    });
+    if (request.message.delete) delete oauth.status; //there is no status when deleting a Tweet
+
+    return getOAuthSignature(oauth, httpReqType, url, consumerSecret, oauthTokenSecret).then((result) => {
+            oauth.oauth_signature = result;
+            delete oauth.status; //this is required to make the signature but not the Auth header
+            let authHeaderString = objectToRequestString(oauth, 'OAuth ', '="', '"', ', ');
+
+            let http_options = {
+                "method": httpReqType,
+                "headers": {
+                    "Content-Type": contentType,
+                    "Authorization": authHeaderString
+                },
+                "body": content
+            };
+
+            return xhr.fetch(url, http_options).then((response) => response.json()).then((response) => {
+                //the successfully posted/deleted Tweet's id can be referenced here with response.id_str
+                return request.ok();
+            });
+        })
+        .catch((error) => {
+            return request.abort({ "500": "500: Internal server error" });
+        });
 };
 
 //Part of OAuth that creates a signature that's unique to each request
@@ -70,7 +89,7 @@ function objectToRequestString(obj, prepend, head, tail, append) {
     let requestString = prepend || "";
     Object.keys(obj).forEach((key, i) => {
         requestString += key + head + encodeURIComponent(obj[key]) + tail;
-        i < Object.keys(obj).length-1 ? requestString += append : null;
+        i < Object.keys(obj).length - 1 ? requestString += append : null;
     });
     return requestString;
 }

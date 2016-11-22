@@ -1,7 +1,9 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Send SMS with RingCentral
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 opengrowth.delight.ringcentral = {};
+
 opengrowth.delight.ringcentral.sms = (request, email, recipientName, recipientLocation) => {
     // Record Delight Activity
     opengrowth.track.delight('ringcentral.sms', request.message.signal, {
@@ -59,14 +61,14 @@ opengrowth.delight.ringcentral.sms = (request, email, recipientName, recipientLo
             httpOptions.method = 'post';
 
             xhr.fetch('https://' + blockConfig.host + blockConfig.oauth_url, httpOptions)
-                .then(r => {
-                        let raccessTok = JSON.parse(r.body || r);
-                        smsConfig.access_token = raccessTok.access_token;
-                        if (callback) callback();
-                    },
-                    e => console.error(e)
-                )
-                .catch(e => console.error(e));
+            .then(r => {
+                    let raccessTok = JSON.parse(r.body || r);
+                    smsConfig.access_token = raccessTok.access_token;
+                    if (callback) callback();
+                },
+                e => console.error(e)
+            )
+            .catch(e => console.error(e));
         }
     }
 
@@ -100,32 +102,32 @@ opengrowth.delight.ringcentral.sms = (request, email, recipientName, recipientLo
             const path = 'https://' + blockConfig.host + '/restapi/v1.0/account/~/extension/~/sms';
 
             return xhr.fetch(path, httpOptions)
-                .then(
-                    () => {
-                        pubnub.publish({
-                            channel: responseChannel,
-                            message: 1
-                        });
-                        return request.ok();
-                    },
-                    response => {
-                        pubnub.publish({
-                            channel: responseChannel,
-                            message: 0
-                        });
-                        console.error(
-                            'sms failed, this is not going to execute');
-                        if (response) console.error(response);
-                        return request.ok();
-                    }
-                )
-                .catch(e => {
-                    console.error(e);
+            .then(
+                () => {
+                    pubnub.publish({
+                        channel: responseChannel,
+                        message: 1
+                    });
+                    return request.ok();
+                },
+                response => {
                     pubnub.publish({
                         channel: responseChannel,
                         message: 0
                     });
+                    console.error(
+                        'sms failed, this is not going to execute');
+                    if (response) console.error(response);
+                    return request.ok();
+                }
+            )
+            .catch(e => {
+                console.error(e);
+                pubnub.publish({
+                    channel: responseChannel,
+                    message: 0
                 });
+            });
         });
     }
 

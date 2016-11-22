@@ -1,57 +1,45 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Send Emails with SendGrid
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-opengrowth.delight.sendgrid = {};
-opengrowth.delight.sendgrid.email = (
-    signal, message, email, name, subject
-) => {
 
+opengrowth.delight.sendgrid = {};
+
+opengrowth.delight.sendgrid.email = (request, email, subject) => {
     // Record Delight Activity
-    opengrowth.track.delight( 'sendgrid.email', signal, {
-        email   : email
-    ,   subject : subject
-    ,   message : message
-    } );
-    
+    opengrowth.track.delight('sendgrid.email', request.message.signal, {
+        email: email,
+        subject: subject,
+        message: request.message.text
+    });
+
     // sendgrid api url
-    const apiurl = 'https://api.sendgrid.com/v3/mail/send';
+    var apiUrl = 'https://api.sendgrid.com/api/mail.send.json';
 
     // sendrid api user
-    const apiuser = opengrowth.keys.sendgrid.user;
+    var apiUser = opengrowth.keys.sendgrid.user;
 
     // sendgrid api key
-    const apikey = opengrowth.keys.sendgrid.apikey;
-
-    // sendgrid reply to
-    const replyto      = opengrowth.keys.sendgrid.replyto;
-    const replyto_name = opengrowth.keys.sendgrid.replyto_name;
+    var apiKey = opengrowth.keys.sendgrid.appkey;
 
     // sendgrid sender email address
-    const sender      = opengrowth.keys.sendgrid.sender;
-    const sender_name = opengrowth.keys.sendgrid.sender_name;
+    var senderAddress = opengrowth.keys.sendgrid.sender;
 
-    // payload
-    const data = {
-        from              : { email: sender,  name: sender_name  }
-    ,   reply_to          : { email: replyto, name: replyto_name }
-    ,   tracking_settings : { subscription_tracking : { enable : false } }
-    ,   content           : [ { type : "text/html", value : message } ]
-    ,   personalizations  : [ {
-            to      : [ { email : email, name : name } ]
-        ,   subject : subject
-        } ]
-    };
+    try {
 
-    // post email
-    return xhr.fetch( apiurl, {
-        method  : 'POST'
-    ,   body    : data
-    ,   headers : {
-        'Authorization' : `Bearer ${apikey}`
-    ,   'Content-Type'  : 'application/json'
+        // create a HTTP GET request to the sendgrid API
+        return xhr.fetch(apiUrl + '?' + query.stringify({
+            api_user: apiUser, // your sendgrid api username
+            api_key: apiKey, // your sendgrid api password
+            from: senderAddress, // sender email address
+            to: request.message.to, // recipient email address
+            toname: request.message.toname, // recipient name
+            subject: request.message.subject, // email subject
+            text: request.message.text // email text
+        })).then(function(res) {
+            return request;
+        });
+
+    } catch (e) {
+        return request;
     }
-    } ).catch( err => {
-        //console.log( 'Error:', err );
-    } );
-
 };
