@@ -49,7 +49,7 @@ opengrowth.signals.signup = ( request, customer ) => {
 
     const message =
     `Hi ${name || 'there'}! ` +
-    `I am PubBot, an Artificial Intelligence alive in PubNub BLOCKS. ` +
+    `I am Neumann, an Artificial Intelligence alive in PubNub BLOCKS. ` +
     `Welcome to the Programmable Network.` +
     `<p><p>` +
     `${usecase ? 'I can help you with realtime ' + usecase + ' and more.' : ''} ` +
