@@ -38,12 +38,11 @@ opengrowth.signals.signup = ( request, customer ) => {
     var twitter = '';
     try       { twitter = customer.person.twitter.handle }
     catch (e) { twitter = '' }
-    try       { twitter = twitter || customer.company.twitter.handle }
-    catch (e) { twitter = twitter }
 
     // Tweet if Twitter Handle
     if (twitter && twitter.toLocaleLowerCase().indexOf('pubnub') < 0) {
-        const tweet = `@${twitter} Hi ${fname}`;
+        const tweet = `@${twitter} hi ${fname} welcome to PubNub ~ ` +
+                      `tweet me back`;
         opengrowth.delight.twitter.tweet( request, tweet );
     }
 
