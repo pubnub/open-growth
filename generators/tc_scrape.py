@@ -50,7 +50,7 @@ def get_new_articles():
 
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-# Scrapes the text contents out of each article that will be analized
+# Scrapes the text contents out of each article that will be analyzed
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 def get_article_contents(new_articles):
     article_dicts_list = []
@@ -167,7 +167,7 @@ def main():
     # Get all newly published articles since last scrape
     new_articles = get_new_articles()
 
-    # Extract and format article Ids, URLS, and contents.
+    # Extract and format article Ids, URLS, and contents
     article_dicts_list = get_article_contents(new_articles)
 
     # Get a list of article texts from the dictionaries
