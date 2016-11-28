@@ -10,6 +10,11 @@ No more sales spam.
 Open Growth is an open source project for developers at 
 API companies to delight your customers with ML/AI.
 
+### Live Chat Room
+
+[Join live developer chat room](https://www.flowdock.com/invitations/5abd296da8ea9a65ca2f585b61fefa332ed858af).
+Team working on open source projects will be here.
+
 ![Deploy V1 Example](http://i.imgur.com/NuobuFP.gif)
 
 ## ❤️  Delight Your Customers
