@@ -13,7 +13,8 @@ API companies to delight your customers with ML/AI.
 ### Live Chat Room
 
 [Join live developer chat room](https://www.flowdock.com/invitations/5abd296da8ea9a65ca2f585b61fefa332ed858af).
-Team working on open source projects will be here.
+Team developing open source projects will be online.
+Team hours weekdays 9:00am PST to 5:00pm PST.
 
 ![Deploy V1 Example](http://i.imgur.com/NuobuFP.gif)
 
