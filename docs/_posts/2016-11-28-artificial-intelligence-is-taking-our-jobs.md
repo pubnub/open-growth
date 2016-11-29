@@ -23,7 +23,7 @@ So what? #techologyisthefuture right?
 Technology #ftw.
 Couple of things.
 Do we start treating artificial intelligence with
-[human-style compensations like bitcoin](http://imgur.com/a/QwmGq)?
+[human-style compensations with bitcoin](http://imgur.com/a/QwmGq)?
 The displaced human jobs, we have to do something for them right?
 
 So the Business owner's dilemma… kinda but not really is: 
