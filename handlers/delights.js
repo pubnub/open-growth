@@ -33,7 +33,7 @@ export default request => {
     //      with all new keys supplied in the signal data
     //      so we have a progressively built profile.
     
-    if (!email) { return opengrowth.signals[signal](request) }
+    if (!email) return opengrowth.signals[signal](request);
 
     return kvdb.get(email).then( customer => {
         // Run any.js for '*'
