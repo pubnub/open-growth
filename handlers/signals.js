@@ -31,7 +31,11 @@ export default request => {
     // TODO special track signal 'reaction' for extra metrics
     // TODO track sent delights
     // TODO send to SQL DB
+    
+    // Ignore if not a customer delight
+    if (!email) return request.ok(); 
 
+    // Process Customer Delight
     return opengrowth.customer( email, signal ).then( customer => {
         return kvdb.set( email, customer ).then( result => {
             return request.ok();
