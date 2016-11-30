@@ -2,8 +2,7 @@
  * Site header
  */
 .site-header {
-  border-top: 5px solid $grey-color-dark;
-  border-bottom: 1px solid $grey-color-light;
+  border: 0;
   min-height: 56px;
 
   // Positioning context for the mobile navigation icon
@@ -47,8 +46,7 @@
     top: 9px;
     right: $spacing-unit / 2;
     background-color: $background-color;
-    border: 1px solid $grey-color-light;
-    border-radius: 5px;
+    border: 0;
     text-align: right;
 
     .menu-icon {
@@ -93,7 +91,7 @@
  * Site footer
  */
 .site-footer {
-  border-top: 1px solid $grey-color-light;
+  border: 0;
   padding: $spacing-unit 0;
 }
 

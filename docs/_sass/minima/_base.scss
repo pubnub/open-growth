@@ -15,13 +15,14 @@ dl, dd, ol, ul, figure {
  */
 body {
   font: $base-font-weight #{$base-font-size}/#{$base-line-height} $base-font-family;
+  letter-spacing: $base-letter-spacing;
   color: $text-color;
   background-color: $background-color;
   -webkit-text-size-adjust: 100%;
-  -webkit-font-feature-settings: "kern" 1;
-     -moz-font-feature-settings: "kern" 1;
-       -o-font-feature-settings: "kern" 1;
-          font-feature-settings: "kern" 1;
+  -webkit-font-feature-settings: "kern" $base-font-kern;
+     -moz-font-feature-settings: "kern" $base-font-kern;
+       -o-font-feature-settings: "kern" $base-font-kern;
+          font-feature-settings: "kern" $base-font-kern;
   font-kerning: normal;
 }
 

@@ -26,7 +26,7 @@ url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: pubnub
 github_username: pubnub
 
-# Build settings
+## Build settings
 markdown: kramdown
 theme: minima
 gems:
@@ -34,3 +34,11 @@ gems:
 exclude:
   - Gemfile
   - Gemfile.lock
+
+## Minify
+compress_html:
+    comments: all
+    clippings: all
+    startings: all
+    endings: all
+

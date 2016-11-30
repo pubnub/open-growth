@@ -19,7 +19,8 @@ AI is scary accurate.
 ## Choosing a Human Workforce or AI
 
 Replacing a workforce is possible within a matter of minutes.
-So what? #techologyisthefuture right?
+So what?
+Technology is the future right?
 Technology #ftw.
 Couple of things.
 Do we start treating artificial intelligence with
