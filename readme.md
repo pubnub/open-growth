@@ -14,7 +14,7 @@ AI never get's tired, and is faster than humans.
 
 ### Live Chat Room
 
-[Join live developer chat room - ask for invite](https://twitter.com/stephenlb).
+[Join live developer chat room - request for invite](https://goo.gl/forms/FltKTMbS8aduTlcu1).
 Team developing open source projects will be online.
 Team hours weekdays 9:00am PST to 5:00pm PST.
 
@@ -25,7 +25,7 @@ It is not yet ready for simple setup and adoption.
 The plan is to make this an easy solution for customers to install
 and grow thier businesses.
 Ask questions in our 
-[chatroom](https://twitter.com/stephenlb) 
+[chatroom](https://goo.gl/forms/FltKTMbS8aduTlcu1) 
 for more details.
 
 ![Deploy V1 Example](http://i.imgur.com/NuobuFP.gif)
