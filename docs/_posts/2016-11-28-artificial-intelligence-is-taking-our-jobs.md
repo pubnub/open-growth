@@ -48,3 +48,5 @@ And it's being made _available for free_ here:
 Powered on the worlds most advanced
 [Programmable Network](https://www.pubnub.com/products/global-data-stream-network/).
 
+[Join Live Chatroom](https://goo.gl/forms/FltKTMbS8aduTlcu1)
+
