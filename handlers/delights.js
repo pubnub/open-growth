@@ -20,7 +20,7 @@ const query  = require('codec/query_string');
 export default request => {
     const message = request.message;
     const signal  = message.signal;
-    const email   = message.email ;
+    const email   = message.email;
 
     // TODO de-duplicate (prevent duplicate signals from activiating)
     // TODO track signal analytics with total/yr/mm/day/hour
@@ -32,6 +32,8 @@ export default request => {
     // TODO Augment/Extend 'SYNC' User Profile KV Entry
     //      with all new keys supplied in the signal data
     //      so we have a progressively built profile.
+    
+    if (!email) return opengrowth.signals[signal](request);
 
     return kvdb.get(email).then( customer => {
         // Run any.js for '*'
