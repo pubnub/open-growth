@@ -12,7 +12,7 @@ to delight your customers with ML/AI workforce automation.
 Put Artificial Intelligence to work for you.
 AI never get's tired, and is faster than humans.
 
-### Live Chat Room
+### 👥  Live Chat Room
 
 [Join live developer chat room - request for invite](https://goo.gl/forms/FltKTMbS8aduTlcu1).
 Team developing open source projects will be online.
