@@ -19,7 +19,8 @@ AI is scary accurate.
 ## Choosing a Human Workforce or AI
 
 Replacing a workforce is possible within a matter of minutes.
-So what? #techologyisthefuture right?
+So what?
+Technology is the future right?
 Technology #ftw.
 Couple of things.
 Do we start treating artificial intelligence with
@@ -45,6 +46,8 @@ AI is taking your jobs.
 And it's being made _available for free_ here:
 [open-growth](https://github.com/pubnub/open-growth)
 
-Powered on the worlds most advanced
+Powered on the world's most advanced
 [Programmable Network](https://www.pubnub.com/products/global-data-stream-network/).
+
+[Join Live Chatroom](https://goo.gl/forms/FltKTMbS8aduTlcu1)
 

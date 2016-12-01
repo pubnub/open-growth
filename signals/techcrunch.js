@@ -4,7 +4,7 @@ opengrowth.signals.techcrunch = ( request ) => {
     const message = '';
     const keywords = request.message.keyword_extraction;
     
-    for (item in keywords){
+    for (var item in keywords){
 	kvdb.get(item.keyword.toLowerCase().replace(/[^0-9a-z]/gi, '')).then(val => {
             if (val) {
 	        message = "These guys were in the news: " + companyName + "\n\nWe should email: " + val;
@@ -12,6 +12,6 @@ opengrowth.signals.techcrunch = ( request ) => {
 	            'techcrunch', message, recipient, companyName, subject
                 );
             }
-        }
-    });
+        });
+    }
 };
