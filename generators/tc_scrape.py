@@ -63,13 +63,13 @@ def get_article_contents(new_articles):
             continue
 
         # gets the raw html for the first article in the feed
-        s = opener.open(article_url).read()
+        raw_html = opener.open(article_url).read()
 
         # reduce the raw html of the whole page to only the article content
         content_re = '<!-- Begin: Wordpress Article Content -->' \
             '([\S\s]*)' \
             '<!-- End: Wordpress Article Content -->'
-        result = re.search(content_re, s).group(0)
+        result = re.search(content_re, raw_html).group(0)
 
         # remove the 'related articles' div from the article content
         aside_re = '<div class="aside aside-related-articles">' \
