@@ -7,16 +7,24 @@
     <div class="footer-col-wrapper">
       <div class="footer-col footer-col-1">
         <ul class="contact-list">
-          <li>
             {% if site.author %}
-              {{ site.author | escape }}
+                <li>{{ site.author | escape }}</li>
             {% else %}
-              {{ site.title | escape }}
+                <li>{{ site.title | escape }}</li>
             {% endif %}
-            </li>
+
             {% if site.email %}
-            <li><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
+                <li><a href="mailto:{{ site.email }}">
+                    {{ site.email }}
+                </a></li>
             {% endif %}
+
+            {% if site.chatroom %}
+                <li><a target="_chatroom" href="{{ site.chatroom }}">
+                    Join Live Chatroom
+                </a></li>
+            {% endif %}
+
         </ul>
       </div>
 
