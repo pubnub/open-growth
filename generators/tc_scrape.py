@@ -124,7 +124,7 @@ def monkey_learn(texts, article_dicts_list):
         'ex_y7BPYzNG',
         texts,
         use_company_names=1,
-        max_keywords=3
+        max_keywords=10
     )
 
     # sentiment analysis
@@ -135,6 +135,7 @@ def monkey_learn(texts, article_dicts_list):
     for i in range(0, len(extraction.result)):
         ml_result = {
             "id": article_dicts_list[i]['id'],
+            "url": article_dicts_list[i]['url'],
             "classification": classification.result[i],
             "keyword_extraction": extraction.result[i]
         }
@@ -154,19 +155,31 @@ def monkey_learn(texts, article_dicts_list):
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Publish Js objects of analysis results for new articles, 1 by 1, to PubNub
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-def pn_publish(ml_results):
-    # Publish to blocks each iteration for debugging
+def pn_publish(message):
+    if not message:
+        return
+
+    pn = Pubnub(publish_key=cfg.PN_PUB, subscribe_key=cfg.PN_SUB)
+    pn.publish(channel=cfg.PN_CHANNEL, message=message)
+
+
+def publish_signal(ml_results):
+    # Publish to BLOCK each iteration for debugging
+    try: result_count = len(ml_results)
+    except: result_count = None
     current_time = strftime("%Y-%m-%d %H:%M:%S:GMT", gmtime())
-    block_log = "TechCrunch Scrape: " + current_time
-    pn.publish(channel=cfg.PN_CHANNEL, message=block_log)
+    block_log = "TechCrunch Scrape: " + \
+        str(result_count) + " articles " + current_time
+    pn_publish(block_log)
 
     if not ml_results:
         return
 
-    pn = Pubnub(publish_key=cfg.PN_PUB, subscribe_key=cfg.PN_SUB)
-
     for result in ml_results:
-        pn.publish(channel=cfg.PN_CHANNEL, message=result)
+        pn_publish({
+            "signal": "techcrunch",
+            "payload": result
+        })
 
 
 def main():
@@ -183,7 +196,7 @@ def main():
     ml_results = monkey_learn(texts, article_dicts_list)
 
     # Publish the ML results to PubNub BLOCK
-    pn_publish(ml_results)
+    publish_signal(ml_results)
 
     # add newly analyzed articles to DB
     if article_dicts_list:
