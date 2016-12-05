@@ -1,7 +1,6 @@
 opengrowth.signals.techcrunch = ( request ) => {
     const recipient = 'open-growth-activity@pubnub.com';
     const subject = 'Techcrunch Signal';
-    const message = '';
     const keywords = request.message.payload.keyword_extraction;
     const url = request.message.payload.url;
 
