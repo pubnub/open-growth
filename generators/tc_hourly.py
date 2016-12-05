@@ -2,6 +2,9 @@ import tc_scrape
 import logging
 from apscheduler.schedulers.blocking import BlockingScheduler
 
+# Write to log on Heroku
+logging.basicConfig()
+
 sched = BlockingScheduler()
 
 # Run tc_scrape.main every hour
