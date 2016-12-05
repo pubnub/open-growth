@@ -8,6 +8,7 @@ import feedparser
 import urllib
 import HTMLParser
 import cfg
+from time import gmtime, strftime
 from monkeylearn import MonkeyLearn
 from pubnub import Pubnub
 from peewee import *
@@ -154,6 +155,11 @@ def monkey_learn(texts, article_dicts_list):
 # Publish Js objects of analysis results for new articles, 1 by 1, to PubNub
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 def pn_publish(ml_results):
+    # Publish to blocks each iteration for debugging
+    current_time = strftime("%Y-%m-%d %H:%M:%S:GMT", gmtime())
+    block_log = "TechCrunch Scrape: " + current_time
+    pn.publish(channel=cfg.PN_CHANNEL, message=block_log)
+
     if not ml_results:
         return
 
