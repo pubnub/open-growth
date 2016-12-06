@@ -13,6 +13,7 @@ from monkeylearn import MonkeyLearn
 from pubnub import Pubnub
 from peewee import *
 
+tc_rss_feed = 'http://feeds.feedburner.com/TechCrunch/'
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Writes new articles to DB
@@ -28,7 +29,7 @@ def db_bulk_upsert(items):
 def get_new_articles():
     # Get the RSS feed's XML. Stop executing if there is no connection.
     try:
-        xml = feedparser.parse('http://feeds.feedburner.com/TechCrunch/')
+        xml = feedparser.parse(tc_rss_feed)
     except:
         exit()
 
