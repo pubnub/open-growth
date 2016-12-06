@@ -1,2 +1,2 @@
 web: node web.js
-pyhton_hourly: python hourly.py
+python_hourly: python hourly.py
