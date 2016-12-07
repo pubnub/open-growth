@@ -2,8 +2,8 @@ opengrowth.signals.signup = ( request, customer ) => {
     kvdb.get('signup-'+request.message.email).then(duplicate => {
         if(!duplicate){
             kvdb.set('signup-'+request.message.email, true);
+
             // Name
-            //console.log('33333HYEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE');
             var name = '';
             try       { name = customer.person.name.fullName }
             catch (e) { name = '' }
@@ -79,6 +79,8 @@ opengrowth.signals.signup = ( request, customer ) => {
             opengrowth.delight.sendgrid.email(
                 'signup', message, email, name, subject
             );
+        } else {
+            console.log('deduplicated');
         }
     });
 };
