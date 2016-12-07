@@ -1,4 +1,4 @@
-opengrowth.signals.signup = ( request, customer ) => {
+opengrowth.signals.example = ( request, customer ) => {
     // Try to get a Name
     var name = '';
     try       { name = customer.person.name.fullName }
