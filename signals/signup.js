@@ -1,7 +1,7 @@
 opengrowth.signals.signup = ( request, customer ) => {
-    kvdb.get(request.message.id).then(duplicate => {
+    kvdb.get('signup-'+request.message.email).then(duplicate => {
         if(!duplicate){
-            kvdb.set(request.message.id, true);
+            kvdb.set('signup-'+request.message.email, true);
             // Name
             //console.log('33333HYEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE');
             var name = '';
