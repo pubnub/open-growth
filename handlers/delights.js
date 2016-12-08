@@ -22,17 +22,17 @@ export default request => {
     const signal  = message.signal;
     const email   = message.email;
 
-    // TODO de-duplicate (prevent duplicate signals from activiating)
-    // TODO track signal analytics with total/yr/mm/day/hour
-    // TODO librato
     // TODO special track signal 'reaction' for extra metrics
-    // TODO track sent delights
     // TODO send to SQL DB
 
-    // TODO Augment/Extend 'SYNC' User Profile KV Entry
+    // TODO Augment/Extend the User Profile in the KV Entry
     //      with all new keys supplied in the signal data
     //      so we have a progressively built profile.
-    
+    //      Right now it's just overriding the existing customer.
+
+    // When processing a Non-delight
+    // such as running ./signals/import.js then
+    // we don't need to lookup a customer record
     if (!email) return opengrowth.signals[signal](request);
 
     return kvdb.get(email).then( customer => {
@@ -45,11 +45,32 @@ export default request => {
             return request.ok();
         }
 
-        // Run the signal in /signals/ directory
-        opengrowth.signals[signal]( request, customer );
+        // We don't want to send the same Delight twice!
+        // Check for Duplicate Delight Signal
+        const duplicate_key = `delight-${signal}-${email}`;
+        return kvdb.get(duplicate_key).then( duplicate => {
+            // Duplicate Detected 
+            // Abort and Track in Librato
+            if (duplicate) {
+                opengrowth.track.delight(
+                    `duplicate.${signal}`
+                ,   signal
+                ,   customer
+                );
+                return request.ok();
+            }
 
-        // Done!
-        return request.ok();
+            // Record Activity so we can prevent future duplicates
+            // Then run the signal's delight handler.
+            return kvdb.set( duplicate_key, true ).then( () => {
+                // Run the signal's delight handler 
+                // This is in /signals/ directory
+                opengrowth.signals[signal]( request, customer );
+
+                // Done!
+                return request.ok();
+            } );
+        } );
     } );
 }
 
