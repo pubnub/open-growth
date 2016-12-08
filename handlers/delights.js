@@ -28,11 +28,11 @@ export default request => {
     // TODO Augment/Extend the User Profile in the KV Entry
     //      with all new keys supplied in the signal data
     //      so we have a progressively built profile.
-    //      Right now it's just overriding the existing cutomer.
+    //      Right now it's just overriding the existing customer.
 
     // When processing a Non-delight
     // such as running ./signals/import.js then
-    // we don't need the lookup a customer record
+    // we don't need to lookup a customer record
     if (!email) return opengrowth.signals[signal](request);
 
     return kvdb.get(email).then( customer => {
