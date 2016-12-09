@@ -33,7 +33,10 @@ export default request => {
     // When processing a Non-delight
     // such as running ./signals/import.js then
     // we don't need to lookup a customer record
-    if (!email) return opengrowth.signals[signal](request);
+    if (!email) {
+        opengrowth.track.signal( `no-email.${signal}`, message );
+        return opengrowth.signals[signal](request);
+    }
 
     return kvdb.get(email).then( customer => {
         // Run any.js for '*'

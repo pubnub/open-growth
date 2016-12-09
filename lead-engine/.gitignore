@@ -1,0 +1,5 @@
+*.json
+.env
+node_modules
+*.pyc
+*.sqlite

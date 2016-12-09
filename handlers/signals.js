@@ -22,14 +22,10 @@ export default request => {
     const signal  = message.signal;
     const email   = message.email;
 
-    // TODO de-duplicate (prevent duplicate signals from activiating)
-    // TODO track signal analytics with total/yr/mm/day/hour
-
     // Record the signal!
     opengrowth.track.signal( signal, message );
 
     // TODO special track signal 'reaction' for extra metrics
-    // TODO track sent delights
     // TODO send to SQL DB
     
     // Ignore if not a customer delight
