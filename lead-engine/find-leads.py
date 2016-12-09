@@ -1,8 +1,24 @@
 ## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+## LeadEngine
+## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+"""LeadEngine Usage
+
+Usage:
+  find-leads.py [--title=TITLE] [--country=COUNTRY]
+
+Options:
+  -h --help        Show this screen.
+  --title=<name>   Job Role Title of Prospects to Find [default: Software]
+  --country=<name> Name of Country to Search [default: US]
+
+"""
+
+## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ## Libs
 ## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 import json
 import clearbit
+from docopt import docopt
 
 ## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ## Runstate
@@ -19,20 +35,19 @@ run = {
 ## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ## Main
 ## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-def main():
+def main(args):
     config       = loadjson('./../keys.json')
     clearbit.key = config['clearbit']['apikey']
 
     ## Find Companies
-    for company in discovery({'country':'US'}):
-        print(company)
+    for company in discovery({ 'country' : args['--country'] or 'US' }):
+        ##print(json.dumps(company))
 
         ## Find Prospects
-        for prospect in prospector( company['domain'], 'Software' ):
-            print(prospect)
-
-    ## Print Result Metrics
-    print( 'Totals: ', run['metrics'] )
+        for prospect in prospector(
+            company['domain']
+        ,   args['--title'] or 'Software'
+        ): print(json.dumps(prospect))
 
 ## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ## Discovery: Get Company Names
@@ -64,34 +79,23 @@ def discovery( query, page=0 ):
 ## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ## Prospector: Find Target Customers
 ## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-def prospector( domain, title, page=1 ):
-    limit = 0
-    count = 0
-
-    ## Get all Prospects
-    while not limit or limit == count:
-        page += 1
+def prospector( domain, title ):
+    ## Get as many Prospects as possible
+    try:
         prospects = clearbit.Prospector.search(
             domain=domain
         ,   query=title
         ,   email=True
-        ,   limit=100
-        ,   page=page
+        ,   limit=20
         )
+    except: prospects = []
 
-        ## Yield Companies One-by-One
-        count = 0
-        for prospect in prospects: 
-            count += 1
-            if prospect['email'] in run['emails']: 
-                count = 0
-                break
-            run['emails'][prospect['email']] = 1
-            run['metrics']['prospects'] += 1
-            yield prospect
-
-        ## Continue Collecting Companies
-        if not limit: limit = count or 10
+    ## Yield Companies One-by-One
+    for prospect in prospects: 
+        if prospect['email'] in run['emails']: break
+        run['emails'][prospect['email']] = 1
+        run['metrics']['prospects'] += 1
+        yield prospect
 
 ## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ## Enrichment: Get Person
@@ -111,5 +115,8 @@ def loadjson(filename):
 ## If Main
 ## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 if __name__ == '__main__': 
-    try                                      : main()
-    except ( KeyboardInterrupt, SystemExit ) : print('\nGoodbye!\n')
+    args = docopt( __doc__, version='LeadEngine 1.0' )
+    try: main(args)
+    except ( KeyboardInterrupt, SystemExit ):
+        print("\nGoodbye!\n")
+        print(run['metrics'] )
