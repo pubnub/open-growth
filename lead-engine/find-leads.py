@@ -4,11 +4,11 @@
 """LeadEngine Usage
 
 Usage:
-  find-leads.py [--title=TITLE] [--country=COUNTRY]
+  find-leads.py [--role=ROLE] [--country=COUNTRY]
 
 Options:
   -h --help        Show this screen.
-  --title=<name>   Job Role Title of Prospects to Find [default: Software]
+  --role=<name>    Job Role of Prospects to Find [default: engineering]
   --country=<name> Name of Country to Search [default: US]
 
 """
@@ -46,7 +46,7 @@ def main(args):
         ## Find Prospects
         for prospect in prospector(
             company['domain']
-        ,   args['--title'] or 'Software'
+        ,   args['--role'] or 'engineering'
         ): print(json.dumps(prospect))
 
 ## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -79,12 +79,12 @@ def discovery( query, page=0 ):
 ## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ## Prospector: Find Target Customers
 ## =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-def prospector( domain, title ):
+def prospector( domain, role ):
     ## Get as many Prospects as possible
     try:
         prospects = clearbit.Prospector.search(
             domain=domain
-        ,   query=title
+        ,   query=role
         ,   email=True
         ,   limit=20
         )
