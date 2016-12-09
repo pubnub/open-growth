@@ -4,8 +4,6 @@ opengrowth.signals.signup = ( request, customer ) => {
     const user    = request.message;
     const csm     = user.csm;
 
-    //{ "csm": { "phone": "", "first_name": "Jason", "last_name": "Wimp", "email": "jason@pubnub.com", "full_name": "Jason Wimp" }, "user_id": 303915, "account_id": 303915, "signal": "signup", "app_id": 343113, "id": 303915, "key_id": 238389,  "email": "it@myhappyforce.com" }
-
     let name = '';
     try       { name = customer.person.name.fullName }
     catch (e) { name = 'there' }
