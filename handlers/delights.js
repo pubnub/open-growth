@@ -51,6 +51,7 @@ export default request => {
         // We don't want to send the same Delight twice!
         // Check for Duplicate Delight Signal
         const duplicate_key = `delight-${signal}-${email}`;
+        const duplicate_ttl = 720/*hour*/ * 60/*min*/;
         return kvdb.get(duplicate_key).then( duplicate => {
             // Duplicate Detected 
             // Abort and Track in Librato
@@ -65,7 +66,7 @@ export default request => {
 
             // Record Activity so we can prevent future duplicates
             // Then run the signal's delight handler.
-            return kvdb.set( duplicate_key, true ).then( () => {
+            return kvdb.set( duplicate_key, true, duplicate_ttl ).then( () => {
                 // Run the signal's delight handler 
                 // This is in /signals/ directory
                 opengrowth.signals[signal]( request, customer );
