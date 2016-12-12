@@ -36,5 +36,6 @@
     "request" : "latest"
   , "request-promise" : "latest"
   , "gulp" : "latest"
+  , "librato" : "latest"
   }
 }
