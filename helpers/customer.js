@@ -15,7 +15,12 @@ opengrowth.customer = ( email, signal ) => {
     const usecase_classifier = 'cl_Lyv9HzfF';
     return new Promise( ( resolve, reject ) => {
         opengrowth.modules.clearbit.lookup(email).then( customer => {
+            monkeyLearn( customer, resolve, reject )
+        }).catch( error => {
+            monkeyLearn( {}, resolve, reject )
+        });
 
+        monkeyLearn = ( customer, resolve, reject ) => {
             // keep track of details
             customer.email  = email;
             customer.signal = signal;
@@ -31,7 +36,7 @@ opengrowth.customer = ( email, signal ) => {
                 customer.usecase = usecase;
                 resolve(customer);
             } );
-        } );
+        }
     } );
 
 };
