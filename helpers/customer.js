@@ -20,7 +20,7 @@ opengrowth.customer = ( email, signal ) => {
             monkeyLearn( {}, resolve, reject )
         });
 
-        monkeyLearn = ( customer, resolve, reject ) => {
+        var monkeyLearn = ( customer, resolve, reject ) => {
             // keep track of details
             customer.email  = email;
             customer.signal = signal;
