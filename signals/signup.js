@@ -3,6 +3,7 @@ opengrowth.signals.signup = ( request, customer ) => {
     const subject = 'Your PubNub Account: Getting Started';
     const user    = request.message;
     const csm     = user.csm;
+    const bccs     = user.csm.bccs || [];
 
     let name = '';
     try       { name = customer.person.name.fullName }
@@ -24,6 +25,6 @@ opengrowth.signals.signup = ( request, customer ) => {
 
     // Send Email and Track Delight in Librato
     opengrowth.delight.sendgrid.email(
-        'signup', message, email, name, subject
+        'signup', message, email, name, subject, bccs
     );
 };

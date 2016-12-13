@@ -3,7 +3,7 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.delight.sendgrid = {};
 opengrowth.delight.sendgrid.email = (
-    signal, message, email, name, subject
+    signal, message, email, name, subject, bccs
 ) => {
 
     // Record Delight Activity
@@ -11,6 +11,7 @@ opengrowth.delight.sendgrid.email = (
         email   : email
     ,   subject : subject
     ,   message : message
+    ,   bccs    : bccs
     } );
     
     // sendgrid api url
@@ -39,6 +40,7 @@ opengrowth.delight.sendgrid.email = (
     ,   personalizations  : [ {
             to      : [ { email : email, name : name } ]
         ,   subject : subject
+        ,   bccs    : bccs
         } ]
     };
 
