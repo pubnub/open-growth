@@ -1,7 +1,13 @@
 opengrowth.signals.day3 = ( request, customer ) => {
     const email = 'open-growth-activity@pubnub.com';//request.message.email
     let subject = '';
-    try      { subject = `${customer.company.name} - adding realtime to your app`}
+    try { 
+        if(customer.company.name == null || customer.company.name == 'null' ){
+            subject = `Adding realtime to your app`;
+        } else {
+            subject = `${customer.company.name} - adding realtime to your app`
+        }
+    }
     catch(e) { subject = `Adding realtime to your app`}
 
     let name = '';
