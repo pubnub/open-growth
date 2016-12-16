@@ -20,7 +20,8 @@ opengrowth.signals.signup = ( request, customer ) => {
         `<p>Your API Keys` +
         `<br />`+
         `<a href="https://admin.pubnub.com/#/user/${user.user_id}/account/${user.account_id}/app/${user.app_id}/key/${user.key_id}/?utm_source=EmailBlasts%20&utm_medium=Open-Growth&utm_campaign=EB-CY16-Q4-Open-Growth-01&utm_term=link2&utm_content=api-keys">https://admin.pubnub.com/#/user/${user.user_id}/account/${user.account_id}/app/${user.app_id}/key/${user.key_id}/</a></p>` +
-        `<p>Welcome Aboard!</p>`;
+        `<p>Welcome Aboard!</p>`+
+        `<p>This email would have been sent to: ${request.message.email}</p>`;
 
     // Logging Message
     console.log(message);
