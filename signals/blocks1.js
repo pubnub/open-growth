@@ -10,9 +10,6 @@ opengrowth.signals.blocks1 = ( request, customer ) => {
     try       { fname = customer.person.name.givenName }
     catch (e) { fname = 'there' }
 
-    console.log(customer);
-    console.log(request.message);
-
     const message =
         `<p>Hi ${fname},</p>` +
         `<p>We noticed your PubNub ${request.message.block_name} block in your ${request.message.app_} app will expire in 3 days. We have a 30 day limit on running block in the FREE tier. You can upgrade to a new plan to keep blocks running continuously.</p>` +
