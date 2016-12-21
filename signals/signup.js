@@ -7,7 +7,10 @@ opengrowth.signals.signup = ( request, customer ) => {
 
     let name = '';
     try       { name = customer.person.name.fullName }
-    catch (e) { name = 'there' }
+    catch (e) { 
+    	try       { name = user.first_name }
+	catch (e) { name = 'there' }
+    }
 
     const message =
         `<p>Hi ${name},</p>` +
@@ -24,7 +27,7 @@ opengrowth.signals.signup = ( request, customer ) => {
         `<p>This email would have been sent to: ${request.message.email}</p>`;
 
     // Logging Message
-    console.log(message);
+    console.log(request.message);
 
     // Send Email and Track Delight in Librato
     opengrowth.delight.sendgrid.email(
