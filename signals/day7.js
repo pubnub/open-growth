@@ -7,7 +7,14 @@ opengrowth.signals.day7 = ( request, customer ) => {
     catch (e) { name = '' }
     
     let company = '';
-    try { company = 'the ' + customer.company.name }
+    try { 
+	if (customer.company.name != null) { 
+	    company = 'the ' + customer.company.name 
+	}
+        else {
+	    throw "Company name is null";
+	}
+    }
     catch (e) { company = "your company's"};
 
     const message =

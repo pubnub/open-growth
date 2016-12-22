@@ -22,8 +22,8 @@ opengrowth.signals.day3 = ( request, customer ) => {
     try { company = customer.company.name }
     catch (e) { company = '' }
 
-    const message = `<p>Hope you’ve had the time to navigate through the PubNub Admin Portal and the PubNub Docs Page over the last few days${fname}</p>`; 
-    if (company == '') { 
+    let message = `<p>Hope you’ve had the time to navigate through the PubNub Admin Portal and the PubNub Docs Page over the last few days${fname}</p>`; 
+    if (company == '' || company == null) { 
         message += `Curious if you or another member of your company is assessing PubNub to power realtime capabilities in your application?</p>`;
     } else {
 	message += `<p>On another note, I see that you work at ${company}. Curious if you or another member of ${company} is assessing PubNub to power realtime capabilities in your application?</p>`;
