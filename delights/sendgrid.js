@@ -3,7 +3,7 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.delight.sendgrid = {};
 opengrowth.delight.sendgrid.email = (
-    signal, message, email, name, subject, bccs
+    signal, message, email, name, sender_email, sender_name, subject, bccs
 ) => {
 
     // Record Delight Activity
@@ -27,13 +27,9 @@ opengrowth.delight.sendgrid.email = (
     const replyto      = opengrowth.keys.sendgrid.replyto;
     const replyto_name = opengrowth.keys.sendgrid.replyto_name;
 
-    // sendgrid sender email address
-    const sender      = opengrowth.keys.sendgrid.sender;
-    const sender_name = opengrowth.keys.sendgrid.sender_name;
-
     // payload
     const data = {
-        from              : { email: sender,  name: sender_name  }
+        from              : { email: sender_email,  name: sender_name  }
     ,   reply_to          : { email: replyto, name: replyto_name }
     ,   tracking_settings : { subscription_tracking : { enable : false } }
     ,   content           : [ { type : "text/html", value : message } ]

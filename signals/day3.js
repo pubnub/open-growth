@@ -14,13 +14,16 @@ opengrowth.signals.day3 = ( request, customer ) => {
     try       { name = customer.person.name.fullName }
     catch (e) { name = '' }
 
-    var fname = '';
+    let fname = '';
     try       { fname = ', '+customer.person.name.givenName + '.' }
     catch (e) { fname = '.' }
     
-    var company = '';
+    let company = '';
     try { company = customer.company.name }
     catch (e) { company = '' }
+
+    let sender_email = request.message.csm.email;
+    let sender_name = request.message.csm.full_name;
 
     let message = `<p>Hope you’ve had the time to navigate through the PubNub Admin Portal and the PubNub Docs Page over the last few days${fname}</p>`; 
     if (company == '' || company == null) { 
@@ -35,6 +38,6 @@ opengrowth.signals.day3 = ( request, customer ) => {
                `<p>This email would have been sent to: ${request.message.email}</p>`;
 
     opengrowth.delight.sendgrid.email(
-        'day3', message, email, name, subject
+        'day3', message, email, name, sender_email, sender_name, subject
     );
 };

@@ -4,13 +4,15 @@ opengrowth.signals.signup = ( request, customer ) => {
     const user    = request.message;
     const csm     = user.csm;
     const bccs    = user.csm.bccs || [];
+    const sender_name = 'Neumann';
+    const sender_email = 'stephen@pubnub.com';
 
     let name = '';
     try       { name = customer.person.name.fullName }
-    catch (e) { name = 'there' }
+    catch (e) { name = null }
 
     const message =
-        `<p>Hi ${name},</p>` +
+        `<p>Hi ${name || 'there'},</p>` +
         `<p>Welcome to PubNub. Your API Keys have been provisioned in 15 global Points of Presence.</p>` +
         `<p>By the way, I am Neumann, an Artificial Intelligence alive in PubNub BLOCKS. Welcome to the Programmable Network. Your designated human is ${csm.full_name} and he can help you with your project when you have questions -  his phone is ${csm.phone || '(415) 223-7552'} and email is ${csm.email}.</p>` + 
         `<p>Meanwhile, get started with:</p>` +
@@ -28,6 +30,6 @@ opengrowth.signals.signup = ( request, customer ) => {
 
     // Send Email and Track Delight in Librato
     opengrowth.delight.sendgrid.email(
-        'signup', message, email, name, subject, bccs
+        'signup', message, email, name, sender_email, sender_name, subject, bccs
     );
 };
