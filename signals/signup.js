@@ -10,6 +10,7 @@ opengrowth.signals.signup = ( request, customer ) => {
     let name = '';
     try       { name = customer.person.name.fullName }
     catch (e) { name = null }
+    if ( name == 'Not Found' ) { name = null }
 
     const message =
         `<p>Hi ${name || 'there'},</p>` +

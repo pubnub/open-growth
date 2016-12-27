@@ -11,11 +11,23 @@ opengrowth.signals.day3 = ( request, customer ) => {
     catch(e) { subject = `Adding realtime to your app`}
 
     let name = '';
-    try       { name = customer.person.name.fullName }
+    try       {
+        if ( customer.person.name.fullName == 'Not Found' || customer.person.name.fullName == null || customer.person.name.fullName == 'null' ){
+            name = '';
+        } else {
+            name = customer.person.name.fullName;
+        }
+    }
     catch (e) { name = '' }
 
     let fname = '';
-    try       { fname = ', '+customer.person.name.givenName + '.' }
+    try       { 
+        if ( customer.person.name.givenName == 'Not Found' || customer.person.name.givenName == null || customer.person.name.givenName == 'null' ){
+            fname = '.';
+        } else {
+            fname = ', '+customer.person.name.givenName + '.';
+        }
+    }
     catch (e) { fname = '.' }
     
     let company = '';
