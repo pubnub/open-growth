@@ -8,7 +8,7 @@ opengrowth.signals.signup = ( request, customer ) => {
     const sender_email = 'neumann@pubnub.com';
 
     let name = '';
-    try       { name = customer.person.name.fullName }
+    try       { name = customer.person.name.givenName }
     catch (e) { name = null }
     if ( name == 'Not Found' ) { name = null }
 
