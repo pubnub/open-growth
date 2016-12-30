@@ -6,6 +6,8 @@ opengrowth.signals.signup = ( request, customer ) => {
     const bccs    = user.csm.bccs || [];
     const sender_name = 'Neumann';
     const sender_email = 'neumann@pubnub.com';
+    const reply_email = 'neumann@pubnub.com';
+    const reply_name = 'Neumann';
 
     let name = '';
     try       { name = customer.person.name.givenName }
@@ -26,11 +28,8 @@ opengrowth.signals.signup = ( request, customer ) => {
         `<p>Welcome Aboard!</p>`+
         `<p>This email would have been sent to: ${request.message.email}</p>`;
 
-    // Logging Message
-    console.log(message);
-
     // Send Email and Track Delight in Librato
     opengrowth.delight.sendgrid.email(
-        'signup', message, email, name, sender_email, sender_name, subject, bccs
+        'signup', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs
     );
 };

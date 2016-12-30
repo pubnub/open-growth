@@ -36,6 +36,8 @@ opengrowth.signals.day3 = ( request, customer ) => {
 
     let sender_email = request.message.csm.email;
     let sender_name = request.message.csm.full_name;
+    let reply_email = request.message.csm.email;
+    let reply_name = request.message.csm.full_name;
 
     let message = `<p>Hope you’ve had the time to navigate through the PubNub Admin Portal and the PubNub Docs Page over the last few days${fname}</p>`; 
     if (company == '' || company == null) { 
@@ -50,6 +52,6 @@ opengrowth.signals.day3 = ( request, customer ) => {
                `<p>This email would have been sent to: ${request.message.email}</p>`;
 
     opengrowth.delight.sendgrid.email(
-        'day3', message, email, name, sender_email, sender_name, subject
+        'day3', message, email, name, sender_email, sender_name, reply_email, reply_name, subject
     );
 };

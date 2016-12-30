@@ -19,6 +19,8 @@ opengrowth.signals.day7 = ( request, customer ) => {
 
     let sender_email = request.message.csm.email;
     let sender_name = request.message.csm.full_name;
+    let reply_email = request.message.csm.email;
+    let reply_name = request.message.csm.full_name;
 
     const message =
         `<p>${name}I wanted to follow up on my email in case it got buried the other day.</p>` +
@@ -28,6 +30,6 @@ opengrowth.signals.day7 = ( request, customer ) => {
         `<p>This email would have been sent to: ${request.message.email}</p>`;
 
     opengrowth.delight.sendgrid.email(
-        'day7', message, email, name, sender_email, sender_name, subject
+        'day7', message, email, name, sender_email, sender_name, reply_email, reply_name, subject
     );
 };
