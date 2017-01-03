@@ -23,9 +23,9 @@ const apikeys = require('./keys.json');
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 var $scope = {
     key_id      : 226891
-,   block_id    : 2071
-,   signals_id  : 2010
-,   delights_id : 2521
+,   block_id    : 4152 
+,   signals_id  : 3880
+,   delights_id : 3881
 };
 
 pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password ).then( login => {
