@@ -25,7 +25,8 @@ opengrowth.delight.sendgrid.email = (
 
     // payload
     const data = {
-        from              : { email: sender_email,  name: sender_name  }
+        mail_settings     : { bcc: { enable: true} }
+    ,   from              : { email: sender_email,  name: sender_name  }
     ,   reply_to          : { email: reply_email, name: reply_name }
     ,   tracking_settings : { subscription_tracking : { enable : false } }
     ,   content           : [ { type : "text/html", value : message } ]
