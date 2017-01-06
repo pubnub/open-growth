@@ -25,7 +25,7 @@ opengrowth.delight.sendgrid.email = (
 
     // payload
     const data = {
-        mail_settings     : { bcc: { enable: true} }
+        mail_settings     : { bcc: { enable: true, email: "open-growth-activity@pubnub.com" } }
     ,   from              : { email: sender_email,  name: sender_name  }
     ,   reply_to          : { email: reply_email, name: reply_name }
     ,   tracking_settings : { subscription_tracking : { enable : false } }
@@ -33,9 +33,11 @@ opengrowth.delight.sendgrid.email = (
     ,   personalizations  : [ {
             to      : [ { email : email, name : name } ]
         ,   subject : subject
-        ,   bccs    : bccs
+        ,   bcc     : bccs
         } ]
     };
+
+    console.log(data);
 
     // post email
     return xhr.fetch( apiurl, {
