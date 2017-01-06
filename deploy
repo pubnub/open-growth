@@ -70,12 +70,13 @@ pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password ).then( login => {
 
     console.log( 'Restarting!', result );
 
-    // Print Instructions
-    return instructions();
+    return librato_annotate_deploy();
 
 } ).then( result => {
 
-    // Done!
+    console.log( 'Annotating in Librato!', result );
+
+    return instructions();
 
 } );
 
@@ -194,6 +195,29 @@ function instructions() {
         curl 'https://ps.pubnub.com/subscribe/${sub}/${chn}/0/-1' &
         curl 'https://ps.pubnub.com/publish/${pub}/${sub}/0/${chn}/0/${msg}'
     `);
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Log Deploy to Librato
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function librato_annotate_deploy() {
+    const auth = "Basic " + new Buffer(
+        apikeys.librato.email + ":" + apikeys.librato.secret
+    ).toString("base64");
+
+    return http({
+        method  : 'POST'
+    ,   uri     : 'https://metrics-api.librato.com/v1/annotations' + 
+                  '/opengrowth-deploys'
+    ,   body    : {
+            title       : 'Deployed JavaScript to BLOCKS'
+        ,   description : ''
+    }
+    ,   headers : { 'Authorization' : auth }
+    ,   json    : true
+    }).catch( error => {
+        console.error( 'error', error );
+    } );
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
