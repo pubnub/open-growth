@@ -1,6 +1,11 @@
 opengrowth.signals.day7 = ( request, customer ) => {
     const email = 'open-growth-activity@pubnub.com';//request.message.email
     const subject = `Following up re: PubNub`;
+    const sender_email = request.message.csm.email;
+    const sender_name = request.message.csm.full_name;
+    const reply_email = request.message.csm.email;
+    const reply_name = request.message.csm.full_name;
+    const bccs  = request.message.csm.bccs;
 
     let name = '';
     try       { name = customer.person.name.givenName + ' - ' }
@@ -17,11 +22,6 @@ opengrowth.signals.day7 = ( request, customer ) => {
     }
     catch (e) { company = "your company's"};
 
-    let sender_email = request.message.csm.email;
-    let sender_name = request.message.csm.full_name;
-    let reply_email = request.message.csm.email;
-    let reply_name = request.message.csm.full_name;
-
     const message =
         `<p>${name}I wanted to follow up on my email in case it got buried the other day.</p>` +
         `<p>Do you or someone from ${company} engineering team need help setting up realtime functionality with PubNub?</p>` + 
@@ -30,6 +30,6 @@ opengrowth.signals.day7 = ( request, customer ) => {
         `<p>This email would have been sent to: ${request.message.email}</p>`;
 
     opengrowth.delight.sendgrid.email(
-        'day7', message, email, name, sender_email, sender_name, reply_email, reply_name, subject
+        'day7', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs
     );
 };

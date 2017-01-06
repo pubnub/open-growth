@@ -3,7 +3,7 @@ opengrowth.signals.signup = ( request, customer ) => {
     const subject = 'Your PubNub Account: Getting Started';
     const user    = request.message;
     const csm     = user.csm;
-    const bccs    = user.csm.bccs || [];
+    const bccs    = csm.bccs;
     const sender_name = 'Neumann';
     const sender_email = 'neumann@pubnub.com';
     const reply_email = 'neumann@pubnub.com';
