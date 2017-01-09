@@ -8,7 +8,7 @@ var pubnub = require('pubnub')
 // Salesforce
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 module.exports = function (app) {
-    app.get( '/sendgrid/', function( request, response ) {
+    app.post( '/sendgrid/', function( request, response ) {
 
         var pn = new pubnub({
               "publishKey"   : config.pubkey
