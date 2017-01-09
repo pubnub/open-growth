@@ -13,6 +13,7 @@ require('./producthunt')   (app);
 require('./slashdot')      (app);
 require('./stackoverflow') (app);
 require('./techcrunch')    (app);
+require('./sendgrid')      (app);
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Startup
