@@ -6,8 +6,8 @@ opengrowth.signals.signup = ( request, customer ) => {
     const bccs    = csm.bccs;
     const sender_name = 'Neumann';
     const sender_email = 'neumann@pubnub.com';
-    const reply_email = 'neumann@pubnub.com';
-    const reply_name = 'Neumann';
+    const reply_email = 'support@pubnub.com';
+    const reply_name = 'Support';
 
     let name = '';
     try       { name = customer.person.name.givenName }
