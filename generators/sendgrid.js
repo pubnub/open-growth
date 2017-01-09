@@ -10,7 +10,7 @@ var pubnub = require('pubnub')
 module.exports = function (app) {
     app.get( '/sendgrid/', function( request, response ) {
 
-        let pn = new pubnub({
+        var pn = new pubnub({
               "publishKey"   : config.pubkey
             , "subscribeKey" : config.subkey
             , "secretKey"    : config.seckey
