@@ -11,9 +11,8 @@ module.exports = function (app) {
     app.post( '/sendgrid/', function( request, response ) {
 
         var pn = new pubnub({
-              "publishKey"   : config.pubkey
-            , "subscribeKey" : config.subkey
-            , "secretKey"    : config.seckey
+              "publishKey"   : process.env.TESTPUBKEY
+            , "subscribeKey" : process.env.TESTSUBKEY
         });
         
         pn.publish({
