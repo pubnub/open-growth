@@ -13,6 +13,8 @@ module.exports = function (app) {
     app.use(bodyParser.urlencoded({ extended: false }))
 
     app.post( '/sendgrid/', function( request, response ) {
+        console.log(request);
+
         var pn = new pubnub({
               "publishKey"   : process.env.TESTPUBKEY
             , "subscribeKey" : process.env.TESTSUBKEY
@@ -24,6 +26,6 @@ module.exports = function (app) {
         });
 
         //tell sendgrid 200 ok.
-        response.send(200);
+        response.sendStatus(200);
     });
 };
