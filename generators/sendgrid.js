@@ -11,9 +11,9 @@ var bodyParser = require('body-parser')
 module.exports = function (app) {
     // Tell express to use the body-parser middleware
     app.use(bodyParser.urlencoded({ extended: true }));
-    console.log(request);
 
     app.post( '/sendgrid', function( request, response ) {
+        console.log(request);
 
         var pn = new pubnub({
               "publishKey"   : process.env.TESTPUBKEY
