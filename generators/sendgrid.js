@@ -9,12 +9,11 @@ var bodyParser = require('body-parser')
 // SendGrid
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 module.exports = function (app) {
-    // Tell express to use the body-parser middleware and to not parse extended bodies
-    app.use(bodyParser.urlencoded({ extended: false }))
+    // Tell express to use the body-parser middleware
+    app.use(bodyParser.urlencoded({ extended: true }))
 
     app.post( '/sendgrid/', function( request, response ) {
-        console.log(request);
-
+        
         var pn = new pubnub({
               "publishKey"   : process.env.TESTPUBKEY
             , "subscribeKey" : process.env.TESTSUBKEY
