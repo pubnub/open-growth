@@ -48,7 +48,7 @@ opengrowth.delight.sendgrid.email = (
     ,   'Content-Type'  : 'application/json'
     }
     } ).catch( err => {
-        //console.log( 'Error:', err );
+        console.log( 'Error:', err );
     } );
 
 };
