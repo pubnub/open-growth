@@ -9,6 +9,7 @@ var pubnub = require('pubnub')
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 module.exports = function (app) {
     app.post( '/sendgrid/', function( request, response ) {
+        console.log(request);
 
         var pn = new pubnub({
               "publishKey"   : process.env.TESTPUBKEY
