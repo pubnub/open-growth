@@ -3,23 +3,25 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 var config = require('./config')
 var pubnub = require('pubnub')
+var bodyParser = require('body-parser')
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Salesforce
+// SendGrid
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 module.exports = function (app) {
-    app.post( '/sendgrid/', function( request, response ) {
-        console.log(request.body);
+    // Tell express to use the body-parser middleware and to not parse extended bodies
+    app.use(bodyParser.urlencoded({ extended: false }))
 
-        // var pn = new pubnub({
-        //       "publishKey"   : process.env.TESTPUBKEY
-        //     , "subscribeKey" : process.env.TESTSUBKEY
-        // });
+    app.post( '/sendgrid/', function( request, response ) {
+        var pn = new pubnub({
+              "publishKey"   : process.env.TESTPUBKEY
+            , "subscribeKey" : process.env.TESTSUBKEY
+        });
         
-        // pn.publish({
-        //       "channel" : "sg_analytics"
-        //     , "message" : request
-        // });
+        pn.publish({
+              "channel" : "sg_analytics"
+            , "message" : request.body
+        });
 
         //tell sendgrid 200 ok.
         response.send(200);
