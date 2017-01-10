@@ -10,7 +10,7 @@ var bodyParser = require('body-parser')
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 module.exports = function (app) {
     // Tell express to use the body-parser middleware
-    app.use(bodyParser.urlencoded({ extended: true }))
+    app.use(bodyParser.urlencoded({ extended: true }));
 
     app.post( '/sendgrid/', function( request, response ) {
         
