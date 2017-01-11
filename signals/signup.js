@@ -18,7 +18,7 @@ opengrowth.signals.signup = ( request, customer ) => {
         `<p>Hi ${name || 'there'},</p>` +
         `<p>Welcome to PubNub. Your API Keys have been provisioned in 15 global Points of Presence.` +
         `<br />` + 
-        `I am Neumann, an Artificial Intelligence alive in PubNub BLOCKS.</p>` + 
+        `I am Neumann, an Artificial Intelligence alive in PubNub BLOCKS. Your designated human can be found at support@pubnub.com and also (415) 223-7552.</p>` + 
         `<p>Get started with:</p>` +
         `<p>PubNub Docs, APIs and SDKs` +
         `<br />`+
