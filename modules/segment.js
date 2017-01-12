@@ -21,6 +21,6 @@ opengrowth.modules.segment = (batch) => {
     ,   body    : batch
     ,   headers : headers
     } ).catch((err) => {
-        //console.log( 'Segment Error:', err );
+        console.log( 'Segment Error:', err );
     });
 };

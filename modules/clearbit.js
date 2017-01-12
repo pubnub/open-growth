@@ -23,7 +23,7 @@ opengrowth.modules.clearbit.lookup = (email) => {
         } ).then( response => {
             resolve(JSON.parse(response.body));
         } ).catch( err => {
-            console.log( 'Error:', err );
+            console.log( 'Clearbit Error:', err );
         } );
     } );
 

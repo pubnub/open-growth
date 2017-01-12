@@ -47,8 +47,11 @@ opengrowth.delight.sendgrid.email = (
         'Authorization' : `Bearer ${apikey}`
     ,   'Content-Type'  : 'application/json'
     }
-    } ).catch( err => {
-        console.log( 'Error:', err );
+    } ).then( (one) => {
+        console.log( one );
+    })
+    .catch( err => {
+        console.log( 'SendGrid Error:', err );
     } );
 
 };

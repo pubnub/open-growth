@@ -32,6 +32,6 @@ opengrowth.modules.librato = ( key, value ) => {
     ,   body    : data
     ,   headers : headers
     } ).catch((err) => {
-        //console.log( 'Librato Error:', err );
+        console.log( 'Librato Error:', err );
     });
 };

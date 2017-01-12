@@ -27,7 +27,7 @@ opengrowth.modules.monkeylearn.classify = ( input, classifier ) => {
         } ).then( response => {
             resolve(JSON.parse(response.body).result[0][0]);
         } ).catch( err => {
-            //console.log( 'Error:', err );
+            console.log( 'MonkeyLearn Error:', err );
         } );
     } );
 
