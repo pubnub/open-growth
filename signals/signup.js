@@ -16,11 +16,13 @@ opengrowth.signals.signup = ( request, customer ) => {
 
     const message =
         `<p>Hi ${name || 'there'},</p>` +
-        `<p>Welcome to PubNub. Your API Keys have been provisioned in 15 global Points of Presence.` +
-        `<br />` + 
-        `I am Neumann, an Artificial Intelligence alive in PubNub BLOCKS.` + 
-        `Your designated human Craig and his awesome support team can be found at support@pubnub.com.  ` +
-        `They respond really quickly and can answer just about any question in the universe.</p>` + 
+        `<p>` +
+            `Welcome to PubNub. Your API Keys have been provisioned in 15 global Points of Presence.` +
+            `<br />` + 
+            `I am Neumann, an Artificial Intelligence alive in PubNub BLOCKS.` + 
+            `Your designated human Craig and his awesome support team can be found at support@pubnub.com.  ` +
+            `They respond really quickly and can answer just about any question in the universe.` + 
+        `</p>` + 
         `<p>Get started with:</p>` +
         `<p>PubNub Docs, APIs and SDKs` +
         `<br />`+
