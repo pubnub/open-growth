@@ -43,6 +43,12 @@ export default request => {
         opengrowth.track.signal( `no-email.${signal}`, message );
         return opengrowth.signals[signal](request);
     }
+    
+    // Ignore PubNub Emails @pubnub.com
+    if (false and email.indexOf('@pubnub.com') > 0) {
+        opengrowth.track.signal( `filtered.pubnub.com.email.${signal}`, message );
+        return opengrowth.signals[signal](request);
+    }
 
     return kvdb.get(email).then( customer => {
         // Run any.js for '*'
