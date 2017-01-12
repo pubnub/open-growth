@@ -10,7 +10,6 @@ var bodyParser = require('body-parser')
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 module.exports = function (app) {
     // Tell express to use the body-parser middleware
-    //app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
 
     app.post( '/sendgrid', function( request, response ) {
@@ -30,9 +29,3 @@ module.exports = function (app) {
         response.sendStatus(200);
     });
 };
-
-
-// var jsonParser = bodyParser.json({ type: 'application/*+json'});
-// var router = express.Router();
-
-// router.post('/', jsonParser, function(req, res) {
