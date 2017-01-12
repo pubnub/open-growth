@@ -24,6 +24,6 @@ opengrowth.signals.block1day = ( request, customer ) => {
 
     // Send Email and Track Delight in Librato
     opengrowth.delight.sendgrid.email(
-        'block1day', message, email, name, sender_email, sender_name, subject
+        'block1day', message, email, name, sender_email, sender_name, reply_email, reply_name, subject
     );
 };
