@@ -28,12 +28,16 @@ export default request => {
     // TODO special track signal 'reaction' for extra metrics
     // TODO send to SQL DB
     
+    // Track in-line Processed Flag
+    request.message.processed = { "started" : true };
+    
     // Ignore if not a customer delight
     if (!email) return request.ok(); 
 
     // Process Customer Delight
     return opengrowth.customer( email, signal ).then( customer => {
         return kvdb.set( email, customer ).then( result => {
+            request.message.processed.complete = true;
             return request.ok();
         } );
     } );
