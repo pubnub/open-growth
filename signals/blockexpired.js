@@ -1,6 +1,6 @@
 opengrowth.signals.blockexpired = ( request, customer ) => {
     const email   = 'open-growth-activity@pubnub.com';//request.message.email
-    const subject = 'PubNub Block Expiring';
+    const subject = 'PubNub Block Expired';
     const sender_email = 'neumann@pubnub.com';
     const sender_name = 'Neumann';
     const reply_email = 'support@pubnub.com';
