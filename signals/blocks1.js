@@ -15,7 +15,7 @@ opengrowth.signals.blocks1 = ( request, customer ) => {
         `<p>Hi ${name || 'there'},</p>` + 
         `<p>I noticed your PubNub ${request.message.block_name} block in your ${request.message.app_name} app will expire in 3 days. We have a 30 day limit on running blocks in the FREE tier. You can upgrade your usage plan to keep blocks running continuously.</p>` +
         `<p>It will be really sad if your workflow got disrupted.</p>` +
-        `<p>It’s really easy to fix. Simply click here <a href='${url}'>here</a> and restart your block.</p>` +
+        `<p>It’s really easy to fix. Simply click <a href='${url}'>here</a> and restart your block.</p>` +
         `<p>Need help? <a href='mailto:support@pubnub.com'>Contact support</a> anytime.</p>` +
         `<p>Happy coding,<br>` +
         `Neumann</p>`;
