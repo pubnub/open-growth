@@ -3,6 +3,8 @@ opengrowth.signals.blocks2 = ( request, customer ) => {
     const subject = 'PubNub Block Expiring Now';
     const sender_email = 'neumann@pubnub.com';
     const sender_name = 'Neumann';
+    const reply_email = 'support@pubnub.com';
+    const reply_name = 'Support';
 
     let name = '';
     try       { name = customer.person.name.givenName }
