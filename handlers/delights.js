@@ -30,6 +30,12 @@ export default request => {
     //      so we have a progressively built profile.
     //      Right now it's just overriding the existing customer.
 
+    // Unhandled Signals
+    if (!opengrowth.signals[signal]) {
+        opengrowth.track.signal( `unhandled.${signal}`, message );
+        return request.ok();
+    }
+
     // When processing a Non-delight
     // such as running ./signals/import.js then
     // we don't need to lookup a customer record
@@ -41,12 +47,6 @@ export default request => {
     return kvdb.get(email).then( customer => {
         // Run any.js for '*'
         opengrowth.signals['*']( customer, signal );
-
-        // Unhandled Signals
-        if (!opengrowth.signals[signal]) {
-            opengrowth.track.signal( `unhandled.${signal}`, customer );
-            return request.ok();
-        }
 
         // We don't want to send the same Delight twice!
         // Check for Duplicate Delight Signal
