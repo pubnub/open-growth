@@ -1,5 +1,5 @@
 opengrowth.signals.sendgrid = ( request ) => {
-    for (let msg of request) {
+    for (let msg of request.body) {
         if (msg.event === "click") {
             let parameters = msg.url.split(/&signal=/)[1];
             let kv = parameters.split(/&|=/);

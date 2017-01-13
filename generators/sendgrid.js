@@ -13,6 +13,11 @@ module.exports = function (app) {
     app.use(bodyParser.json());
 
     app.post( '/sendgrid', function( request, response ) {
+        var message = {
+            "signal" : "sendgrid",
+            "body"   : request.body
+        };
+
         var pn = new pubnub({
               "publishKey"   : process.env.PN_PUB
             , "subscribeKey" : process.env.PN_SUB
