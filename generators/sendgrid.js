@@ -25,7 +25,7 @@ module.exports = function (app) {
         
         pn.publish({
               "channel" : process.env.PN_CHANNEL
-            , "message" : request.body
+            , "message" : message
         });
 
         //tell sendgrid 200 ok.
