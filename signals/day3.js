@@ -1,4 +1,5 @@
 opengrowth.signals.day3 = ( request, customer ) => {
+    const categories = ['day3'];
     const email = request.message.email;
     const bccs = request.message.csm.bccs;
     const sender_email = request.message.csm.email;
@@ -52,6 +53,6 @@ opengrowth.signals.day3 = ( request, customer ) => {
                `<p>Best, ${request.message.csm.first_name}</p>`;
 
     opengrowth.delight.sendgrid.email(
-        'day3', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs
+        'day3', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs, categories
     );
 };

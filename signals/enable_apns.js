@@ -1,4 +1,5 @@
 opengrowth.signals.apns = ( request, customer ) => {
+    const categories = ['enable_apns'];
     const email = 'open-growth-activity@pubnub.com';//request.message.email
     const subject = 'You enabled APNS!';
     const sender_email = 'neumann@pubnub.com';
@@ -17,6 +18,6 @@ opengrowth.signals.apns = ( request, customer ) => {
 		`<p>Good luck,<br />Neumann</p>`; 
 
     opengrowth.delight.sendgrid.email(
-        'features', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs
+        'features', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs, categories
     );
 };

@@ -1,4 +1,5 @@
 opengrowth.signals.multiplexing = ( request, customer ) => {
+    const categories = ['enable_multiplexing'];
     const email = 'open-growth-activity@pubnub.com';//request.message.email
     const subject = 'You enabled Multiplexing!';
     const sender_email = 'neumann@pubnub.com';
@@ -17,6 +18,6 @@ opengrowth.signals.multiplexing = ( request, customer ) => {
 		`<p>Good luck,<br />Neumann</p>`; 
 
     opengrowth.delight.sendgrid.email(
-        'features', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs
+        'features', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs, categories
     );
 };

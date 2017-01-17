@@ -1,10 +1,12 @@
 opengrowth.signals.block1day = ( request, customer ) => {
+    const categories = ['block1day'];
     const email   = 'open-growth-activity@pubnub.com';//request.message.email
     const subject = 'PubNub Block Expiring Now';
     const sender_email = 'neumann@pubnub.com';
     const sender_name = 'Neumann';
     const reply_email = 'support@pubnub.com';
     const reply_name = 'Support';
+    const bccs = [];
 
     let name = '';
     try       { name = customer.person.name.givenName }
@@ -24,6 +26,6 @@ opengrowth.signals.block1day = ( request, customer ) => {
 
     // Send Email and Track Delight in Librato
     opengrowth.delight.sendgrid.email(
-        'block1day', message, email, name, sender_email, sender_name, reply_email, reply_name, subject
+        'block1day', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs, categories
     );
 };

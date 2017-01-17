@@ -1,4 +1,5 @@
 opengrowth.signals.lms = ( request, customer ) => {
+    const categories = ['enable_lms'];
     const email = 'open-growth-activity@pubnub.com';//request.message.email
     const subject = 'You enabled LMS!';
     const sender_email = 'neumann@pubnub.com';
@@ -17,6 +18,6 @@ opengrowth.signals.lms = ( request, customer ) => {
 		`<p>Good luck,<br />Neumann</p>`; 
 
     opengrowth.delight.sendgrid.email(
-        'features', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs
+        'features', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs, categories
     );
 };

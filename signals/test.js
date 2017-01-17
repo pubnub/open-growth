@@ -12,8 +12,9 @@ opengrowth.signals.test = ( request, customer ) => {
     const reply_name = "Neumann";
     const subject = "this is a test";
     const bccs = "dustin@pubnub.com";
+    const categories = ['testing'];
 
     opengrowth.delight.sendgrid.email(
-        'signup', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs
+        'signup', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs, categories
     );
 };

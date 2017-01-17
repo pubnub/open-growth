@@ -1,4 +1,5 @@
 opengrowth.signals.signup = ( request, customer ) => {
+    const categories = ['signup'];
     const email   = request.message.email;
     const subject = 'Your PubNub Account: Getting Started';
     const user    = request.message;
@@ -34,6 +35,6 @@ opengrowth.signals.signup = ( request, customer ) => {
 
     // Send Email and Track Delight in Librato
     opengrowth.delight.sendgrid.email(
-        'signup', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs
+        'signup', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs, categories
     );
 };

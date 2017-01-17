@@ -1,10 +1,12 @@
 opengrowth.signals.blockexpired = ( request, customer ) => {
+    const categories = ['blockexpired'];
     const email   = 'open-growth-activity@pubnub.com';//request.message.email
     const subject = 'PubNub Block Expired';
     const sender_email = 'neumann@pubnub.com';
     const sender_name = 'Neumann';
     const reply_email = 'support@pubnub.com';
     const reply_name = 'Support';
+    const bcc = [];
 
     let name = '';
     try       { name = customer.person.name.givenName }
@@ -24,6 +26,6 @@ opengrowth.signals.blockexpired = ( request, customer ) => {
 
     // Send Email and Track Delight in Librato
     opengrowth.delight.sendgrid.email(
-        'blockexpired', message, email, name, sender_email, sender_name, reply_email, reply_name, subject
+        'blockexpired', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bcc, categories
     );
 };
