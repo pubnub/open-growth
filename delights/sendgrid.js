@@ -8,10 +8,11 @@ opengrowth.delight.sendgrid.email = (
 
     // Record Delight Activity
     opengrowth.track.delight( 'sendgrid.email', signal, {
-        email   : email
-    ,   subject : subject
-    ,   message : message
-    ,   bccs    : bccs
+        email    : email
+    ,   subject  : subject
+    ,   message  : message
+    ,   bccs     : bccs
+    ,   category : categories[0]
     } );
     
     // sendgrid api url
