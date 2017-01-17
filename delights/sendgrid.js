@@ -29,7 +29,7 @@ opengrowth.delight.sendgrid.email = (
     ,   from              : { email: sender_email,  name: sender_name  }
     ,   reply_to          : { email: reply_email, name: reply_name }
     ,   tracking_settings : { subscription_tracking : { enable : false } }
-    ,   categories        : 
+    ,   categories        : categories
     ,   content           : [ { type : "text/html", value : message } ]
     ,   personalizations  : [ {
             to      : [ { email : email, name : name } ]
