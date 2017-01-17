@@ -49,7 +49,7 @@ opengrowth.signals.day3 = ( request, customer ) => {
     }
     
     message += `<p>Looking forward to hearing from you soon. In the meantime, here's a developer's guide to PubNub:</p>` + 
-               `<p><a href="https://www.pubnub.com/developers/tech/how-pubnub-works/?utm_source=EmailBlasts%20&utm_medium=Open-Growth&utm_campaign=EB-CY16-Q4-Open-Growth-02&utm_term=link1&utm_content=how-pubnub-works">How PubNub Works</a></p>` +
+               `<p><a href="https://www.pubnub.com/developers/tech/how-pubnub-works/?utm_source=EmailBlasts%20&utm_medium=Open-Growth&utm_campaign=EB-CY16-Q4-Open-Growth-02&utm_term=link1&utm_content=how-pubnub-works&link=devguide">How PubNub Works</a></p>` +
                `<p>Best, ${request.message.csm.first_name}</p>`;
 
     opengrowth.delight.sendgrid.email(

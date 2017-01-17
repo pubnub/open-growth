@@ -1,23 +1,21 @@
 opengrowth.signals.sendgrid = ( request ) => {
-    for (var action of request.body) {
-        handlers[action.event](action);
-    }
 
     function categoryEvent ( action ) {
-        opengrowth.track.signal("sg.${action.category}.{action.event}", 1);
+        console.log(`sg.${action.category}.${action.event}`);
+        opengrowth.track.signal(`sg.${action.category}.${action.event}`, 1);
     }
 
     function signalLink ( action ) {
         params = getUrlParams(action.url);
+        console.log(`sg.${params.signal}.link.${params.link}`);
         opengrowth.track.signal(`sg.${params.signal}.link.${params.link}`, 1);
     }
 
     function getUrlParams ( url ) {
-        let parameters = url.split(/&signal=/)[1];
+        let parameters = url.split(/&link=/)[1];
         let kv = parameters.split(/&|=/);
-        let signal = kv[0];
-        let link = kv[2]; //key set or docs
-        return { "signal" : signal, "link" : link };
+        let link = kv[0];
+        return link;
     }
 
     var handlers = {
@@ -33,4 +31,11 @@ opengrowth.signals.sendgrid = ( request ) => {
         , "group_unsubscribe" : signalLink
         , "group_resubscribe" : signalLink
     };
+
+    for (var action of request.message.body) {
+        //only open growth emails have a category property
+        if (action.category) {
+            handlers[action.event](action);
+        }
+    }
 };

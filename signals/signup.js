@@ -27,7 +27,7 @@ opengrowth.signals.signup = ( request, customer ) => {
         `<p>Get started with:</p>` +
         `<p>PubNub Docs, APIs and SDKs` +
         `<br />`+
-        `<a href="https://www.pubnub.com/docs?utm_source=EmailBlasts%20&utm_medium=Open-Growth&utm_campaign=EB-CY16-Q4-Open-Growth-01&utm_term=link1&utm_content=docs-page&signal=signup&link=docs">https://www.pubnub.com/docs</a></p>` +
+        `<a href="https://www.pubnub.com/docs?utm_source=EmailBlasts%20&utm_medium=Open-Growth&utm_campaign=EB-CY16-Q4-Open-Growth-01&utm_term=link1&utm_content=docs-page&link=docs">https://www.pubnub.com/docs</a></p>` +
         `<p>Your API Keys` +
         `<br />`+
         `<a href="https://admin.pubnub.com/#/user/${user.user_id}/account/${user.account_id}/app/${user.app_id}/key/${user.key_id}/?utm_source=EmailBlasts%20&utm_medium=Open-Growth&utm_campaign=EB-CY16-Q4-Open-Growth-01&utm_term=link2&utm_content=api-keys&signal=signup&link=keys">https://admin.pubnub.com/#/user/${user.user_id}/account/${user.account_id}/app/${user.app_id}/key/${user.key_id}/</a></p>` +
