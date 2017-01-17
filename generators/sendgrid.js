@@ -19,12 +19,12 @@ module.exports = function (app) {
         };
 
         var pn = new pubnub({
-              "publishKey"   : process.env.TESTPUBKEY
-            , "subscribeKey" : process.env.TESTSUBKEY
+              "publishKey"   : process.env.PN_PUB
+            , "subscribeKey" : process.env.PN_SUB
         });
         
         pn.publish({
-              "channel" : "sg_analytics"
+              "channel" : process.env.PN_CHANNEL
             , "message" : message
         });
 
