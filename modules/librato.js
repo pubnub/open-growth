@@ -26,6 +26,10 @@ opengrowth.modules.librato = ( key, value ) => {
     ,   'Content-Type'  : 'application/x-www-form-urlencoded'
     };
 
+    console.log("writing to librato now: ");
+    console.log(JSON.stringify(headers));
+    console.log(JSON.stringify(data));
+
     // Send Recording to Librato
     return xhr.fetch( 'https://metrics-api.librato.com/v1/metrics', {
         method  : 'POST'
