@@ -67,8 +67,8 @@ def pn_publish(message):
     if not message:
         return
 
-    pn = Pubnub(publish_key=cfg.PN_PUB, subscribe_key=cfg.PN_SUB)
-    pn.publish(channel=cfg.PN_CHANNEL, message=message)
+    pn = Pubnub(publish_key=cfg.PUBKEY, subscribe_key=cfg.SUBKEY)
+    pn.publish(channel=cfg.OGCHAN, message=message)
 
 
 def publish_signal(ml_results):
