@@ -44,13 +44,14 @@ export default request => {
         return opengrowth.signals[signal](request);
     }
     
-    // Ignore PubNub Emails @pubnub.com
+    // Ignore De-duplication for PubNub Emails @pubnub.com
+    // Also ignore non-signup signals from @pubnub.com Emails
     if (email.indexOf('@pubnub.com') > 0) {
         opengrowth.track.signal( `filtered.pubnub.com.email.${signal}`, message );
                         
         // Special Cody Sign-email Only
         // You are excluded for all emails/delights except the signup email.
-        if (signal == "signup") return opengrowth.signals[signal](request);
+        if (signal == "signup") return opengrowth.signals[signal]( request, {} );
         else                    return request.ok();
     }
 
