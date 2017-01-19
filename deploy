@@ -5,9 +5,11 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 const http    = require('request-promise');
 const gulp    = require('gulp');
+const fs      = require('fs');
 const apikeys = require('./keys.json');
 
-
+const config  = {};
+const args = process.argv.slice(2);
 
 // TODO - GET/MAKE BLOCK labled 'Open Growth'
 // TODO - ...
@@ -21,17 +23,121 @@ const apikeys = require('./keys.json');
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Main
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-var $scope = {
-    key_id      : 226891
-,   block_id    : 4152 
-,   signals_id  : 3880
-,   delights_id : 3881
-};
 
 pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password ).then( login => {
+    //log in and save login token
 
     console.log( 'Logged In!', login.result.user_id );
-    $scope.login = login.result;
+    config.login = login.result;
+    config.owner_id = config.login.user.id;
+
+    return list_apps(config.owner_id);
+
+} ).then( result => {
+    //get list of user's apps and their keys, find Open Growth app_id and key_id's or create them
+    let app_exists = false;
+    let gold_keyset_exists = false;
+    let silver_keyset_exists = false;
+
+    for( let i in result.result ) {
+        if( result.result[i].name == "testing" ) { 
+            app_exists = true;
+            console.log( 'Open Growth App Found!');
+            config.app_id = result.result[i].id;
+            
+            for( let j in result.result[i].keys ) {
+                if( result.result[i].keys[j].properties.name == "Gold" ) {
+                    gold_keyset_exists = true;
+                    console.log( 'Gold Keyset Found!');
+                    config.gold_key_id = result.result[i].keys[j].id;
+                } else if( result.result[i].keys[j].properties.name == "Silver" ) {
+                    silver_keyset_exists = true;
+                    console.log( 'Silver Keyset Found!');
+                    config.silver_key_id = result.result[i].keys[j].id;
+                }
+            }
+        }
+    }
+
+    if( !app_exists ) {
+        create_app('testing').then( result => {
+            console.log('Created Open Growth App!');
+            config.app_id = result.result.id;
+        });
+    }
+
+    if( !gold_keyset_exists ) {
+        create_keyset(config.app_id, 'Gold').then( result => {
+            console.log('Created Gold Keys!');
+            config.gold_key_id = result.result.id;
+        });
+    }
+
+    if( !silver_keyset_exists ) {
+        create_keyset(config.app_id, 'Silver').then( result => {
+            console.log('Created Silver Keys!');
+            config.silver_key_id = result.result.id;
+        });
+    }
+
+    if( args[0] == '--production' || args[0] == '--gold' ){
+        config.key_id = config.gold_key_id;
+    } else {
+        config.key_id = config.silver_key_id;
+    }
+
+    return list_blocks(config.key_id);
+
+} ).then( result => {
+
+    let block_exists = false;
+
+    for( let i in result.payload ) {
+        if( result.payload[i].name == "Open Growth" ) {
+            block_exists = true;
+            config.block_id = result.payload[i].id;
+            console.log( 'Block Found!' );
+        }
+    }
+
+    if( !block_exists ) { 
+        create_block("Open Growth", "10x your business!", config.key_id).then( result => {
+            config.block_id = result.payload.id;
+            console.log( 'Block Created!' );
+        }); 
+    }
+
+    return list_event_handlers(config.key_id, config.block_id);
+} ).then( result => {
+    let event_handlers = result.payload[0].event_handlers;
+    let before_publish_exists = false;
+    let after_publish_exists = false;
+
+    for( let i in event_handlers ){
+        if( event_handlers[i].event == 'js-before-publish' ){
+            before_publish_exists = true;
+            config.signals_id = event_handlers[i].id;
+            console.log( 'Signals Event Handler Found!' );
+        } else if( event_handlers[i].event == 'js-after-publish' ){
+            after_publish_exists = true;
+            config.delights_id = event_handlers[i].id;
+            console.log( 'Delights Event Handler Found!' );
+        }
+    }
+
+    if( !before_publish_exists ){
+        create_event_handler(config.key_id, config.block_id, 'Signals Handler', 'js-before-publish').then( result => {
+            config.signals_id=result.payload.id;
+            console.log( 'Signals Event Handler Created!' );
+        });
+    }
+
+    if( !before_publish_exists ){
+        create_event_handler(config.key_id, config.block_id, 'Delights Handler', 'js-after-publish').then( result => {
+            config.delights_id=result.payload.id;
+            console.log( 'Delights Event Handler Created!' );
+        });
+    }
 
     // Build Signals Handler
     return build_signals();
@@ -39,7 +145,7 @@ pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password ).then( login => {
 } ).then( result => {
 
     console.log( 'Built Signals Handler!', result.length );
-    $scope.signals_code = result;
+    config.signals_code = result;
 
     // Build Delights Handler
     return build_delights();
@@ -47,7 +153,7 @@ pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password ).then( login => {
 } ).then( result => {
 
     console.log( 'Built Delights Handler!', result.length );
-    $scope.delights_code = result;
+    config.delights_code = result;
 
     // Upload Signals
     return upload_signals_handler();
@@ -62,7 +168,7 @@ pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password ).then( login => {
 } ).then( result => {
 
     console.log( 'Uploaded Delights Handler!', result );
-
+    /*
     // Sent Restart Signal
     return restart();
 
@@ -77,8 +183,8 @@ pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password ).then( login => {
     console.log( 'Annotating in Librato!', result );
 
     return instructions();
-
-} );
+*/
+});
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Build Event Handler Code
@@ -125,6 +231,135 @@ function build_delights() {
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Create a block
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function create_block(name, desc, key_id) {
+    return http({
+        method  : 'POST'
+    ,   json    : true
+    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
+                  `/blocks/key/${key_id}/`   +
+                  `block`
+    ,   headers : { 'X-Session-Token' : config.login.token }
+    ,   body    : {
+            key_id : config.key_id
+        ,   name: name
+        ,   description: desc
+        }
+    }).catch( error => {
+        console.error( 'error', error );
+    } );
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Create a block
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function create_app(name) {
+    return http({
+        method  : 'POST'
+    ,   json    : true
+    ,   uri     : 'https://admin.pubnub.com/api/apps'
+    ,   headers : { 'X-Session-Token' : config.login.token }
+    ,   body    : {
+            owner_id : config.owner_id
+        ,   name: name
+        }
+    }).catch( error => {
+        console.error( 'error', error );
+    } );
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Create a keyset
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function create_keyset(app_id, name) {
+    return http({
+        method  : 'POST'
+    ,   json    : true
+    ,   uri     : 'https://admin.pubnub.com/api/keys'
+    ,   headers : { 'X-Session-Token' : config.login.token }
+    ,   body    : { 
+            app_id: app_id
+        ,   properties : { name : name }
+        }
+    }).catch( error => {
+        console.error( 'error', error );
+    } );
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get list of all blocks
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function list_blocks(key_id) {
+    return http({
+        method  : 'GET'
+    ,   json    : true
+    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
+                  `/blocks/key/${key_id}/`   +
+                  `block`
+    ,   headers : { 'X-Session-Token' : config.login.token }
+    }).catch( error => {
+        console.error( 'error', error );
+    } );
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get list of all apps
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function list_apps(owner_id) {
+    return http({
+        method  : 'GET'
+    ,   json    : true
+    ,   uri     : `https://admin.pubnub.com/api/apps?owner_id=${owner_id}`
+    ,   headers : { 'X-Session-Token' : config.login.token}
+    }).catch( error => {
+        console.error( 'error', error );
+    } );
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Upload Signals Handler Code
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function list_event_handlers(key_id, block_id) {
+    return http({
+        method  : 'GET'
+    ,   json    : true
+    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
+                  `/blocks/key/${key_id}`   +
+                  `/block/${block_id}`
+    ,   headers : { 'X-Session-Token' : config.login.token }
+    }).catch( error => {
+        console.error( 'error', error );
+    } );
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Upload Signals Handler Code
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function create_event_handler(key_id, block_id, name, event) {
+    return http({
+        method  : 'POST'
+    ,   json    : true
+    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
+                  `/blocks/key/${key_id}/`   +
+                  `event_handler`
+    ,   headers : { 'X-Session-Token' : config.login.token }
+    ,   body    : {
+            key_id : key_id
+        ,   block_id: block_id
+        ,   type: 'js'
+        ,   event: event
+        ,   channels: 'opengrowth.signals'
+        ,   name: name
+        ,   code: "console.log('hi');"
+        ,   output: 'output-0.5823105682419438'
+        }
+    }).catch( error => {
+        console.error( 'error', error );
+    } );
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Upload Signals Handler Code
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function upload_signals_handler() {
@@ -132,14 +367,14 @@ function upload_signals_handler() {
         method  : 'PUT'
     ,   json    : true
     ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  `/blocks/key/${$scope.key_id}/`   +
-                  `event_handler/${$scope.signals_id}`
-    ,   headers : { 'X-Session-Token' : $scope.login.token }
+                  `/blocks/key/${config.key_id}/`   +
+                  `event_handler/${config.signals_id}`
+    ,   headers : { 'X-Session-Token' : config.login.token }
     ,   body    : {
-            key_id    : $scope.key_id
-        ,   block_id  : $scope.block_id
-        ,   id        : $scope.signals_id
-        ,   code      : $scope.signals_code
+            key_id    : config.key_id
+        ,   block_id  : config.block_id
+        ,   id        : config.signals_id
+        ,   code      : config.signals_code
         ,   channels  : 'opengrowth.signals'
         ,   event     : 'js-before-publish'
         ,   type      : 'js'
@@ -160,14 +395,14 @@ function upload_delights_handler() {
         method  : 'PUT'
     ,   json    : true
     ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  `/blocks/key/${$scope.key_id}/`   +
-                  `event_handler/${$scope.delights_id}`
-    ,   headers : { 'X-Session-Token' : $scope.login.token }
+                  `/blocks/key/${config.key_id}/`   +
+                  `event_handler/${config.delights_id}`
+    ,   headers : { 'X-Session-Token' : config.login.token }
     ,   body    : {
-            key_id    : $scope.key_id
-        ,   block_id  : $scope.block_id
-        ,   id        : $scope.delights_id
-        ,   code      : $scope.delights_code
+            key_id    : config.key_id
+        ,   block_id  : config.block_id
+        ,   id        : config.delights_id
+        ,   code      : config.delights_code
         ,   channels  : 'opengrowth.signals'
         ,   event     : 'js-after-publish'
         ,   type      : 'js'
@@ -227,14 +462,14 @@ function restart() {
     return http({
         method  : 'POST'
     ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  `/blocks/key/${$scope.key_id}/`   +
-                  `block/${$scope.block_id}/start`
+                  `/blocks/key/${config.key_id}/`   +
+                  `block/${config.block_id}/start`
     ,   body    : {
-            block_id : $scope.block_id
-        ,   key_id   : $scope.key_id
+            block_id : config.block_id
+        ,   key_id   : config.key_id
         ,   action   : 'start' 
     }
-    ,   headers : { 'X-Session-Token' : $scope.login.token }
+    ,   headers : { 'X-Session-Token' : config.login.token }
     ,   json    : true
     }).catch( error => {
         console.error( 'error', error );
