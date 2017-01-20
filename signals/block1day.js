@@ -24,8 +24,6 @@ opengrowth.signals.block1day = ( request, customer ) => {
         `<p>Happy coding,<br>` +
         `Neumann</p>`;
 
-    console.log("block1day now executing...");
-
     // Send Email and Track Delight in Librato
     opengrowth.delight.sendgrid.email(
         'block1day', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs, categories
