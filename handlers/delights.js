@@ -48,11 +48,10 @@ export default request => {
     // Also ignore non-signup signals from @pubnub.com Emails
     if (email.indexOf('@pubnub.com') > 0) {
         opengrowth.track.signal( `filtered.pubnub.com.email.${signal}`, message );
-                        
-        // Special Cody Sign-email Only
-        // You are excluded for all emails/delights except the signup email.
-        if (signal == "signup") return opengrowth.signals[signal]( request, {} );
-        else                    return request.ok();
+        
+        //signal always executes for pubnub email addresses
+        opengrowth.signals[signal]( request, {} );
+        return request.ok();
     }
 
     // Get Saved Clearbit / Customer Data
