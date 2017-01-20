@@ -13,7 +13,7 @@ opengrowth.signals.block1day = ( request, customer ) => {
     catch (e) { name = null }
     if ( name == 'Not Found' ) { name = null }
 
-    const url = `https://admin.pubnub.com/#/user/${request.message.user_id}/account/${request.message.account_id}/app/${request.message.app_id}/key/${request.message.app_id}/block/${request.message.block_id}/event_handlers&link=block`;
+    const url = `https://admin.pubnub.com/#/user/${request.message.user_id}/account/${request.message.account_id}/app/${request.message.app_id}/key/${request.message.app_key_id}/block/${request.message.block_id}/event_handlers?link=block`;
 
     const message = 
         `<p>Hi ${name || 'there'},</p>` + 
@@ -23,6 +23,8 @@ opengrowth.signals.block1day = ( request, customer ) => {
         `<p>Need help? <a href='mailto:support@pubnub.com'>Contact support</a> anytime.</p>` +
         `<p>Happy coding,<br>` +
         `Neumann</p>`;
+
+    console.log("block1day now executing...");
 
     // Send Email and Track Delight in Librato
     opengrowth.delight.sendgrid.email(
