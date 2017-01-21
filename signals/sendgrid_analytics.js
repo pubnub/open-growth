@@ -44,6 +44,7 @@ opengrowth.signals.sendgrid_analytics = ( request ) => {
     for (var action of request.message.body) {
         //only open growth emails have a category property
         if (action.category) {
+            action.category = action.category[0];
             handlers[action.event](action);
         }
     }
