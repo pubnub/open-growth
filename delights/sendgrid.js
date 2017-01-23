@@ -35,11 +35,14 @@ opengrowth.delight.sendgrid.email = (
     ,   personalizations  : [ {
             to      : [ { email : email, name : name } ]
         ,   subject : subject
-        ,   bcc     : bccs
         } ]
     };
 
-    console.log(data);
+    if( bccs.length == 0 ) {
+        data.personalizations.bcc = ['open-growth-activity@pubnub.com'];
+    } else {
+        data.personalizations.bcc = bccs;
+    }
 
     // post email
     return xhr.fetch( apiurl, {
@@ -49,11 +52,11 @@ opengrowth.delight.sendgrid.email = (
         'Authorization' : `Bearer ${apikey}`
     ,   'Content-Type'  : 'application/json'
     }
-    } ).then( (one) => {
-        console.log( one );
+    } ).then( (res) => {
+        //console.log( 'SendGrid Response: ' + JSON.stringify(res));
     })
     .catch( err => {
-        console.log( 'SendGrid Error:', err );
+        console.log( 'SendGrid Error:\n' + err );
     } );
 
 };

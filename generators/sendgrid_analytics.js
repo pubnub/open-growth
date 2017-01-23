@@ -13,9 +13,20 @@ module.exports = function (app) {
     app.use(bodyParser.json());
 
     app.post( '/sendgrid', function( request, response ) {
+        //blocks had an issue with body objects, parsing them here resolves it
+        var actions = [];
+        for (var action of request.body) {
+            actions.push({
+                "email"    : action.email,
+                "category" : action.category,
+                "event"    : action.event,
+                "url"      : action.url
+            });
+        }
+
         var message = {
-            "signal" : "sendgrid_analytics",
-            "body"   : request.body
+            "signal"    : "sendgrid_analytics",
+            "actions"   : actions
         };
 
         var pn = new pubnub({

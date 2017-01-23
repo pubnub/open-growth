@@ -172,7 +172,6 @@ pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password ).then( login => {
 } ).then( result => {
 
     console.log( 'Uploaded Delights Handler!', result );
-    /*
     // Sent Restart Signal
     return restart();
 
@@ -187,7 +186,6 @@ pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password ).then( login => {
     console.log( 'Annotating in Librato!', result );
 
     return instructions();
-*/
 });
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -446,13 +444,16 @@ function librato_annotate_deploy() {
         apikeys.librato.email + ":" + apikeys.librato.secret
     ).toString("base64");
 
+    let desc = '(SILVER)'
+    if (gold) desc = '(GOLD)';
+
     return http({
         method  : 'POST'
     ,   uri     : 'https://metrics-api.librato.com/v1/annotations' + 
                   '/opengrowth-deploys'
     ,   body    : {
             title       : 'Deployed JavaScript to BLOCKS'
-        ,   description : ''
+        ,   description : desc
     }
     ,   headers : { 'Authorization' : auth }
     ,   json    : true

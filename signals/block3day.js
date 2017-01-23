@@ -13,7 +13,7 @@ opengrowth.signals.block3day = ( request, customer ) => {
     catch (e) { name = null }
     if ( name == 'Not Found' ) { name = null }
 
-    const url = `https://admin.pubnub.com/#/user/${request.message.user_id}/account/${request.message.account_id}/app/${request.message.app_id}/key/${request.message.app_id}/block/${request.message.block_id}/event_handlers&link=block`;
+    const url = `https://admin.pubnub.com/#/user/${request.message.user_id}/account/${request.message.account_id}/app/${request.message.app_id}/key/${request.message.app_key_id}/block/${request.message.block_id}/event_handlers?link=block`;
 
     const message = 
         `<p>Hi ${name || 'there'},</p>` + 
