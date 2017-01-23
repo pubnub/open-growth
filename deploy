@@ -62,7 +62,7 @@ pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password ).then( login => {
     }
 
     if( !app_exists ) {
-        create_app('testing').then( result => {
+        create_app('Open Growth').then( result => {
             console.log('Created Open Growth App!');
             config.app_id = result.result.id;
         });
