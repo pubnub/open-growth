@@ -44,6 +44,12 @@ export default request => {
         return opengrowth.signals[signal](request);
     }
 
+    // Ignore De-duplication if dedup is set to false    
+    if (message.dedup === false) {  
+        opengrowth.signals[signal]( request, {} );
+        return request.ok();
+    }
+
     // Get Saved Clearbit / Customer Data
     return kvdb.get(email).then( customer => {
         // Run any.js for '*'
