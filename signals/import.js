@@ -8,10 +8,10 @@ opengrowth.signals.import = (request) => {
                 if (val) {
                     if (val.indexOf(request.message[key]) == -1) { //.includes not supported yet??
                         val.push(request.message[key]);
-                        kvdb.set(key.toLowerCase().replace(/[^0-9a-z]/gi, ''), val);
+                        kvdb.set(key.toLowerCase().replace(/[^0-9a-z]/gi, ''), val, 14400);
                     }
                 } else {
-                    kvdb.set(key.toLowerCase().replace(/[^0-9a-z]/gi, ''), [request.message[key]]);
+                    kvdb.set(key.toLowerCase().replace(/[^0-9a-z]/gi, ''), [request.message[key]], 14400);
                 }
             });
         }
