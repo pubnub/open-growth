@@ -1,12 +1,16 @@
 opengrowth.signals.day7 = ( request, customer ) => {
-    const categories = ['day7'];
-    const email = request.message.email;
+    let email = 'open-growth-activity@pubnub.com';
+    // @if GOLD
+    email = request.message.email;
+    // @endif
+    
     const subject = `Following up re: PubNub`;
     const sender_email = request.message.csm.email;
     const sender_name = request.message.csm.full_name;
     const reply_email = request.message.csm.email;
     const reply_name = request.message.csm.full_name;
     const bccs  = request.message.csm.bccs;
+    const categories = ['day7'];
 
     let name = '';
     try       { name = customer.person.name.givenName + ' - ' }

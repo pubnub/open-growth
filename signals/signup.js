@@ -1,6 +1,9 @@
 opengrowth.signals.signup = ( request, customer ) => {
-    const categories = ['signup'];
-    const email   = request.message.email;
+    let email = 'open-growth-activity@pubnub.com';
+    // @if GOLD
+    email = request.message.email;
+    // @endif
+    
     const subject = 'Your PubNub Account: Getting Started';
     const user    = request.message;
     const csm     = user.csm;
@@ -9,6 +12,7 @@ opengrowth.signals.signup = ( request, customer ) => {
     const sender_email = 'neumann@pubnub.com';
     const reply_email = 'support@pubnub.com';
     const reply_name = 'Support';
+    const categories = ['signup'];
 
     let name = '';
     try       { name = customer.person.name.givenName }

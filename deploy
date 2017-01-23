@@ -3,13 +3,15 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Libs
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-const http    = require('request-promise');
-const gulp    = require('gulp');
-const fs      = require('fs');
-const apikeys = require('./keys.json');
+const http       = require('request-promise');
+const gulp       = require('gulp');
+const preprocess = require('gulp-preprocess');
+const fs         = require('fs');
+const apikeys    = require('./keys.json');
 
 const config  = {};
 const args = process.argv.slice(2);
+let gold = false;
 
 // TODO - GET/MAKE BLOCK labled 'Open Growth'
 // TODO - ...
@@ -80,9 +82,11 @@ pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password ).then( login => {
         });
     }
 
-    if( args[0] == '--production' || args[0] == '--gold' ){
+    if( args[0] == '--gold' ){
+        gold = true;
         config.key_id = config.gold_key_id;
     } else {
+        gold = false;
         config.key_id = config.silver_key_id;
     }
 
@@ -200,6 +204,7 @@ function build_signals() {
         //,   './delights/*.js'
         //,   './signals/*.js'
         ])
+        .pipe( preprocess( { context: { GOLD: gold } } ) )
         .on( 'end',   data  => { resolve(buffer + keys) } )
         .on( 'error', error => { reject(error)          } )
         .on( 'data',  bytes => {
@@ -222,6 +227,7 @@ function build_delights() {
         ,   './delights/*.js'
         ,   './signals/*.js'
         ])
+        .pipe( preprocess( { context: { GOLD: gold } } ) )
         .on( 'end',   data  => { resolve(buffer + keys) } )
         .on( 'error', error => { reject(error)          } )
         .on( 'data',  bytes => {

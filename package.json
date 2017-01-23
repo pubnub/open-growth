@@ -31,10 +31,10 @@
     "url": "https://github.com/pubnub/open-growht/issues"
   },
   "homepage": "https://github.com/pubnub/open-growht#readme",
-  "devDependencies": {},
   "dependencies": {
-    "request" : "latest"
-  , "request-promise" : "latest"
-  , "gulp" : "latest"
+    "request": "latest",
+    "request-promise": "latest",
+    "gulp": "latest",
+    "gulp-preprocess": "latest"
   }
 }
