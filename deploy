@@ -42,7 +42,7 @@ pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password ).then( login => {
     let silver_keyset_exists = false;
 
     for( let i in result.result ) {
-        if( result.result[i].name == "testing" ) { 
+        if( result.result[i].name == "Open Growth" ) { 
             app_exists = true;
             console.log( 'Open Growth App Found!');
             config.app_id = result.result[i].id;
