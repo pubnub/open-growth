@@ -85,9 +85,11 @@ pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password ).then( login => {
     if( args[0] == '--gold' ){
         gold = true;
         config.key_id = config.gold_key_id;
+        console.log( 'Deploying to Gold environment!' );
     } else {
         gold = false;
         config.key_id = config.silver_key_id;
+        console.log( 'Deploying to Silver environment!' );
     }
 
     return list_blocks(config.key_id);
