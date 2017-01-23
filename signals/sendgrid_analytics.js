@@ -41,7 +41,7 @@ opengrowth.signals.sendgrid_analytics = ( request ) => {
         , "group_resubscribe" : signalLink
     };
 
-    for (var action of request.message.body) {
+    for (var action of request.message.actions) {
         //only open growth emails have a category property
         if (action.category) {
             action.category = action.category[0];
