@@ -13,7 +13,6 @@ module.exports = function (app) {
     app.use(bodyParser.json());
 
     app.post( '/sendgrid', function( request, response ) {
-        //blocks had an issue with body objects, parsing them here resolves it
         var actions = [];
         for (var action of request.body) {
             actions.push({
