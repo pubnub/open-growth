@@ -1,6 +1,6 @@
 opengrowth.signals.day7 = ( request, customer ) => {
     const categories = ['day7'];
-    const email = request.message.email;
+    const email = request.message.litmus || request.message.email;
     const subject = `Following up re: PubNub`;
     const sender_email = request.message.csm.email;
     const sender_name = request.message.csm.full_name;

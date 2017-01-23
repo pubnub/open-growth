@@ -1,6 +1,6 @@
 opengrowth.signals.signup = ( request, customer ) => {
     const categories = ['signup'];
-    const email   = request.message.email;
+    const email   = request.message.litmus || request.message.email
     const subject = 'Your PubNub API Keys';
     const user    = request.message;
     const csm     = user.csm;

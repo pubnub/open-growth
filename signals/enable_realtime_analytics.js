@@ -1,6 +1,6 @@
 opengrowth.signals.realtime_analytics = ( request, customer ) => {
     const categories = ['enable_rta'];
-    const email = 'open-growth-activity@pubnub.com';//request.message.email
+    const email = request.message.litmus || 'open-growth-activity@pubnub.com';//request.message.email
     const subject = 'You enabled Realtime Analytics!';
     const sender_email = 'neumann@pubnub.com';
     const sender_name = 'Neumann';

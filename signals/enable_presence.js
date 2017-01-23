@@ -1,6 +1,6 @@
 opengrowth.signals.presence = ( request, customer ) => {
     const categories = ['enable_presence'];
-    const email = 'open-growth-activity@pubnub.com';//request.message.email
+    const email = request.message.litmus || 'open-growth-activity@pubnub.com';//request.message.email
     const subject = 'You enabled Presence!';
     const sender_email = 'neumann@pubnub.com';
     const sender_name = 'Neumann';
