@@ -43,16 +43,6 @@ export default request => {
         opengrowth.track.signal( `no-email.${signal}`, message );
         return opengrowth.signals[signal](request);
     }
-    
-    // Ignore De-duplication for PubNub Emails @pubnub.com
-    // Also ignore non-signup signals from @pubnub.com Emails
-    if (email.indexOf('@pubnub.com') > 0) {
-        opengrowth.track.signal( `filtered.pubnub.com.email.${signal}`, message );
-        
-        //signal always executes for pubnub email addresses
-        opengrowth.signals[signal]( request, {} );
-        return request.ok();
-    }
 
     // Get Saved Clearbit / Customer Data
     return kvdb.get(email).then( customer => {
