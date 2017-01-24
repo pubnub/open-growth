@@ -1,6 +1,6 @@
 opengrowth.signals.block1day = ( request, customer ) => {
     const categories = ['block1day'];
-    const email   = 'open-growth-activity@pubnub.com';//request.message.email
+    const email   = request.message.litmus || 'open-growth-activity@pubnub.com';//request.message.email
     const subject = 'PubNub Block Expiring Now';
     const sender_email = 'neumann@pubnub.com';
     const sender_name = 'Neumann';

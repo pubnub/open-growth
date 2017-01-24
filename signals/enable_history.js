@@ -1,6 +1,6 @@
 opengrowth.signals.history = ( request, customer ) => {
     const categories = ['enable_history'];
-    const email = 'open-growth-activity@pubnub.com';//request.message.email
+    const email = request.message.litmus || 'open-growth-activity@pubnub.com';//request.message.email
     const subject = 'You enabled History!';
     const sender_email = 'neumann@pubnub.com';
     const sender_name = 'Neumann';

@@ -1,6 +1,6 @@
 opengrowth.signals.multiplexing = ( request, customer ) => {
     const categories = ['enable_multiplexing'];
-    const email = 'open-growth-activity@pubnub.com';//request.message.email
+    const email = request.message.litmus || 'open-growth-activity@pubnub.com';//request.message.email
     const subject = 'You enabled Multiplexing!';
     const sender_email = 'neumann@pubnub.com';
     const sender_name = 'Neumann';

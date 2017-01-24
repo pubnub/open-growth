@@ -13,6 +13,12 @@ module.exports = function (app) {
     app.use(bodyParser.json());
 
     app.post( '/sendgrid', function( request, response ) {
+        //only open growth emails have categories
+        if (!action.category) {
+            response.sendStatus(200);
+            return; 
+        }
+
         var actions = [];
         for (var action of request.body) {
             actions.push({

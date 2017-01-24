@@ -3,7 +3,7 @@ opengrowth.signals.day7 = ( request, customer ) => {
     // @if GOLD
     email = request.message.email;
     // @endif
-    
+
     const subject = `Following up re: PubNub`;
     const sender_email = request.message.csm.email;
     const sender_name = request.message.csm.full_name;
