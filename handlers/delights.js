@@ -58,7 +58,7 @@ export default request => {
         // We don't want to send the same Delight twice!
         // Check for Duplicate Delight Signal
         const duplicate_key = `delight-${signal}-${email}`;
-        const duplicate_ttl = 720/*hour*/ * 60/*min*/;
+        const duplicate_ttl = request.message.ttl || 720/*hour*/ * 60/*min*/;
         return kvdb.get(duplicate_key).then( duplicate => {
             // Duplicate Detected 
             // Abort and Track in Librato
