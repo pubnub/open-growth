@@ -1,11 +1,15 @@
 opengrowth.signals.day3 = ( request, customer ) => {
-    const categories = ['day3'];
-    const email = request.message.litmus || request.message.email;
+    let email = 'open-growth-activity@pubnub.com';
+    // @if GOLD
+    email = request.message.email;
+    // @endif
+    
     const bccs = request.message.csm.bccs;
     const sender_email = request.message.csm.email;
     const sender_name = request.message.csm.full_name;
     const reply_email = request.message.csm.email;
     const reply_name = request.message.csm.full_name;
+    const categories = ['day3'];
     
     let subject = '';
     try { 
