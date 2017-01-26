@@ -1,12 +1,17 @@
 opengrowth.signals.block3day = ( request, customer ) => {
-    const categories = ['block3day'];
-    const email   = request.message.litmus || 'open-growth-activity@pubnub.com';//request.message.email
+    let email = 'open-growth-activity@pubnub.com';
+    // @if GOLD
+    email = request.message.email;
+    // @endif
+
     const subject = 'PubNub Block Expiring';
     const sender_email = 'neumann@pubnub.com';
     const sender_name = 'Neumann';
     const reply_email = 'support@pubnub.com';
     const reply_name = 'Support';
-    const bcc = [];
+    const bccs = [];
+    const categories = ['block3day'];
+
 
     let name = '';
     try       { name = customer.person.name.givenName }
@@ -26,6 +31,6 @@ opengrowth.signals.block3day = ( request, customer ) => {
 
     // Send Email and Track Delight in Librato
     opengrowth.delight.sendgrid.email(
-        'block3day', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bcc, categories
+        'block3day', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs, categories
     );
 };
