@@ -44,7 +44,10 @@ export default request => {
         return opengrowth.signals[signal](request);
     }
 
-    // Ignore De-duplication if dedup is set to false    
+    // Ignore De-duplication if dedup is set to false  
+    // @if !GOLD
+    message.dedup = false;
+    // @endif
     if (message.dedup === false) {  
         opengrowth.signals[signal]( request, {} );
         return request.ok();
