@@ -13,20 +13,22 @@ module.exports = function (app) {
     app.use(bodyParser.json());
 
     app.post( '/sendgrid', function( request, response ) {
-        //only open growth emails have categories
-        if (!action.category) {
-            response.sendStatus(200);
-            return; 
-        }
 
         var actions = [];
         for (var action of request.body) {
+            //only open growth emails have categories
+            if (!action.category) continue;
             actions.push({
                 "email"    : action.email,
                 "category" : action.category,
                 "event"    : action.event,
                 "url"      : action.url
             });
+        }
+
+        if (actions.length === 0) {
+            response.sendStatus(200);
+            return;
         }
 
         var message = {

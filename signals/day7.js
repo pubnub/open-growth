@@ -25,7 +25,7 @@ opengrowth.signals.day7 = ( request, customer ) => {
     	    throw "Company name is null";
     	}
     }
-    catch (e) { company = "your company's"};
+    catch (e) { company = "company's"};
 
     const message =
         `<p>${name}I wanted to follow up on my email in case it got buried the other day.</p>` +
