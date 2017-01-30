@@ -38,10 +38,8 @@ opengrowth.delight.sendgrid.email = (
         } ]
     };
 
-    if( bccs.length == 0 ) {
-        data.personalizations.bcc = ['open-growth-activity@pubnub.com'];
-    } else {
-        data.personalizations.bcc = bccs;
+    if ( bccs.length !== 0 ) {
+        data.personalizations[0].bcc = bccs;
     }
 
     // post email
@@ -56,7 +54,7 @@ opengrowth.delight.sendgrid.email = (
         //console.log( 'SendGrid Response: ' + JSON.stringify(res));
     })
     .catch( err => {
-        console.log( 'SendGrid Error:\n' + err );
+        console.log( 'SendGrid Error:\n' + JSON.stringify(err) );
     } );
 
 };
