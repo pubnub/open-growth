@@ -18,6 +18,6 @@ opengrowth.signals.uuid = ( request, customer ) => {
                     `<p>Love, Nuemann</p>`;
 
     opengrowth.delight.sendgrid.email(
-        'day3', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs, categories
+        'uuid', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs, categories
     );
 };
