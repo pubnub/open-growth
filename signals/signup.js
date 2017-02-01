@@ -1,20 +1,11 @@
 opengrowth.signals.signup = ( request, customer ) => {
+    const user  = request.message;
     let email = 'open-growth-activity@pubnub.com';
     // @if GOLD
     email = request.message.email;
     // @endif
-    
-    const subject = 'Your PubNub API Keys';
-    const user    = request.message;
-    const csm     = user.csm;
-    const bccs    = csm.bccs;
-    const sender_name = 'Neumann';
-    const sender_email = 'neumann@pubnub.com';
-    const reply_email = 'support@pubnub.com';
-    const reply_name = 'Support';
-    const categories = ['signup'];
 
-    let name = '';
+    let name = "";
     try       { name = customer.person.name.givenName }
     catch (e) { name = null }
     if ( name == 'Not Found' ) { name = null }
@@ -40,8 +31,20 @@ opengrowth.signals.signup = ( request, customer ) => {
         `</p>` +
         `<p>Welcome Aboard!</p>`;
 
+    var sendgridPostBody = {
+        "signal"        : "signup"
+      , "message"       : message
+      , "email"         : email
+      , "name"          : name
+      , "sender_email"  : "neumann@pubnub.com"
+      , "sender_name"   : "Neumann"
+      , "reply_email"   : "support@pubnub.com"
+      , "reply_name"    : "Support"
+      , "subject"       : "Your PubNub API Keys"
+      , "bccs"          : user.csm.bccs
+      , "categories"    : [ "signup" ]
+    }
+
     // Send Email and Track Delight in Librato
-    opengrowth.delight.sendgrid.email(
-        'signup', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs, categories
-    );
+    opengrowth.delight.sendgrid.email(sendgridPostBody);
 };

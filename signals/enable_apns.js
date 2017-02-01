@@ -1,23 +1,28 @@
 opengrowth.signals.apns = ( request, customer ) => {
-    const categories = ['enable_apns'];
     const email = request.message.litmus || 'open-growth-activity@pubnub.com';//request.message.email
-    const subject = 'You enabled APNS!';
-    const sender_email = 'neumann@pubnub.com';
-    const sender_name = 'Neumann';
-    const reply_email = 'neumann@pubnub.com';
-    const reply_name = 'Neumann';
-    const bccs = [];
+
+    let sendgridPostBody = {
+        "signal"       : "features"
+      , "message"      : ""
+      , "email"        : email
+      , "name"         : ""
+      , "sender_email" : "neumann@pubnub.com"
+      , "sender_name"  : "Neumann"
+      , "reply_email"  : "neumann@pubnub.com"
+      , "reply_name"   : "Neumann"
+      , "subject"      : "You enabled APNS!"
+      , "bccs"         : []
+      , "categories"   : [ "enable_apns" ]
+    }
     
-    let name = null;
-    try { name = customer.person.name.givenName }
-    catch(e) { name = null }
+    try { sendgridPostBody.name = customer.person.name.givenName }
+    catch(e) { sendgridPostBody.name = null }
 
-    const message = `<p>Hey ${name || 'there'},</p>` +
-		`<p>I noticed that you enabled Apple Push Notifications in your ${request.message.app_name} app.</p>` +
-		`<p>Information about how to use APNS can be found <a href='http://lmgtfy.com/?q=pubnub+apns'>here</a></p>` + 
-		`<p>Good luck,<br />Neumann</p>`; 
+    sendgridPostBody.message = `<p>Hey ${sendgridPostBody.name || 'there'},</p>` +
+        `<p>I noticed that you enabled Apple Push Notifications in your ${request.message.app_name} app.</p>` +
+        `<p>Information about how to use APNS can be found <a href='http://lmgtfy.com/?q=pubnub+apns'>here</a></p>` + 
+        `<p>Good luck,<br />Neumann</p>`; 
 
-    opengrowth.delight.sendgrid.email(
-        'features', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs, categories
-    );
+    // Send Email and Track Delight in Librato
+    opengrowth.delight.sendgrid.email(sendgridPostBody);
 };

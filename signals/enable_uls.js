@@ -1,23 +1,28 @@
 opengrowth.signals.uls = ( request, customer ) => {
-    const categories = ['enable_uls'];
     const email = request.message.litmus || 'open-growth-activity@pubnub.com';//request.message.email
-    const subject = 'You enabled ULS!';
-    const sender_email = 'neumann@pubnub.com';
-    const sender_name = 'Neumann';
-    const reply_email = 'neumann@pubnub.com';
-    const reply_name = 'Neumann';
-    const bccs = [];
+
+    let sendgridPostBody = {
+        "signal"       : "features"
+      , "message"      : ""
+      , "email"        : email
+      , "name"         : ""
+      , "sender_email" : "neumann@pubnub.com"
+      , "sender_name"  : "Neumann"
+      , "reply_email"  : "neumann@pubnub.com"
+      , "reply_name"   : "Neumann"
+      , "subject"      : "You enabled ULS!"
+      , "bccs"         : []
+      , "categories"   : [ "enable_uls" ]
+    }
     
-    let name = null;
-    try { name = customer.person.name.givenName }
-    catch(e) { name = null }
+    try { sendgridPostBody.name = customer.person.name.givenName }
+    catch(e) { sendgridPostBody.name = null }
 
-    const message = `<p>Hey ${name || 'there'},</p>` +
-		`<p>I noticed that you enabled ULS in your ${request.message.app_name} app.</p>` +
-		`<p>I don't know what ULS stands for, but you can probably find out <a href='http://lmgtfy.com/?q=pubnub+uls'>here</a></p>` + 
-		`<p>Good luck,<br />Neumann</p>`; 
+    sendgridPostBody.message = `<p>Hey ${sendgridPostBody.name || 'there'},</p>` +
+        `<p>I noticed that you enabled ULS in your ${request.message.app_name} app.</p>` +
+        `<p>I don't know what ULS stands for, but you can probably find out <a href='http://lmgtfy.com/?q=pubnub+uls'>here</a></p>` + 
+        `<p>Good luck,<br />Neumann</p>`; 
 
-    opengrowth.delight.sendgrid.email(
-        'features', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs, categories
-    );
+    // Send Email and Track Delight in Librato
+    opengrowth.delight.sendgrid.email(sendgridPostBody);
 };

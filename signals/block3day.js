@@ -1,18 +1,11 @@
 opengrowth.signals.block3day = ( request, customer ) => {
-    let email = 'open-growth-activity@pubnub.com';
+    const user = request.message;
+    let email  = 'open-growth-activity@pubnub.com';
     // @if GOLD
-    email = request.message.email;
+    email = user.email;
     // @endif
-
-    const subject = 'PubNub Block Expiring';
-    const sender_email = 'neumann@pubnub.com';
-    const sender_name = 'Neumann';
-    const reply_email = 'support@pubnub.com';
-    const reply_name = 'Support';
-    const categories = ['block3day'];
-    const bccs = [];
-
-    let name = '';
+    
+    let name = "";
     try       { name = customer.person.name.givenName }
     catch (e) { name = null }
     if ( name == 'Not Found' ) { name = null }
@@ -24,7 +17,7 @@ opengrowth.signals.block3day = ( request, customer ) => {
         `<p>It’s really easy to fix, just follow the links and restart your blocks:</p>`;
 
     message += '<ul>';
-    for (let block of request.message.blocks){
+    for ( let block of request.message.blocks ) {
         message += `<li><a href='https://admin.pubnub.com/#/user/${block.user_id}/account/${block.account_id}/app/${block.app_id}/key/${block.app_key_id}/block/${block.block_id}/event_handlers?link=block</li>'>${block.block_name}</a>`;
     }
     message += '</ul>';
@@ -33,8 +26,20 @@ opengrowth.signals.block3day = ( request, customer ) => {
         `<p>Happy coding,<br>` +
         `Neumann</p>`;
 
+    let sendgridPostBody = {
+        "signal"       : "block3day"
+      , "message"      : message
+      , "email"        : email
+      , "name"         : ""
+      , "sender_email" : "neumann@pubnub.com"
+      , "sender_name"  : "Neumann"
+      , "reply_email"  : "support@pubnub.com"
+      , "reply_name"   : "Support"
+      , "subject"      : "PubNub Block Expiring"
+      , "bccs"         : user.csm.bccs || []
+      , "categories"   : [ "block3day" ]
+    }
+
     // Send Email and Track Delight in Librato
-    opengrowth.delight.sendgrid.email(
-        'block3day', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs, categories
-    );
+    opengrowth.delight.sendgrid.email(sendgridPostBody);
 };
