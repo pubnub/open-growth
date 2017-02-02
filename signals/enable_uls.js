@@ -1,11 +1,22 @@
 opengrowth.signals.uls = ( request, customer ) => {
-    const email = request.message.litmus || 'open-growth-activity@pubnub.com';//request.message.email
+    const user = request.message;
+    let email  = user.litmus || 'open-growth-activity+testing@pubnub.com';
+    // @if GOLD
+    //email = user.email;
+    // @endif
+
+    let name = "";
+    if ( customer && customer.person && customer.person.name &&
+         customer.person.name.fullName &&
+         customer.person.name.fullName !== 'Not Found' &&
+         customer.person.name.fullName !== 'null' ) {
+      name = customer.person.name.fullName;
+    }
 
     let sendgridPostBody = {
         "signal"       : "features"
-      , "message"      : ""
       , "email"        : email
-      , "name"         : ""
+      , "name"         : name
       , "sender_email" : "neumann@pubnub.com"
       , "sender_name"  : "Neumann"
       , "reply_email"  : "neumann@pubnub.com"
@@ -13,15 +24,12 @@ opengrowth.signals.uls = ( request, customer ) => {
       , "subject"      : "You enabled ULS!"
       , "bccs"         : []
       , "categories"   : [ "enable_uls" ]
-    }
-    
-    try { sendgridPostBody.name = customer.person.name.givenName }
-    catch(e) { sendgridPostBody.name = null }
-
-    sendgridPostBody.message = `<p>Hey ${sendgridPostBody.name || 'there'},</p>` +
-        `<p>I noticed that you enabled ULS in your ${request.message.app_name} app.</p>` +
-        `<p>I don't know what ULS stands for, but you can probably find out <a href='http://lmgtfy.com/?q=pubnub+uls'>here</a></p>` + 
-        `<p>Good luck,<br />Neumann</p>`; 
+      , "template_id"   : "d9bde5d3-ad60-43c0-974e-d64c531af9b7"
+      , "substitutions" : {
+            "-salutation-" : name || "there"
+          , "-app_name-"   : user.app_name
+        }
+    };
 
     // Send Email and Track Delight in Librato
     opengrowth.delight.sendgrid.email(sendgridPostBody);

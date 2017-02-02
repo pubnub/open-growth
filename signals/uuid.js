@@ -1,13 +1,20 @@
 opengrowth.signals.uuid = ( request, customer ) => {
-    const user  = request.message;
-    const email = 'open-growth-activity@pubnub.com';
+    const user = request.message;
+    let email  = user.litmus || 'open-growth-activity+testing@pubnub.com';
     // @if GOLD
-    email = request.message.email;
+    //email = user.email;
     // @endif
+
+    let name = "";
+    if ( customer && customer.person && customer.person.name &&
+         customer.person.name.fullName &&
+         customer.person.name.fullName !== 'Not Found' &&
+         customer.person.name.fullName !== 'null' ) {
+      name = customer.person.name.fullName;
+    }
 
     let sendgridPostBody = {
         "signal"       : "uuid"
-      , "message"      : message
       , "email"        : email
       , "name"         : ""
       , "sender_email" : "neumann@pubnub.com"
@@ -15,13 +22,15 @@ opengrowth.signals.uuid = ( request, customer ) => {
       , "reply_email"  : "support@pubnub.com"
       , "reply_name"   : "Support"
       , "subject"      : "Have you configured UUID's for your app?"
-      , "bccs"         : []]
+      , "bccs"         : []
       , "categories"   : [ "uuid" ]
+      , "template_id"   : "bf0bd3c3-ba49-41cb-886e-7c3c95a1a293"
+      , "substitutions" : {
+            "-salutation-" : name || "there"
+          , "-uuid_count-" : user.uuid_count.toString()
+          , "-ip_count-"   : user.ip_count.toString()
+        }
     }
-
-    sendgridPostBody.message = `<p>Hey there,</p>` +
-        `<p>I noticed that you have ${user.uuid_count} UUIDs generated across only ${user.ip_count} devices. If this isn't on purpose, RTFM: <a href='https://support.pubnub.com/support/solutions/articles/14000043671-how-do-i-set-the-uuid-'>How do I set the UUID?</a></p>` +
-        `<p>Love, Nuemann</p>`;
 
     opengrowth.delight.sendgrid.email(sendgridPostBody);
 };

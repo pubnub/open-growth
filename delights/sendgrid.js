@@ -24,8 +24,7 @@ opengrowth.delight.sendgrid.email = ( req ) => {
 
     // payload
     let data = {
-      "mail_settings"     : { "bcc": { "enable": true, "email": "open-growth-activity@pubnub.com" } }
-    , "from"              : { "email": req.sender_email,  "name": req.sender_name  }
+      "from"              : { "email": req.sender_email,  "name": req.sender_name  }
     , "reply_to"          : { "email": req.reply_email, "name": req.reply_name }
     , "tracking_settings" : { "subscription_tracking" : { "enable" : false } }
     , "categories"        : req.categories
@@ -40,6 +39,13 @@ opengrowth.delight.sendgrid.email = ( req ) => {
     //add BCCs for SalesForce
     if ( req.bccs.length !== 0 ) {
         data.personalizations[0].bcc = req.bccs;
+        data.personalizations[0].bcc.push({
+            "email": "open-growth-activity@pubnub.com"
+        });
+    } else {
+        data.personalizations[0].bcc = [{
+            "email": "open-growth-activity@pubnub.com"
+        }];
     }
 
     //add content if not using a template on sendgrid

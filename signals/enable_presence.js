@@ -1,11 +1,22 @@
 opengrowth.signals.presence = ( request, customer ) => {
-    const email = request.message.litmus || 'open-growth-activity@pubnub.com';//request.message.email
+    const user = request.message;
+    let email  = user.litmus || 'open-growth-activity+testing@pubnub.com';
+    // @if GOLD
+    //email = user.email;
+    // @endif
+
+    let name = "";
+    if ( customer && customer.person && customer.person.name &&
+         customer.person.name.fullName &&
+         customer.person.name.fullName !== 'Not Found' &&
+         customer.person.name.fullName !== 'null' ) {
+      name = customer.person.name.fullName;
+    }
 
     let sendgridPostBody = {
         "signal"       : "features"
-      , "message"      : ""
       , "email"        : email
-      , "name"         : ""
+      , "name"         : name
       , "sender_email" : "neumann@pubnub.com"
       , "sender_name"  : "Neumann"
       , "reply_email"  : "neumann@pubnub.com"
@@ -13,15 +24,12 @@ opengrowth.signals.presence = ( request, customer ) => {
       , "subject"      : "You enabled Presence!"
       , "bccs"         : []
       , "categories"   : [ "enable_presence" ]
-    }
-    
-    try { sendgridPostBody.name = customer.person.name.givenName }
-    catch(e) { sendgridPostBody.name = null }
-
-    sendgridPostBody.message = `<p>Hey ${sendgridPostBody.name || 'there'},</p>` +
-        `<p>I noticed that you enabled Presence in your ${request.message.app_name} app.</p>` +
-        `<p>Information about how to use Presence can be found <a href='http://lmgtfy.com/?q=pubnub+presence'>here</a></p>` + 
-        `<p>Good luck,<br />Neumann</p>`; 
+      , "template_id"   : "360f8ff0-d9d0-43c8-a637-4e28633eb20b"
+      , "substitutions" : {
+            "-salutation-" : name || "there"
+          , "-app_name-"   : user.app_name
+        }
+    };
 
     // Send Email and Track Delight in Librato
     opengrowth.delight.sendgrid.email(sendgridPostBody);
