@@ -37,7 +37,7 @@ opengrowth.delight.sendgrid.email = ( req ) => {
     };
 
     //add BCCs for SalesForce
-    if ( req.bccs.length !== 0 ) {
+    if ( req.bccs && req.bccs.length && req.bccs.length !== 0 ) {
         data.personalizations[0].bcc = req.bccs;
         data.personalizations[0].bcc.push({
             "email": "open-growth-activity@pubnub.com"
