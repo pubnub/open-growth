@@ -7,13 +7,21 @@ opengrowth.signals.day3 = ( request, customer ) => {
     // @endif
 
     let subject = "Adding realtime to your app";
-    let company = "";
+    let company_name = "your company";
     if ( customer && customer.company &&
          customer.company.name &&
          customer.company.name !== 'Not Found' &&
          customer.company.name !== 'null' ) {
       subject = `${customer.company.name} - adding realtime to your app`;
-      company = customer.company.name;
+      company_name = customer.company.name;
+    }
+
+    let company_mention;
+    if ( company_name !== "your company" ) {
+      company_mention = `On another note, I see that you work at ${company_name}. `;
+    }
+    else {
+      company_mention = "";
     }
 
     let personalization = ".";
@@ -32,15 +40,6 @@ opengrowth.signals.day3 = ( request, customer ) => {
       name = customer.person.name.fullName;
     }
 
-    var hasCompany = `On another note, I see that you work at ${company}. ` + 
-      `Curious if you or another member of ${company} is ` + 
-      `assessing PubNub to power realtime capabilities in your application?`;
-
-    var noCompany = "Curious if you or another member of your company " + 
-      "is assessing PubNub to power realtime capabilities in your application?";
-
-    var company_mention = company ? hasCompany : noCompany;
-
     let sendgridPostBody = {
         "signal"        : "day3"
       , "message"       : ""
@@ -58,6 +57,7 @@ opengrowth.signals.day3 = ( request, customer ) => {
             "-personalization-" : personalization
           , "-csm_first_name-"  : csm.first_name
           , "-company_mention-" : company_mention
+          , "-company_name-"    : company_name
         }
     }
 

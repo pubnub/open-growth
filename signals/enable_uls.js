@@ -7,10 +7,10 @@ opengrowth.signals.uls = ( request, customer ) => {
 
     let name = "";
     if ( customer && customer.person && customer.person.name &&
-         customer.person.name.fullName &&
-         customer.person.name.fullName !== 'Not Found' &&
-         customer.person.name.fullName !== 'null' ) {
-      name = customer.person.name.fullName;
+         customer.person.name.givenName &&
+         customer.person.name.givenName !== 'Not Found' &&
+         customer.person.name.givenName !== 'null' ) {
+      name = customer.person.name.givenName;
     }
 
     let sendgridPostBody = {

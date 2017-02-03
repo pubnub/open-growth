@@ -6,9 +6,12 @@ opengrowth.signals.signup = ( request, customer ) => {
     // @endif
 
     let name = "";
-    try       { name = customer.person.name.givenName }
-    catch (e) { name = null }
-    if ( name == 'Not Found' ) { name = null }
+    if ( customer && customer.person && customer.person.name &&
+         customer.person.name.givenName &&
+         customer.person.name.givenName !== 'Not Found' &&
+         customer.person.name.givenName !== 'null' ) {
+      name = customer.person.name.givenName;
+    }
 
     let display_url = `https://admin.pubnub.com/#/user/${user.user_id}/` +
                       `account/${user.account_id}/` +
