@@ -1,62 +1,66 @@
 opengrowth.signals.day3 = ( request, customer ) => {
-    let email = 'open-growth-activity@pubnub.com';
+    const user = request.message;
+    const csm  = user.csm;
+    let email  = user.litmus || 'open-growth-activity+testing@pubnub.com';
     // @if GOLD
-    email = request.message.email;
+    email = user.email;
     // @endif
-    
-    const bccs = request.message.csm.bccs;
-    const sender_email = request.message.csm.email;
-    const sender_name = request.message.csm.full_name;
-    const reply_email = request.message.csm.email;
-    const reply_name = request.message.csm.full_name;
-    const categories = ['day3'];
-    
-    let subject = '';
-    try { 
-        if(customer.company.name == null || customer.company.name == 'null' ){
-            subject = `Adding realtime to your app`;
-        } else {
-            subject = `${customer.company.name} - adding realtime to your app`
+
+    let subject = "Adding realtime to your app";
+    let company_name = "your company";
+    if ( customer && customer.company &&
+         customer.company.name &&
+         customer.company.name !== 'Not Found' &&
+         customer.company.name !== 'null' ) {
+      subject = `${customer.company.name} - adding realtime to your app`;
+      company_name = customer.company.name;
+    }
+
+    let company_mention;
+    if ( company_name !== "your company" ) {
+      company_mention = `On another note, I see that you work at ${company_name}. `;
+    }
+    else {
+      company_mention = "";
+    }
+
+    let personalization = ".";
+    if ( customer && customer.person && customer.person.name &&
+         customer.person.name.givenName &&
+         customer.person.name.givenName !== 'Not Found' &&
+         customer.person.name.givenName !== 'null' ) {
+      personalization = ', ' + customer.person.name.givenName + '.';
+    }
+
+    let name = "";
+    if ( customer && customer.person && customer.person.name &&
+         customer.person.name.fullName &&
+         customer.person.name.fullName !== 'Not Found' &&
+         customer.person.name.fullName !== 'null' ) {
+      name = customer.person.name.fullName;
+    }
+
+    let sendgridPostBody = {
+        "signal"        : "day3"
+      , "message"       : ""
+      , "email"         : email
+      , "name"          : name
+      , "sender_email"  : csm.email
+      , "sender_name"   : csm.full_name
+      , "reply_email"   : csm.email
+      , "reply_name"    : csm.full_name
+      , "subject"       : subject
+      , "bccs"          : csm.bccs || []
+      , "categories"    : [ "day3" ]
+      , "template_id"   : "ed0bcf03-8afd-413c-b267-adb6abc8001c"
+      , "substitutions" : {
+            "-personalization-" : personalization
+          , "-csm_first_name-"  : csm.first_name
+          , "-company_mention-" : company_mention
+          , "-company_name-"    : company_name
         }
     }
-    catch(e) { subject = `Adding realtime to your app`}
 
-    let name = '';
-    try       {
-        if ( customer.person.name.fullName == 'Not Found' || customer.person.name.fullName == null || customer.person.name.fullName == 'null' ){
-            name = '';
-        } else {
-            name = customer.person.name.fullName;
-        }
-    }
-    catch (e) { name = '' }
-
-    let fname = '';
-    try       { 
-        if ( customer.person.name.givenName == 'Not Found' || customer.person.name.givenName == null || customer.person.name.givenName == 'null' ){
-            fname = '.';
-        } else {
-            fname = ', '+customer.person.name.givenName + '.';
-        }
-    }
-    catch (e) { fname = '.' }
-    
-    let company = '';
-    try { company = customer.company.name }
-    catch (e) { company = '' }
-
-    let message = `<p>Hope you’ve had the time to navigate through the PubNub Admin Portal and the PubNub Docs Page over the last few days${fname}</p>`; 
-    if (company == '' || company == null) { 
-        message += `Curious if you or another member of your company is assessing PubNub to power realtime capabilities in your application?</p>`;
-    } else {
-	message += `<p>On another note, I see that you work at ${company}. Curious if you or another member of ${company} is assessing PubNub to power realtime capabilities in your application?</p>`;
-    }
-    
-    message += `<p>Looking forward to hearing from you soon. In the meantime, here's a developer's guide to PubNub:</p>` + 
-               `<p><a href="https://www.pubnub.com/developers/tech/how-pubnub-works/?utm_source=EmailBlasts%20&utm_medium=Open-Growth&utm_campaign=EB-CY16-Q4-Open-Growth-02&utm_term=link1&utm_content=how-pubnub-works&link=devguide">How PubNub Works</a></p>` +
-               `<p>Best, ${request.message.csm.first_name}</p>`;
-
-    opengrowth.delight.sendgrid.email(
-        'day3', message, email, name, sender_email, sender_name, reply_email, reply_name, subject, bccs, categories
-    );
+    // Send Email and Track Delight in Librato
+    opengrowth.delight.sendgrid.email(sendgridPostBody);
 };
