@@ -6,6 +6,11 @@ var pubnub = require('pubnub')
 var bodyParser = require('body-parser')
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Globals
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+var default_bcc = "open-growth-activity@pubnub.com";
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // SendGrid
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 module.exports = function (app) {
@@ -17,7 +22,11 @@ module.exports = function (app) {
         var actions = [];
         for (var action of request.body) {
             //only open growth emails have categories
-            if (!action.category) continue;
+            //no analytics tracking for default bcc
+            if (!action.category || action.email === default_bcc) {
+                continue;
+            }
+
             actions.push({
                 "email"    : action.email,
                 "category" : action.category,
