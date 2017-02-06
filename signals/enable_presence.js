@@ -21,7 +21,6 @@ opengrowth.signals.presence = ( request, customer ) => {
       , "sender_name"  : "Neumann"
       , "reply_email"  : "neumann@pubnub.com"
       , "reply_name"   : "Neumann"
-      , "subject"      : "You enabled Presence!"
       , "bccs"         : []
       , "categories"   : [ "enable_presence" ]
       , "template_id"   : "360f8ff0-d9d0-43c8-a637-4e28633eb20b"

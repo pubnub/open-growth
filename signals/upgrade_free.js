@@ -22,7 +22,6 @@ opengrowth.signals.upgrade_free = ( request, customer ) => {
       , "sender_name"   : csm.full_name
       , "reply_email"   : csm.email
       , "reply_name"    : csm.full_name
-      , "subject"       : "Upgrade Required"
       , "bccs"          : csm.bccs || []
       , "categories"    : [ "upgrade_free" ]
       , "template_id"   : "a1b59a4f-75d2-4b38-9fa9-8d52baf0b93d"

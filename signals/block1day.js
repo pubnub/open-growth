@@ -29,7 +29,6 @@ opengrowth.signals.block1day = ( request, customer ) => {
       , "sender_name"  : "Neumann"
       , "reply_email"  : "support@pubnub.com"
       , "reply_name"   : "Support"
-      , "subject"      : "PubNub Block Expiring Now"
       , "bccs"         : csm_bccs
       , "categories"   : [ "block1day" ]
       , "template_id"   : "67f64bfe-77c1-44cc-9667-b29cf73332bc"

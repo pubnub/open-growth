@@ -21,7 +21,6 @@ opengrowth.signals.history = ( request, customer ) => {
       , "sender_name"  : "Neumann"
       , "reply_email"  : "neumann@pubnub.com"
       , "reply_name"   : "Neumann"
-      , "subject"      : "You enabled History!"
       , "bccs"         : []
       , "categories"   : [ "enable_history" ]
       , "template_id"   : "1d0cf50c-6be6-403d-adab-92bf66805a00"

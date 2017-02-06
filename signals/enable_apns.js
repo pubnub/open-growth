@@ -21,7 +21,6 @@ opengrowth.signals.apns = ( request, customer ) => {
       , "sender_name"  : "Neumann"
       , "reply_email"  : "neumann@pubnub.com"
       , "reply_name"   : "Neumann"
-      , "subject"      : "You enabled APNS!"
       , "bccs"         : []
       , "categories"   : [ "enable_apns" ]
       , "template_id"   : "00ebcd68-4294-497a-9b3a-c4c4c8d92be7"

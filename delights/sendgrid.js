@@ -31,7 +31,6 @@ opengrowth.delight.sendgrid.email = ( req ) => {
     , "template_id"       : req.template_id
     , "personalizations"  : [ {
             "to" : [ { "email" : req.email, "name" : req.name } ]
-        ,   "subject" : req.subject
         ,   "substitutions" : req.substitutions
         } ]
     };

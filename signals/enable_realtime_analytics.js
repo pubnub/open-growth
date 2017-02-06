@@ -21,7 +21,6 @@ opengrowth.signals.realtime_analytics = ( request, customer ) => {
       , "sender_name"  : "Neumann"
       , "reply_email"  : "neumann@pubnub.com"
       , "reply_name"   : "Neumann"
-      , "subject"      : "You enabled Realtime Analytics!"
       , "bccs"         : []
       , "categories"   : [ "enable_rta" ]
       , "template_id"   : "a65e767d-8de9-4745-af54-226d306bb1eb"

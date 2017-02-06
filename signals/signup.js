@@ -31,10 +31,9 @@ opengrowth.signals.signup = ( request, customer ) => {
       , "sender_name"   : "Neumann"
       , "reply_email"   : "support@pubnub.com"
       , "reply_name"    : "Support"
-      , "subject"       : "Your PubNub API Keys"
       , "bccs"          : csm_bccs
       , "categories"    : [ "signup" ]
-      , "template_id"   : "8c2c3be2-afc2-4d72-85b8-5304b9421ff3"
+      , "template_id"   : "311ca49b-df67-4e4f-8bf9-48ed18c91716"
       , "substitutions" : {
             "-name-"        : name || 'there'
           , "-display_url-" : display_url

@@ -21,7 +21,6 @@ opengrowth.signals.lms = ( request, customer ) => {
       , "sender_name"  : "Neumann"
       , "reply_email"  : "neumann@pubnub.com"
       , "reply_name"   : "Neumann"
-      , "subject"      : "You enabled LMS!"
       , "bccs"         : []
       , "categories"   : [ "enable_lms" ]
       , "template_id"   : "80dea1cc-451a-4ff9-ba48-396ea61abd3b"

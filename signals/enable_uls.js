@@ -21,7 +21,6 @@ opengrowth.signals.uls = ( request, customer ) => {
       , "sender_name"  : "Neumann"
       , "reply_email"  : "neumann@pubnub.com"
       , "reply_name"   : "Neumann"
-      , "subject"      : "You enabled ULS!"
       , "bccs"         : []
       , "categories"   : [ "enable_uls" ]
       , "template_id"   : "d9bde5d3-ad60-43c0-974e-d64c531af9b7"

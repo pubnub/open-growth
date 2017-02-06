@@ -21,7 +21,6 @@ opengrowth.signals.multiplexing = ( request, customer ) => {
       , "sender_name"  : "Neumann"
       , "reply_email"  : "neumann@pubnub.com"
       , "reply_name"   : "Neumann"
-      , "subject"      : "You enabled Multiplexing!"
       , "bccs"         : []
       , "categories"   : [ "enable_multiplexing" ]
       , "template_id"   : "76eaa940-0859-4ba7-a0e7-c3ebf97de79e"

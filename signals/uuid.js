@@ -21,7 +21,6 @@ opengrowth.signals.uuid = ( request, customer ) => {
       , "sender_name"  : "Neumann"
       , "reply_email"  : "support@pubnub.com"
       , "reply_name"   : "Support"
-      , "subject"      : "Have you configured UUID's for your app?"
       , "bccs"         : []
       , "categories"   : [ "uuid" ]
       , "template_id"   : "bf0bd3c3-ba49-41cb-886e-7c3c95a1a293"

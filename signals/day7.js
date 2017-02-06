@@ -29,7 +29,6 @@ opengrowth.signals.day7 = ( request, customer ) => {
       , "sender_name"   : csm.full_name
       , "reply_email"   : csm.email
       , "reply_name"    : csm.full_name
-      , "subject"       : "Following up re: PubNub"
       , "bccs"          : csm.bccs || []
       , "categories"    : [ "day7" ]
       , "template_id"   : "9bc6db92-80df-43be-8fa0-8f9f5e34f50f"

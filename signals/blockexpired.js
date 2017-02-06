@@ -29,7 +29,6 @@ opengrowth.signals.blockexpired = ( request, customer ) => {
       , "sender_name"  : "Neumann"
       , "reply_email"  : "support@pubnub.com"
       , "reply_name"   : "Support"
-      , "subject"      : "PubNub Block Expired"
       , "bccs"         : csm_bccs
       , "categories"   : [ "blockexpired" ]
       , "template_id"   : "a91ffa95-27f9-43fa-8229-3283f3c6975a"
