@@ -1,5 +1,6 @@
 opengrowth.signals.signup = ( request, customer ) => {
     const user = request.message;
+    const csm_bccs = user.csm && user.csm.bcc ? user.csm.bcc : [];
     let email  = user.litmus || 'open-growth-activity+testing@pubnub.com';
     // @if GOLD
     email = user.email;
@@ -31,7 +32,7 @@ opengrowth.signals.signup = ( request, customer ) => {
       , "reply_email"   : "support@pubnub.com"
       , "reply_name"    : "Support"
       , "subject"       : "Your PubNub API Keys"
-      , "bccs"          : user.csm.bccs
+      , "bccs"          : csm_bccs
       , "categories"    : [ "signup" ]
       , "template_id"   : "8c2c3be2-afc2-4d72-85b8-5304b9421ff3"
       , "substitutions" : {

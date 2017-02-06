@@ -1,5 +1,6 @@
 opengrowth.signals.block1day = ( request, customer ) => {
     const user = request.message;
+    const csm_bccs = user.csm && user.csm.bcc ? user.csm.bcc : [];
     let email  = user.litmus || 'open-growth-activity+testing@pubnub.com';
     // @if GOLD
     //email = user.email;
@@ -29,7 +30,7 @@ opengrowth.signals.block1day = ( request, customer ) => {
       , "reply_email"  : "support@pubnub.com"
       , "reply_name"   : "Support"
       , "subject"      : "PubNub Block Expiring Now"
-      , "bccs"         : user.csm.bccs || []
+      , "bccs"         : csm_bccs
       , "categories"   : [ "block1day" ]
       , "template_id"   : "67f64bfe-77c1-44cc-9667-b29cf73332bc"
       , "substitutions" : {
