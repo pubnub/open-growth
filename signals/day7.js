@@ -6,9 +6,11 @@ opengrowth.signals.day7 = ( request, customer ) => {
     email = user.email;
     // @endif
 
+    let name = "";
     let salutation = "";
     if ( customer && customer.person && customer.person.name &&
          customer.person.name.givenName ) {
+      name = customer.person.name.givenName;
       salutation = customer.person.name.givenName + " - ";
     }
     
@@ -22,7 +24,7 @@ opengrowth.signals.day7 = ( request, customer ) => {
         "signal"        : "day7"
       , "message"       : ""
       , "email"         : email
-      , "name"          : ""
+      , "name"          : name
       , "sender_email"  : csm.email
       , "sender_name"   : csm.full_name
       , "reply_email"   : csm.email
