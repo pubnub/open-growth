@@ -20,10 +20,12 @@ module.exports = function (app) {
     app.post( '/sendgrid', function( request, response ) {
 
         var actions = [];
-        for (var action of request.body) {
+        for ( var action of request.body ) {
             //only open growth emails have categories
             //no analytics tracking for default bcc
-            if (!action.category || action.email === default_bcc) {
+            if ( !action.category ||
+                 action.email === default_bcc ||
+                 action.email.indexOf("emailtosalesforce@") > -1 ) {
                 continue;
             }
 
@@ -35,7 +37,7 @@ module.exports = function (app) {
             });
         }
 
-        if (actions.length === 0) {
+        if ( actions.length === 0 ) {
             response.sendStatus(200);
             return;
         }
