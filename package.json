@@ -28,13 +28,14 @@
   "author": "PubNub",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pubnub/open-growht/issues"
+    "url": "https://github.com/pubnub/open-growth/issues"
   },
-  "homepage": "https://github.com/pubnub/open-growht#readme",
+  "homepage": "https://github.com/pubnub/open-growth#readme",
   "dependencies": {
     "request": "latest",
     "request-promise": "latest",
     "gulp": "latest",
-    "gulp-preprocess": "latest"
+    "gulp-preprocess": "latest",
+    "prompt-promise": "latest"
   }
 }
