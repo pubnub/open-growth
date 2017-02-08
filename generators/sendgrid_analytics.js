@@ -6,6 +6,11 @@ var pubnub = require('pubnub')
 var bodyParser = require('body-parser')
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Globals
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+var default_bcc = "open-growth-activity@pubnub.com";
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // SendGrid
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 module.exports = function (app) {
@@ -15,9 +20,15 @@ module.exports = function (app) {
     app.post( '/sendgrid', function( request, response ) {
 
         var actions = [];
-        for (var action of request.body) {
+        for ( var action of request.body ) {
             //only open growth emails have categories
-            if (!action.category) continue;
+            //no analytics tracking for default bcc
+            if ( !action.category ||
+                 action.email === default_bcc ||
+                 action.email.indexOf("emailtosalesforce@") > -1 ) {
+                continue;
+            }
+
             actions.push({
                 "email"    : action.email,
                 "category" : action.category,
@@ -26,7 +37,7 @@ module.exports = function (app) {
             });
         }
 
-        if (actions.length === 0) {
+        if ( actions.length === 0 ) {
             response.sendStatus(200);
             return;
         }
