@@ -29,13 +29,13 @@ let gold = false;
 // Main
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 prompt('Password: ').then( password => {
-    apikeys = decrypt(password);
-
     if(args[0] == '--password'){
+        apikeys = decrypt(password);
         return prompt('New Password: ');
     } else if(args[0] == '--generate'){
         return prompt('New Password: ');
     } else{
+        apikeys = decrypt(password);
         return pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password );
     }
 } ).then( result => {
