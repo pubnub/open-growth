@@ -7,7 +7,10 @@ const http       = require('request-promise');
 const gulp       = require('gulp');
 const preprocess = require('gulp-preprocess');
 const fs         = require('fs');
-const apikeys    = require('./keys.json');
+const prompt     = require('prompt-promise');
+let apikeys      = {};
+const crypto     = require('crypto');
+const readline   = require('readline');
 
 const config  = {};
 const args = process.argv.slice(2);
@@ -25,18 +28,33 @@ let gold = false;
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Main
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+prompt('Password: ').then( password => {
+    apikeys = decrypt(password);
 
-pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password ).then( login => {
-    //log in and save login token
-
-    console.log( 'Logged In!', login.result.user_id );
-    config.login = login.result;
-    config.owner_id = config.login.user.id;
-
-    return list_apps(config.owner_id);
-
+    if(args[0] == '--password'){
+        return prompt('New Password: ');
+    } else if(args[0] == '--generate'){
+        return prompt('New Password: ');
+    } else{
+        return pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password );
+    }
 } ).then( result => {
-    //get list of user's apps and their keys, find Open Growth app_id and key_id's or create them
+    if(args[0] == '--password'){
+        //change password
+        encrypt(result);
+    } else if(args[0] == '--generate'){
+        generate(result);
+    } else{
+        //login and save token
+        console.log( 'Logged In!', result.result.user_id );
+        config.login = result.result;
+        config.owner_id = config.login.user.id;
+    }
+} ).then( result => {
+    //get list of user's apps and their keys, 
+    return list_apps(config.owner_id);
+} ).then( result => {
+    //find Open Growth app_id and key_id's or create them
     let app_exists = false;
     let gold_keyset_exists = false;
     let silver_keyset_exists = false;
@@ -188,7 +206,7 @@ pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password ).then( login => {
     console.log( 'Annotating in Librato!', result );
 
     return instructions();
-});
+} ).then(()=>{process.exit()});
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Build Event Handler Code
@@ -497,4 +515,48 @@ function pubnub_login( email, password ) {
     }).catch( error => {
         console.error( 'error', error );
     } );
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Encrypt keys from keys.json
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function generate( password ) {
+    let text = fs.readFileSync('./keys.json','utf8')
+    let cipher = crypto.createCipher('aes-256-ctr', password);
+    let crypted = cipher.update(text,'utf8','hex');
+    crypted += cipher.final('hex');
+    fs.writeFileSync('./keys.aes', crypted,'utf8');
+    console.log('Keys Encrypted');
+    process.exit();
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Encrypt keys
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function encrypt( password ) {
+    let keysText = JSON.stringify(apikeys);
+    let cipher = crypto.createCipher('aes-256-ctr', password);
+    let crypted = cipher.update(keysText,'utf8','hex');
+    crypted += cipher.final('hex');
+    fs.writeFileSync('./keys.aes', crypted,'utf8');
+    console.log('Keys Encrypted');
+    process.exit();
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Decrypt keys
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function decrypt( password ) {
+    let text = fs.readFileSync('./keys.aes','utf8')
+    let decipher = crypto.createDecipher('aes-256-ctr', password);
+    let dec = decipher.update(text,'hex','utf8');
+    dec += decipher.final('utf8');
+    try{
+        let keys = JSON.parse(dec);
+        console.log('Keys Decrypted');
+        return keys;
+    } catch(e){
+        console.log('Password Incorrect');
+        process.exit();
+    }
 }
