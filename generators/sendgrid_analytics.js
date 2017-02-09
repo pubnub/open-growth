@@ -8,7 +8,7 @@ var bodyParser = require('body-parser')
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Globals
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-var default_bcc = "open-growth-activity@pubnub.com";
+var default_bcc = "open-growth-activity";
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // SendGrid
@@ -24,7 +24,7 @@ module.exports = function (app) {
             //only open growth emails have categories
             //no analytics tracking for default bcc
             if ( !action.category ||
-                 action.email === default_bcc ||
+                 action.email.indexOf(default_bcc) > -1 ||
                  action.email.indexOf("emailtosalesforce@") > -1 ) {
                 continue;
             }
