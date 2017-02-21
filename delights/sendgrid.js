@@ -61,11 +61,9 @@ opengrowth.delight.sendgrid.email = ( request ) => {
 
     // post email
     return xhr.fetch( apiurl, sendgridRequest ).then( (res) => {
-        //log(sendgridRequest, true, "");
         console.log( 'SendGrid Response: ' + JSON.stringify(res));
     })
     .catch( err => {
-        //log(sendgridRequest, false, err);
         console.log( "SendGrid Error:\n" + err );
     } );
 };

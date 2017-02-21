@@ -7,11 +7,14 @@ const http       = require('request-promise');
 const gulp       = require('gulp');
 const preprocess = require('gulp-preprocess');
 const fs         = require('fs');
-const apikeys    = require('./keys.json');
+const prompt     = require('prompt-promise');
+const crypto     = require('crypto');
+const readline   = require('readline');
+const args       = process.argv.slice(2);
 
-const config  = {};
-const args = process.argv.slice(2);
-let gold = false;
+let apikeys      = {};
+let config     = {};
+let gold         = false;
 
 // TODO - GET/MAKE BLOCK labled 'Open Growth'
 // TODO - ...
@@ -25,170 +28,261 @@ let gold = false;
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Main
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+switch(args[0]){
+    case '--generate':
+        generate();
+        break;
+    case '--password':
+        password();
+        break;
+    case '--reconfigure':
+        reconfigure();
+        break;
+    case '--gold':
+        gold = true;//no break, falls through
+    default:
+        deploy();
+}
 
-pubnub_login( apikeys.pubnub.email, apikeys.pubnub.password ).then( login => {
-    //log in and save login token
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Deploy to blocks gold or silver
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function deploy(){
+    prompt('Password: ').then(password =>{
+        apikeys = decrypt(password);
+        return pubnub_login(apikeys.pubnub.email, apikeys.pubnub.password);
+    }).then( result => {
+        //login and save token
+        console.log( 'Logged In!', result.result.user_id );
+        config.login = result.result;
+        config.owner_id = config.login.user.id;
 
-    console.log( 'Logged In!', login.result.user_id );
-    config.login = login.result;
-    config.owner_id = config.login.user.id;
+        //get list of user's apps and their keys, 
+        return list_apps(config.owner_id);
+    } ).then( result => {
+        //find Open Growth app_id and key_id's or create them
+        let app_exists = false;
+        let gold_keyset_exists = false;
+        let silver_keyset_exists = false;
 
-    return list_apps(config.owner_id);
-
-} ).then( result => {
-    //get list of user's apps and their keys, find Open Growth app_id and key_id's or create them
-    let app_exists = false;
-    let gold_keyset_exists = false;
-    let silver_keyset_exists = false;
-
-    for( let i in result.result ) {
-        if( result.result[i].name == "Open Growth" ) { 
-            app_exists = true;
-            console.log( 'Open Growth App Found!');
-            config.app_id = result.result[i].id;
-            
-            for( let j in result.result[i].keys ) {
-                if( result.result[i].keys[j].properties.name == "Gold" ) {
-                    gold_keyset_exists = true;
-                    console.log( 'Gold Keyset Found!');
-                    config.gold_key_id = result.result[i].keys[j].id;
-                } else if( result.result[i].keys[j].properties.name == "Silver" ) {
-                    silver_keyset_exists = true;
-                    console.log( 'Silver Keyset Found!');
-                    config.silver_key_id = result.result[i].keys[j].id;
+        for( let i in result.result ) {
+            if( result.result[i].name == "Open Growth" ) { 
+                app_exists = true;
+                console.log( 'Open Growth App Found!');
+                config.app_id = result.result[i].id;
+                
+                for( let j in result.result[i].keys ) {
+                    if( result.result[i].keys[j].properties.name == "Gold" ) {
+                        gold_keyset_exists = true;
+                        console.log( 'Gold Keyset Found!');
+                        config.gold_key_id = result.result[i].keys[j].id;
+                    } else if( result.result[i].keys[j].properties.name == "Silver" ) {
+                        silver_keyset_exists = true;
+                        console.log( 'Silver Keyset Found!');
+                        config.silver_key_id = result.result[i].keys[j].id;
+                    }
                 }
             }
         }
-    }
 
-    if( !app_exists ) {
-        create_app('Open Growth').then( result => {
-            console.log('Created Open Growth App!');
-            config.app_id = result.result.id;
-        });
-    }
-
-    if( !gold_keyset_exists ) {
-        create_keyset(config.app_id, 'Gold').then( result => {
-            console.log('Created Gold Keys!');
-            config.gold_key_id = result.result.id;
-        });
-    }
-
-    if( !silver_keyset_exists ) {
-        create_keyset(config.app_id, 'Silver').then( result => {
-            console.log('Created Silver Keys!');
-            config.silver_key_id = result.result.id;
-        });
-    }
-
-    if( args[0] == '--gold' ){
-        gold = true;
-        config.key_id = config.gold_key_id;
-        console.log( 'Deploying to Gold environment!' );
-    } else {
-        gold = false;
-        config.key_id = config.silver_key_id;
-        console.log( 'Deploying to Silver environment!' );
-    }
-
-    return list_blocks(config.key_id);
-
-} ).then( result => {
-
-    let block_exists = false;
-
-    for( let i in result.payload ) {
-        if( result.payload[i].name == "Open Growth" ) {
-            block_exists = true;
-            config.block_id = result.payload[i].id;
-            console.log( 'Block Found!' );
+        if( !app_exists ) {
+            create_app('Open Growth').then( result => {
+                console.log('Created Open Growth App!');
+                config.app_id = result.result.id;
+            });
         }
-    }
 
-    if( !block_exists ) { 
-        create_block("Open Growth", "10x your business!", config.key_id).then( result => {
-            config.block_id = result.payload.id;
-            console.log( 'Block Created!' );
-        }); 
-    }
-
-    return list_event_handlers(config.key_id, config.block_id);
-} ).then( result => {
-    let event_handlers = result.payload[0].event_handlers;
-    let before_publish_exists = false;
-    let after_publish_exists = false;
-
-    for( let i in event_handlers ){
-        if( event_handlers[i].event == 'js-before-publish' ){
-            before_publish_exists = true;
-            config.signals_id = event_handlers[i].id;
-            console.log( 'Signals Event Handler Found!' );
-        } else if( event_handlers[i].event == 'js-after-publish' ){
-            after_publish_exists = true;
-            config.delights_id = event_handlers[i].id;
-            console.log( 'Delights Event Handler Found!' );
+        if( !gold_keyset_exists ) {
+            create_keyset(config.app_id, 'Gold').then( result => {
+                console.log('Created Gold Keys!');
+                config.gold_key_id = result.result.id;
+            });
         }
-    }
 
-    if( !before_publish_exists ){
-        create_event_handler(config.key_id, config.block_id, 'Signals Handler', 'js-before-publish').then( result => {
-            config.signals_id=result.payload.id;
-            console.log( 'Signals Event Handler Created!' );
-        });
-    }
+        if( !silver_keyset_exists ) {
+            create_keyset(config.app_id, 'Silver').then( result => {
+                console.log('Created Silver Keys!');
+                config.silver_key_id = result.result.id;
+            });
+        }
 
-    if( !before_publish_exists ){
-        create_event_handler(config.key_id, config.block_id, 'Delights Handler', 'js-after-publish').then( result => {
-            config.delights_id=result.payload.id;
-            console.log( 'Delights Event Handler Created!' );
-        });
-    }
+        if(gold){
+            config.key_id = config.gold_key_id;
+            console.log( 'Deploying to Gold environment!' );
+        } else {
+            config.key_id = config.silver_key_id;
+            console.log( 'Deploying to Silver environment!' );
+        }
 
-    // Build Signals Handler
-    return build_signals();
+        return list_blocks(config.key_id);
 
-} ).then( result => {
+    } ).then( result => {
 
-    console.log( 'Built Signals Handler!', result.length );
-    config.signals_code = result;
+        let block_exists = false;
 
-    // Build Delights Handler
-    return build_delights();
+        for( let i in result.payload ) {
+            if( result.payload[i].name == "Open Growth" ) {
+                block_exists = true;
+                config.block_id = result.payload[i].id;
+                console.log( 'Block Found!' );
+            }
+        }
 
-} ).then( result => {
+        if( !block_exists ) { 
+            create_block("Open Growth", "10x your business!", config.key_id).then( result => {
+                config.block_id = result.payload.id;
+                console.log( 'Block Created!' );
+            }); 
+        }
 
-    console.log( 'Built Delights Handler!', result.length );
-    config.delights_code = result;
+        return list_event_handlers(config.key_id, config.block_id);
+    } ).then( result => {
+        let event_handlers = result.payload[0].event_handlers;
+        let before_publish_exists = false;
+        let after_publish_exists = false;
 
-    // Upload Signals
-    return upload_signals_handler();
+        for( let i in event_handlers ){
+            if( event_handlers[i].event == 'js-before-publish' ){
+                before_publish_exists = true;
+                config.signals_id = event_handlers[i].id;
+                console.log( 'Signals Event Handler Found!' );
+            } else if( event_handlers[i].event == 'js-after-publish' ){
+                after_publish_exists = true;
+                config.delights_id = event_handlers[i].id;
+                console.log( 'Delights Event Handler Found!' );
+            }
+        }
 
-} ).then( result => {
+        if( !before_publish_exists ){
+            create_event_handler(config.key_id, config.block_id, 'Signals Handler', 'js-before-publish').then( result => {
+                config.signals_id=result.payload.id;
+                console.log( 'Signals Event Handler Created!' );
+            });
+        }
 
-    console.log( 'Uploaded Signals Handler!', result );
+        if( !before_publish_exists ){
+            create_event_handler(config.key_id, config.block_id, 'Delights Handler', 'js-after-publish').then( result => {
+                config.delights_id=result.payload.id;
+                console.log( 'Delights Event Handler Created!' );
+            });
+        }
 
-    // Upload Delights
-    return upload_delights_handler();
+        // Build Signals Handler
+        return build_signals();
 
-} ).then( result => {
+    } ).then( result => {
 
-    console.log( 'Uploaded Delights Handler!', result );
-    // Sent Restart Signal
-    return restart();
+        console.log( 'Built Signals Handler!', result.length );
+        config.signals_code = result;
 
-} ).then( result => {
+        // Build Delights Handler
+        return build_delights();
 
-    console.log( 'Restarting!', result );
+    } ).then( result => {
 
-    return librato_annotate_deploy();
+        console.log( 'Built Delights Handler!', result.length );
+        config.delights_code = result;
 
-} ).then( result => {
+        // Upload Signals
+        return upload_signals_handler();
 
-    console.log( 'Annotating in Librato!', result );
+    } ).then( result => {
 
-    return instructions();
-});
+        console.log( 'Uploaded Signals Handler!', result );
+
+        // Upload Delights
+        return upload_delights_handler();
+
+    } ).then( result => {
+
+        console.log( 'Uploaded Delights Handler!', result );
+        // Sent Restart Signal
+        return restart();
+
+    } ).then( result => {
+
+        console.log( 'Restarting!', result );
+
+        return librato_annotate_deploy();
+
+    } ).then( result => {
+
+        console.log( 'Annotating in Librato!', result );
+
+        return instructions();
+    } ).then(()=>{process.exit()});
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Encrypt keys from keys.json
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function reconfigure() {
+    let firstKey = '';
+    let secondKey = '';
+    let value = '';
+    let pass = '';
+
+    prompt("Password: ")
+    .then(password => {
+        pass = password;
+        apikeys = decrypt(password);
+        console.log('\nCurrent Keys: ')
+        for(key in apikeys){
+            console.log('\t'+key);
+        }
+        return prompt('Enter Key: ');
+    }).then(entry=>{
+        firstKey = entry;
+        console.log('\nSubkeys: ')
+        for(key in apikeys[entry]){
+            console.log('\t'+key);
+        }
+        return prompt('Enter Subkey: ')
+    }).then(entry=>{
+        secondKey = entry;
+        console.log('Current Value: ' + apikeys[firstKey][secondKey]);
+        return prompt('New Value: ');
+    }).then(entry=>{
+        value = entry;
+        console.log('Upserting '+firstKey+' { '+secondKey+': '+value+' } to keys file');
+        if(firstKey in apikeys){
+            apikeys[firstKey][secondKey] = value;
+        } else {
+            apikeys[firstKey] = {};
+            apikeys[firstKey][secondKey] = value;
+        }
+        encrypt(pass);
+    });
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Encrypt keys from keys.json
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function generate() {
+    prompt('Set password: ')
+    .then(password => {
+        console.log('Creating keys.aes from keys.json...')
+        let text = fs.readFileSync('./keys.json','utf8')
+        let cipher = crypto.createCipher('aes-256-ctr', password);
+        let crypted = cipher.update(text,'utf8','hex');
+        crypted += cipher.final('hex');
+        fs.writeFileSync('./keys.aes', crypted,'utf8');
+        console.log('Keys Encrypted');
+    });
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Change encryption password on keys.aes
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function password() {
+    prompt('Password: ')
+    .then(password => {
+        apikeys = decrypt(password);
+        return prompt('New Password: ');
+    }).then(newpass => {
+        encrypt(newpass);
+    });
+}
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Build Event Handler Code
@@ -497,4 +591,35 @@ function pubnub_login( email, password ) {
     }).catch( error => {
         console.error( 'error', error );
     } );
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Encrypt keys
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function encrypt( password ) {
+    let keysText = JSON.stringify(apikeys);
+    let cipher = crypto.createCipher('aes-256-ctr', password);
+    let crypted = cipher.update(keysText,'utf8','hex');
+    crypted += cipher.final('hex');
+    fs.writeFileSync('./keys.aes', crypted,'utf8');
+    console.log('Keys Encrypted');
+    process.exit();
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Decrypt keys
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function decrypt( password ) {
+    let text = fs.readFileSync('./keys.aes','utf8')
+    let decipher = crypto.createDecipher('aes-256-ctr', password);
+    let dec = decipher.update(text,'hex','utf8');
+    dec += decipher.final('utf8');
+    try{
+        let keys = JSON.parse(dec);
+        console.log('Keys Decrypted');
+        return keys;
+    } catch(e){
+        console.log('Password Incorrect');
+        process.exit();
+    }
 }

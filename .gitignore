@@ -1,6 +1,7 @@
 .DS_Store
 keys.js
 keys.json
+keys.aes
 .env
 node_modules
 *.pyc
