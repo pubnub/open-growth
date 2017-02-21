@@ -2,15 +2,14 @@
 // Send Emails with SendGrid
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.delight.sendgrid = {};
-opengrowth.delight.sendgrid.email = ( req ) => {
-
+opengrowth.delight.sendgrid.email = ( request ) => {
     // Record Delight Activity
-    opengrowth.track.delight( 'sendgrid.email', req.signal, {
-      "email"    : req.email
-    , "subject"  : req.subject
-    , "message"  : req.message || "SG Template"
-    , "bccs"     : req.bccs
-    , "category" : req.categories[0]
+    opengrowth.track.delight( 'sendgrid.email', request.signal, {
+      "email"    : request.email
+    , "subject"  : request.subject
+    , "message"  : request.message || "SG Template"
+    , "bccs"     : request.bccs
+    , "category" : request.categories[0]
     } );
     
     // sendgrid api url
@@ -24,20 +23,20 @@ opengrowth.delight.sendgrid.email = ( req ) => {
 
     // payload
     let data = {
-      "from"              : { "email": req.sender_email,  "name": req.sender_name  }
-    , "reply_to"          : { "email": req.reply_email, "name": req.reply_name }
+      "from"              : { "email": request.sender_email,  "name": request.sender_name  }
+    , "reply_to"          : { "email": request.reply_email, "name": request.reply_name }
     , "tracking_settings" : { "subscription_tracking" : { "enable" : false } }
-    , "categories"        : req.categories
-    , "template_id"       : req.template_id
+    , "categories"        : request.categories
+    , "template_id"       : request.template_id
     , "personalizations"  : [ {
-            "to" : [ { "email" : req.email, "name" : req.name } ]
-        ,   "substitutions" : req.substitutions
+            "to" : [ { "email" : request.email, "name" : request.name } ]
+        ,   "substitutions" : request.substitutions
         } ]
     };
 
     //add BCCs for SalesForce
-    if ( req.bccs && req.bccs.length && req.bccs.length !== 0 ) {
-        data.personalizations[0].bcc = req.bccs;
+    if ( request.bccs && request.bccs.length && request.bccs.length !== 0 ) {
+        data.personalizations[0].bcc = request.bccs;
     } else {
         data.personalizations[0].bcc = [{
             "email": "open-growth-activity@pubnub.com"
@@ -45,8 +44,8 @@ opengrowth.delight.sendgrid.email = ( req ) => {
     }
 
     //add content if not using a template on sendgrid
-    if ( req.message ) {
-        data.content = [ { "type" : "text/html", "value" : req.message } ];
+    if ( request.message ) {
+        data.content = [ { "type" : "text/html", "value" : request.message } ];
         delete data.personalizations.substitutions;
         delete data.template_id;
     }
@@ -67,5 +66,4 @@ opengrowth.delight.sendgrid.email = ( req ) => {
     .catch( err => {
         console.log( "SendGrid Error:\n" + err );
     } );
-
 };

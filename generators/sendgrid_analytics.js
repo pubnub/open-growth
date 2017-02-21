@@ -24,8 +24,7 @@ module.exports = function (app) {
             //only open growth emails have categories
             //no analytics tracking for default bcc
             if ( !action.category ||
-                 action.email.indexOf(default_bcc) > -1 ||
-                 action.email.indexOf("emailtosalesforce@") > -1 ) {
+                 action.email.indexOf(default_bcc) > -1 ) {
                 continue;
             }
 
