@@ -7,17 +7,17 @@ opengrowth.signals.day3 = ( request, customer ) => {
     // @endif
 
     let subject = "Adding realtime to your app";
-    let company_name = "your company";
+    let company_name = "your team";
     if ( customer && customer.company &&
          customer.company.name &&
          customer.company.name !== 'Not Found' &&
          customer.company.name !== 'null' ) {
-      subject = `${customer.company.name} - adding realtime to your app`;
       company_name = customer.company.name;
+      subject = `${company_name} - adding realtime to your app`;
     }
 
     let company_mention;
-    if ( company_name !== "your company" ) {
+    if ( company_name !== "your team" ) {
       company_mention = `On another note, I see that you work at ${company_name}. `;
     }
     else {
@@ -45,19 +45,20 @@ opengrowth.signals.day3 = ( request, customer ) => {
       , "message"       : ""
       , "email"         : email
       , "name"          : name
-      , "sender_email"  : csm.email
-      , "sender_name"   : csm.full_name
-      , "reply_email"   : csm.email
-      , "reply_name"    : csm.full_name
-      , "subject"       : subject
+      , "sender_email"  : "neumann@pubnub.com"
+      , "sender_name"   : "Neumann"
+      , "reply_email"   : "support@pubnub.com"
+      , "reply_name"    : "Support"
       , "bccs"          : csm.bccs || []
       , "categories"    : [ "day3" ]
-      , "template_id"   : "ed0bcf03-8afd-413c-b267-adb6abc8001c"
+      , "template_id"   : "6b3a9a07-e470-4075-a84b-02087fa99699"
       , "substitutions" : {
-            "-personalization-" : personalization
-          , "-csm_first_name-"  : csm.first_name
-          , "-company_mention-" : company_mention
-          , "-company_name-"    : company_name
+            "-name-"              : name || 'there'
+          , "-personalization-"   : personalization
+          , "-csm_first_name-"    : csm.first_name
+          , "-csm_email_address-" : csm.email
+          , "-company_mention-"   : company_mention
+          , "-company_name-"      : company_name
         }
     }
 

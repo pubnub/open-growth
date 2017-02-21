@@ -5,3 +5,4 @@ keys.json
 node_modules
 *.pyc
 *.sqlite
+*.aes

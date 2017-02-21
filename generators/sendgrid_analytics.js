@@ -8,7 +8,7 @@ var bodyParser = require('body-parser')
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Globals
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-var default_bcc = "open-growth-activity@pubnub.com";
+var default_bcc = "open-growth-activity";
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // SendGrid
@@ -20,10 +20,11 @@ module.exports = function (app) {
     app.post( '/sendgrid', function( request, response ) {
 
         var actions = [];
-        for (var action of request.body) {
+        for ( var action of request.body ) {
             //only open growth emails have categories
             //no analytics tracking for default bcc
-            if (!action.category || action.email === default_bcc) {
+            if ( !action.category ||
+                 action.email.indexOf(default_bcc) > -1 ) {
                 continue;
             }
 
@@ -35,7 +36,7 @@ module.exports = function (app) {
             });
         }
 
-        if (actions.length === 0) {
+        if ( actions.length === 0 ) {
             response.sendStatus(200);
             return;
         }
