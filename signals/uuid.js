@@ -2,7 +2,7 @@ opengrowth.signals.uuid = ( request, customer ) => {
     const user = request.message;
     let email  = user.litmus || 'open-growth-activity+testing@pubnub.com';
     // @if GOLD
-    //email = user.email;
+    email = user.email;
     // @endif
 
     let name = "";
@@ -25,7 +25,7 @@ opengrowth.signals.uuid = ( request, customer ) => {
       , "categories"   : [ "uuid" ]
       , "template_id"   : "bf0bd3c3-ba49-41cb-886e-7c3c95a1a293"
       , "substitutions" : {
-            "-salutation-" : name || "there"
+            "-name-" : name || "there"
           , "-uuid_count-" : user.uuid_count.toString()
           , "-ip_count-"   : user.ip_count.toString()
         }

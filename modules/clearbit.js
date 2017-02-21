@@ -26,6 +26,5 @@ opengrowth.modules.clearbit.lookup = (email) => {
             console.log( 'Clearbit Error:', err );
         } );
     } );
-
 };
 

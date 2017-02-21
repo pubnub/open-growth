@@ -33,7 +33,7 @@ opengrowth.signals.block1day = ( request, customer ) => {
       , "categories"   : [ "block1day" ]
       , "template_id"   : "67f64bfe-77c1-44cc-9667-b29cf73332bc"
       , "substitutions" : {
-            "-salutation-" : name || "there"
+            "-name-" : name || "there"
           , "-url_list-"   : url_list
         }
     }

@@ -7,16 +7,18 @@ opengrowth.signals.day7 = ( request, customer ) => {
     // @endif
 
     let name = "";
-    let salutation = "";
     if ( customer && customer.person && customer.person.name &&
-         customer.person.name.givenName ) {
+         customer.person.name.givenName &&
+         customer.person.name.givenName !== 'Not Found' &&
+         customer.person.name.givenName !== 'null' ) {
       name = customer.person.name.givenName;
-      salutation = customer.person.name.givenName + " - ";
     }
     
+    let company_name = "your engineering"
     let company_mention = "your company's";
     if ( customer && customer.company &&
-         customer.company.name ) { 
+         customer.company.name ) {
+      company_name = "the " + customer.company.name + "engineering";
       company_mention = "the " + customer.company.name;
     }
 
@@ -25,17 +27,18 @@ opengrowth.signals.day7 = ( request, customer ) => {
       , "message"       : ""
       , "email"         : email
       , "name"          : name
-      , "sender_email"  : csm.email
-      , "sender_name"   : csm.full_name
-      , "reply_email"   : csm.email
-      , "reply_name"    : csm.full_name
+      , "sender_email"  : "neumann@pubnub.com"
+      , "sender_name"   : "Neumann"
+      , "reply_email"   : "support@pubnub.com"
+      , "reply_name"    : "Support"
       , "bccs"          : csm.bccs || []
       , "categories"    : [ "day7" ]
-      , "template_id"   : "9bc6db92-80df-43be-8fa0-8f9f5e34f50f"
+      , "template_id"   : "3651fe4d-ec21-4bf8-aee3-de87836bf38d"
       , "substitutions" : {
-            "-salutation-"      : salutation
+            "-name-"            : name || 'there'
           , "-csm_first_name-"  : csm.first_name
           , "-company_mention-" : company_mention
+          , "-company_name-"    : company_name
         }
     }
 
