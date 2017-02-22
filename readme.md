@@ -1,6 +1,8 @@
+# Open Growth and Neumann
+
 ![Open Growth](http://i.imgur.com/Pug4ybX.gif)
 
-# Open Growth 
+## Open Growth 
 
 ### grow your business 10x by automating tedious workforce tasks using machines
 
