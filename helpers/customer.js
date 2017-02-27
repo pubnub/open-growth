@@ -1,7 +1,9 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Customer Fetch
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-opengrowth.customer = ( email, signal ) => {
+opengrowth.customer = {};
+// TODO: change .customer to .customer.getCustomer in open-growth/handlers/signals.js
+opengrowth.customer.getCustomer = ( email, signal ) => {
 
     // TODO 
     // TODO Augment/Extend 'SYNC' User Profile KV Entry
@@ -40,3 +42,45 @@ opengrowth.customer = ( email, signal ) => {
     } );
 
 };
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get first name from a Customer Object, returns null if not found
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+opengrowth.customer.getFirstName = ( customer ) => {
+	let result = null;
+    if ( customer && customer.person && customer.person.name &&
+         customer.person.name.givenName &&
+         customer.person.name.givenName !== 'Not Found' &&
+         customer.person.name.givenName !== 'null' ) {
+      result = customer.person.name.givenName;
+    }
+    return result;
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get last name from a Customer Object, returns null if not found
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+opengrowth.customer.getLastName = ( customer ) => {
+	let result = null;
+    if ( customer && customer.person && customer.person.name &&
+         customer.person.name.familyName &&
+         customer.person.name.familyName !== 'Not Found' &&
+         customer.person.name.familyName !== 'null' ) {
+      result = customer.person.name.familyName;
+    }
+    return result;
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get company name from a Customer Object, returns null if not found
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+opengrowth.customer.getCompany = ( customer ) => {
+    let result = null;
+    if ( customer && customer.company &&
+         customer.company.name &&
+         customer.company.name !== 'Not Found' &&
+         customer.company.name !== 'null' ) {
+      result = customer.company.name;
+    }
+    return result;
+}

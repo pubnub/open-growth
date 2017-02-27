@@ -1,4 +1,4 @@
-opengrowth.signals.day3 = ( request, customer ) => {
+opengrowth.signals.multiplexing = ( request, customer ) => {
     const user = request.message;
     const csm  = user.csm;
     const csm_bccs = csm && csm.bccs ? csm.bccs : [];
@@ -24,14 +24,14 @@ opengrowth.signals.day3 = ( request, customer ) => {
     };
 
     var sendWithUsPostBody = {
-      "template": opengrowth.keys.swu.templates.day3,
+      "template": opengrowth.keys.swu.templates.enable_multiplexing,
       "recipient": {
         "name": firstName,
         "address": email
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "day3" ]
+      "tags" : [ "enable_multiplexing" ]
     };
 
     // Send Email and Track Delight in Librato

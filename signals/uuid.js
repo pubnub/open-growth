@@ -1,35 +1,40 @@
 opengrowth.signals.uuid = ( request, customer ) => {
     const user = request.message;
+    const csm  = user.csm;
+    const csm_bccs = csm && csm.bccs ? csm.bccs : [];
     let email  = user.litmus || 'open-growth-activity+testing@pubnub.com';
     // @if GOLD
     email = user.email;
     // @endif
 
-    let name = "";
-    if ( customer && customer.person && customer.person.name &&
-         customer.person.name.givenName &&
-         customer.person.name.givenName !== 'Not Found' &&
-         customer.person.name.givenName !== 'null' ) {
-      name = customer.person.name.givenName;
-    }
+    let firstName    = opengrowth.customer.getFirstName(customer);
+    let lastName     = opengrowth.customer.getLastName(customer);
+    let company_name = opengrowth.customer.getCompany(customer);
 
-    let sendgridPostBody = {
-        "signal"       : "uuid"
-      , "email"        : email
-      , "name"         : ""
-      , "sender_email" : "neumann@pubnub.com"
-      , "sender_name"  : "Neumann"
-      , "reply_email"  : "support@pubnub.com"
-      , "reply_name"   : "Support"
-      , "bccs"         : []
-      , "categories"   : [ "uuid" ]
-      , "template_id"   : "bf0bd3c3-ba49-41cb-886e-7c3c95a1a293"
-      , "substitutions" : {
-            "-name-" : name || "there"
-          , "-uuid_count-" : user.uuid_count.toString()
-          , "-ip_count-"   : user.ip_count.toString()
-        }
-    }
+    var template_data = {
+        "customer_first_name" : firstName
+      , "customer_last_name"  : lastName
+      , "company_name"        : company_name
+      , "csm_first_name"      : csm.first_name
+      , "csm_last_name"       : csm.last_name
+      , "csm_email"           : csm.email
+      , "csm_phone"           : csm.phone
+      , "csm_bccs"            : csm_bccs
+      , "app_name"            : user.app_name
+      , "uuid_count"          : user.uuid_count.toString()
+      , "ip_count"            : user.ip_count.toString()
+    };
 
-    opengrowth.delight.sendgrid.email(sendgridPostBody);
+    var sendWithUsPostBody = {
+      "template": opengrowth.keys.swu.templates.uuid,
+      "recipient": {
+        "name": firstName,
+        "address": email
+      },
+      "template_data": template_data,
+      "bcc": csm_bccs,
+      "tags" : [ "uuid" ]
+    };
+
+    opengrowth.delight.sendwithus.email(sendWithUsPostBody);
 };
