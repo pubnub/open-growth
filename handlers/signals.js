@@ -22,6 +22,11 @@ export default request => {
     const signal  = message.signal;
     const email   = message.email;
 
+    // Copy publishes to Silver        
+    // @if GOLD        
+    opengrowth.modules.pubnub.silver(message);     
+    // @endif
+
     // Record the signal!
     opengrowth.track.signal( signal, message );
 
