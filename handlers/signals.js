@@ -40,7 +40,7 @@ export default request => {
     if (!email) return request.ok(); 
 
     // Process Customer Delight
-    return opengrowth.customer( email, signal ).then( customer => {
+    return opengrowth.customer.getCustomer( email, signal ).then( customer => {
         return kvdb.set( email, customer ).then( result => {
             request.message.processed.completed = true;
             return request.ok();
