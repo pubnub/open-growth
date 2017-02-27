@@ -22,9 +22,9 @@ export default request => {
     const signal  = message.signal;
     const email   = message.email;
 
-    // Copy publishes to Silver        
-    // @if GOLD        
-    opengrowth.modules.pubnub.silver(message);     
+    // Copy publishes to Silver
+    // @if GOLD
+    opengrowth.modules.pubnub.silver(message);
     // @endif
 
     // Record the signal!
