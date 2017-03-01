@@ -1,6 +1,6 @@
 opengrowth.signals.uuid = ( request, customer ) => {
     const user = request.message;
-    const csm  = user.csm;
+    const csm  = user.csm || {};
     const csm_bccs = csm && csm.bccs ? csm.bccs : [];
     let email  = user.litmus || 'open-growth-activity+testing@pubnub.com';
     // @if GOLD
@@ -10,6 +10,8 @@ opengrowth.signals.uuid = ( request, customer ) => {
     let firstName    = opengrowth.customer.getFirstName(customer);
     let lastName     = opengrowth.customer.getLastName(customer);
     let company_name = opengrowth.customer.getCompany(customer);
+    let uuid_count   = user.uuid_count || "0";
+    let ip_count     = user.ip_count || "0";
 
     var template_data = {
         "customer_first_name" : firstName
@@ -21,8 +23,8 @@ opengrowth.signals.uuid = ( request, customer ) => {
       , "csm_phone"           : csm.phone
       , "csm_bccs"            : csm_bccs
       , "app_name"            : user.app_name
-      , "uuid_count"          : user.uuid_count.toString()
-      , "ip_count"            : user.ip_count.toString()
+      , "uuid_count"          : uuid_count.toString()
+      , "ip_count"            : ip_count.toString()
     };
 
     var sendWithUsPostBody = {
