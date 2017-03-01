@@ -1,6 +1,6 @@
 opengrowth.signals.day3 = ( request, customer ) => {
     const user = request.message;
-    const csm  = user.csm;
+    const csm  = user.csm || {};
     const csm_bccs = csm && csm.bccs ? csm.bccs : [];
     let email  = user.litmus || 'open-growth-activity+testing@pubnub.com';
     // @if GOLD
