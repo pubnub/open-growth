@@ -47,12 +47,10 @@ opengrowth.delight.sendwithus.email = ( request ) => {
         , "Content-Type"  : "application/json"
         }
     }
-
-    console.log(JSON.stringify(swuRequest));
-
+    
     // post email
     return xhr.fetch( apiurl, swuRequest ).then( (res) => {
-        console.log( "SendWithUs Response: " + JSON.stringify(res));
+        //console.log( "SendWithUs Response: " + JSON.stringify(res));
     })
     .catch( err => {
         console.log( "SendWithUs Error:\n" + err );

@@ -2,7 +2,6 @@
 // Customer Fetch
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.customer = {};
-// TODO: change .customer to .customer.getCustomer in open-growth/handlers/signals.js
 opengrowth.customer.getCustomer = ( email, signal ) => {
 
     // TODO 
@@ -37,7 +36,9 @@ opengrowth.customer.getCustomer = ( email, signal ) => {
                 customer.email   = email;
                 customer.usecase = usecase;
                 resolve(customer);
-            } );
+            } ).catch((err) => {
+              console.log( 'monkeylearn Error:', err );
+          });
         }
     } );
 
