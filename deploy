@@ -546,7 +546,7 @@ function librato_annotate_deploy() {
     return http({
         method  : 'POST'
     ,   uri     : 'https://metrics-api.librato.com/v1/annotations' + 
-                  '/opengrowth-deploys'
+                  '/opengrowth.deploy.blocks'
     ,   body    : {
             title       : 'Deployed JavaScript to BLOCKS'
         ,   description : desc
