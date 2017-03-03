@@ -6,6 +6,8 @@ opengrowth.modules.librato = ( key, value ) => {
     if (!opengrowth.keys.librato.email || !opengrowth.keys.librato.secret)
         return (new Promise()).resolve('Librato disabled. No API Key.');
 
+    let apiUrl = 'https://metrics-api.librato.com/v1/metrics';
+
     // Librato for `opengrowth.${key}`.
     const data = [
         `source=pubnub-blocks`
@@ -25,13 +27,19 @@ opengrowth.modules.librato = ( key, value ) => {
         'Authorization' : libauth
     ,   'Content-Type'  : 'application/x-www-form-urlencoded'
     };
-    
+
+    const body = {
+        "method"  : 'POST'
+    ,   "body"    : data
+    ,   "headers" : headers
+    };
+
     // Send Recording to Librato
-    return xhr.fetch( 'https://metrics-api.librato.com/v1/metrics', {
-        method  : 'POST'
-    ,   body    : data
-    ,   headers : headers
-    } ).catch((err) => {
+    return xhr.fetch( apiUrl, body )
+    .then((res) => {
+        //console.log( 'Librato Res:', res );
+    })
+    .catch((err) => {
         console.log( 'Librato Error:', err );
     });
 };
