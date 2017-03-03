@@ -1,7 +1,8 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Analytical Tracking of Delights
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-opengrowth.track = (key) => {
+opengrowth.track = {};
+const track = (key) => {
     // Counter Key
     const time = new Date();
     const y    = time.getFullYear();
@@ -30,7 +31,7 @@ opengrowth.track = (key) => {
 // Track Signals Received
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.track.signal = ( signal, data ) => {
-    return opengrowth.track(`signals.${signal}`);
+    return track(`signals.${signal}`);
     //.then( (result) => {
         //console.log( 'Libratted:', result );
     //} );
@@ -43,7 +44,7 @@ opengrowth.track.signal = ( signal, data ) => {
 // Track Delights Sent
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.track.delight = ( delight, signal, data ) => {
-    return opengrowth.track(`delights.${delight}`);
+    return track(`delights.${delight}`);
     // TODO
     // TODO log delight to MySQL
     // TODO 
@@ -53,11 +54,8 @@ opengrowth.track.delight = ( delight, signal, data ) => {
 // Track Reactions
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.track.reaction = (what_goes_here) => {
-    return opengrowth.track(`reactions`);
+    return track(`reactions`);
     // TODO
     // TODO log reaction to MySQL
     // TODO 
 };
-
-
-
