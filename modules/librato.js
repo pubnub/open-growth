@@ -1,7 +1,7 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Librato
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-opengrowth.modules.librato = ( key, value ) => {
+opengrowth.modules.librato = ( gaugeArray ) => {
     // Skip if missing your Librato API Keys
     if (!opengrowth.keys.librato.email || !opengrowth.keys.librato.secret)
         return (new Promise()).resolve('Librato disabled. No API Key.');
@@ -9,12 +9,18 @@ opengrowth.modules.librato = ( key, value ) => {
     let apiUrl = 'https://metrics-api.librato.com/v1/metrics';
 
     // Librato for `opengrowth.${key}`.
-    const data = [
+    let data = [
         `source=pubnub-blocks`
     ,   `period=60`
-    ,   `gauges[0][name]=${key}`
-    ,   `gauges[0][value]=${value}`
     ].join('&');
+
+    let index = 0;
+    for ( let key in gaugeArray ) {
+        data += "&" + `gauges[${index}][name]=${key}` +
+            "&" +
+            `gauges[${index}][value]=${gaugeArray[key]}`;
+        index++;
+    }
 
     // B64 Encode Auth Header
     const libauth = auth.basic(
@@ -37,9 +43,11 @@ opengrowth.modules.librato = ( key, value ) => {
     // Send Recording to Librato
     return xhr.fetch( apiUrl, body )
     .then((res) => {
-        //console.log( 'Librato Res:', res );
+        //console.log("Librato Response:\n", res );
+        opengrowth.log("librato", "xhr", res.status);
     })
     .catch((err) => {
-        console.log( 'Librato Error:', err );
+        console.log("Librato Error:\n", err );
+        opengrowth.log("librato", "xhr", err, true);
     });
 };

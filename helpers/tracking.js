@@ -12,18 +12,8 @@ const track = (key) => {
     const min  = time.getMinutes();
 
     // Increment KV Counters
-    var counter = `opengrowth.${key}.${y}_${m}_${d}_${h}_${min}`;
-    return kvdb.incrCounter( counter, 1 ).then( () => {
-        return kvdb.getCounter(counter);
-    } ).then( (value) => {
-        // Record Resolutions
-        //kvdb.incrCounter( `opengrowth.${key}.${y}_${m}`,           1 );
-        //kvdb.incrCounter( `opengrowth.${key}.${y}_${m}_${d}`,      1 );
-        //kvdb.incrCounter( `opengrowth.${key}.${y}_${m}_${d}_${h}`, 1 );
-
-        // Librato
-        return opengrowth.modules.librato( `opengrowth.${key}`, value );
-    } );
+    let count = opengrowth.libratoUpdates[`opengrowth.${key}`];
+    opengrowth.libratoUpdates[`opengrowth.${key}`] = count ? count+1 : 1;
 };
 
 
@@ -31,23 +21,16 @@ const track = (key) => {
 // Track Signals Received
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.track.signal = ( signal, data ) => {
+    opengrowth.log(signal, "signal", data);
     return track(`signals.${signal}`);
-    //.then( (result) => {
-        //console.log( 'Libratted:', result );
-    //} );
-    // TODO
-    // TODO log signal to MySQL / segmentIO
-    // TODO 
 };
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Track Delights Sent
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.track.delight = ( delight, signal, data ) => {
+    opengrowth.log(delight, "delight", data);
     return track(`delights.${delight}`);
-    // TODO
-    // TODO log delight to MySQL
-    // TODO 
 };
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -55,7 +38,4 @@ opengrowth.track.delight = ( delight, signal, data ) => {
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.track.reaction = (what_goes_here) => {
     return track(`reactions`);
-    // TODO
-    // TODO log reaction to MySQL
-    // TODO 
 };

@@ -35,5 +35,5 @@ opengrowth.signals.uls = ( request, customer ) => {
     };
 
     // Send Email and Track Delight in Librato
-    opengrowth.delight.sendwithus.email(sendWithUsPostBody);
+    return opengrowth.delight.sendwithus.email(sendWithUsPostBody);
 };

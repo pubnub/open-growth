@@ -4,7 +4,7 @@ opengrowth.signals.block1day = ( request, customer ) => {
     const csm_bccs = csm && csm.bccs ? csm.bccs : [];
     let email  = user.litmus || 'open-growth-activity+testing@pubnub.com';
     // @if GOLD
-    email = user.email;
+    //email = user.email;
     // @endif
 
     let blocks_name_array = [];
@@ -46,5 +46,5 @@ opengrowth.signals.block1day = ( request, customer ) => {
     };
 
     // Send Email and Track Delight in Librato
-    opengrowth.delight.sendwithus.email(sendWithUsPostBody);
+    return opengrowth.delight.sendwithus.email(sendWithUsPostBody);
 };

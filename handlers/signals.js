@@ -22,10 +22,9 @@ export default request => {
     const signal  = message.signal;
     const email   = message.email;
 
-    // Copy publishes to Silver
-    // @if GOLD
-    opengrowth.modules.pubnub.silver(message);
-    // @endif
+    // Where logs are stored during before publish EH execution
+    opengrowth.logs = [];
+    opengrowth.libratoUpdates = {};
 
     // Record the signal!
     opengrowth.track.signal( signal, message );
@@ -37,16 +36,30 @@ export default request => {
     request.message.processed = { started : true };
     
     // Ignore if not a customer delight
-    if (!email) return request.ok(); 
+    if (!email) {
+        return opengrowth.modules.librato(opengrowth.libratoUpdates)
+        .then(() => {
+            return opengrowth.publishLogs();
+        }).then(() => {
+            request.message.processed.completed = true;
+            return request.ok();
+        });
+    }
 
     // Process Customer Delight
     return opengrowth.customer.getCustomer( email, signal ).then( customer => {
-        return kvdb.set( email, customer ).then( result => {
+        let toStore = {
+            "customer" : customer,
+            "logs"     : opengrowth.logs
+        };
+        return kvdb.set( email, toStore ).then( result => {
+            return opengrowth.modules.librato(opengrowth.libratoUpdates);
+        } ).then( () => {
             request.message.processed.completed = true;
             return request.ok();
-        } );
+        });
     } );
-}
+};
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Modules that Augment and Enhance with ML and AI

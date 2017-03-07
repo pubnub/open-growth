@@ -50,9 +50,11 @@ opengrowth.delight.sendwithus.email = ( request ) => {
     
     // post email
     return xhr.fetch( apiurl, swuRequest ).then( (res) => {
-        //console.log( "SendWithUs Response: " + JSON.stringify(res));
+        //console.log( "SendWithUs Response:\n" + JSON.stringify(res));
+        opengrowth.log("sendwithus.email", "xhr", res.status);
     })
     .catch( err => {
-        console.log( "SendWithUs Error:\n" + err );
+        console.log("SendWithUs Error:\n" + err);
+        opengrowth.log("sendwithus.email", "xhr", err, true);
     } );
 };
