@@ -4,7 +4,7 @@ opengrowth.signals.blockexpired = ( request, customer ) => {
     const csm_bccs = csm && csm.bccs ? csm.bccs : [];
     let email  = user.litmus || 'open-growth-activity+testing@pubnub.com';
     // @if GOLD
-    //email = user.email;
+    email = user.email;
     // @endif
 
     let blocks_name_array = [];
