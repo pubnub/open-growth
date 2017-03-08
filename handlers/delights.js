@@ -15,12 +15,16 @@ const pubnub = require('pubnub');
 const query  = require('codec/query_string');
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Open Growth Signals Handler
+// Open Growth Delights Handler
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 export default request => {
     const message = request.message;
     const signal  = message.signal;
     const email   = message.email;
+
+    // Gets published to logging channel at the end of After Publish EH
+    opengrowth.logs = [];
+    opengrowth.libratoUpdates = {};
 
     // TODO special track signal 'reaction' for extra metrics
     // TODO send to SQL DB
@@ -33,7 +37,13 @@ export default request => {
     // Unhandled Signals
     if (!opengrowth.signals[signal]) {
         opengrowth.track.signal( `unhandled.${signal}`, message );
-        return request.ok();
+        return opengrowth.modules.librato(opengrowth.libratoUpdates)
+        .then(() => {
+            return opengrowth.publishLogs();
+        }).then(() => {
+            request.message.processed.completed = true;
+            return request.ok();
+        });
     }
 
     // When processing a Non-delight
@@ -41,7 +51,15 @@ export default request => {
     // we don't need to lookup a customer record
     if (!email) {
         opengrowth.track.signal( `no-email.${signal}`, message );
-        return opengrowth.signals[signal](request);
+        return opengrowth.signals[signal]( request )
+        .then(() => {
+            return opengrowth.modules.librato(opengrowth.libratoUpdates);
+        }).then(() => {
+            return opengrowth.publishLogs();
+        }).then(() => {
+            request.message.processed.completed = true;
+            return request.ok();
+        });
     }
 
     // @if !GOLD
@@ -50,13 +68,9 @@ export default request => {
     // @endif
 
     // Get Saved Clearbit / Customer Data
-    return kvdb.get(email).then( customer => {
-        //Ignore Deduplication if dedup is set to false 
-        if (message.dedup === false) {  
-            opengrowth.signals[signal]( request, customer );
-            return request.ok();
-        }
-
+    return kvdb.get(email).then( stored => {
+        let customer    = stored.customer;
+        opengrowth.logs = opengrowth.logs.concat(stored.logs || []); 
         // Run any.js for '*'
         opengrowth.signals['*']( customer, signal );
 
@@ -67,25 +81,36 @@ export default request => {
         return kvdb.get(duplicate_key).then( duplicate => {
             // Duplicate Detected 
             // Abort and Track in Librato
-            if (duplicate) {
+            if ( duplicate && !(message.dedup === false) ) {
                 opengrowth.track.delight(
                     `duplicate.${signal}`
                 ,   signal
                 ,   customer
                 );
-                return request.ok();
+                return opengrowth.modules.librato(opengrowth.libratoUpdates)
+                .then(() => {
+                    return opengrowth.publishLogs();
+                }).then(() => {
+                    request.message.processed.completed = true;
+                    return request.ok();
+                });
+            } else {
+                // Record Activity so we can prevent future duplicates
+                // Then run the signal's delight handler.
+                return kvdb.set( duplicate_key, true, duplicate_ttl ).then( () => {
+                    // Run the signal's delight handler 
+                    // This is in /signals/ directory
+                    return opengrowth.signals[signal]( request, customer )
+                    .then(() => {
+                        return opengrowth.modules.librato(opengrowth.libratoUpdates);
+                    }).then(() => {
+                        return opengrowth.publishLogs();
+                    }).then(() => {
+                        request.message.processed.completed = true;
+                        return request.ok();
+                    });
+                } );
             }
-
-            // Record Activity so we can prevent future duplicates
-            // Then run the signal's delight handler.
-            return kvdb.set( duplicate_key, true, duplicate_ttl ).then( () => {
-                // Run the signal's delight handler 
-                // This is in /signals/ directory
-                opengrowth.signals[signal]( request, customer );
-
-                // Done!
-                return request.ok();
-            } );
         } );
     } );
 }
