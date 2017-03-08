@@ -18,15 +18,9 @@ opengrowth.log = ( type, event, message, isError ) => {
 opengrowth.publishLogs = () => {
     return new Promise(( resolve, reject ) => {
         if (!opengrowth.logs.length) resolve();
-
-        let channel = "opengrowth.log";
-        // @if !GOLD
-        // Silver Logs
-        channel = "opengrowth.log-silver";
-        // @endif
-
+        
         pubnub.publish({
-            "channel": channel,
+            "channel": "opengrowth.log",
             "message": {
                 "log" : opengrowth.logs,
                 "ts"  : Math.floor(new Date().getTime()/1000)
