@@ -22,8 +22,8 @@ opengrowth.publishLogs = () => {
         pubnub.publish({
             "channel": "opengrowth.log",
             "message": {
-                "log" : opengrowth.logs,
-                "ts"  : Math.floor(new Date().getTime()/1000)
+                "ts"  : Math.floor(new Date().getTime()/1000),
+                "log" : opengrowth.logs
             }
         }).then((res) => {
             resolve();
