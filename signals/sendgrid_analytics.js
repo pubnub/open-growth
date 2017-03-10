@@ -1,14 +1,14 @@
 opengrowth.signals.sendgrid_analytics = ( request ) => {
     // Tracks status of an email sent to a customer through SendGrid
     const categoryEvent = ( action ) => {
-        opengrowth.track.signal(`sendgrid_analytics.${action.category}.${action.event}`);
+        opengrowth.track.reaction(`sendgrid_analytics.${action.category}.${action.event}`, "swu-event-webhook");
         let message = getLogMessage(action);
         opengrowth.log("sendwithus.email", "reaction", message);
     }
 
     // Tracks a clicked link event in a SendGrid email
     const signalLink = ( action ) => {
-        opengrowth.track.signal(`sendgrid_analytics.${action.category}.link.${action.url}`);
+        opengrowth.track.reaction(`sendgrid_analytics.${action.category}.click.${action.url}`, "swu-event-webhook");
         let message = getLogMessage(action);
         opengrowth.log("sendwithus.email", "reaction", message);
     }
