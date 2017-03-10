@@ -25,9 +25,9 @@ var getUrlLabel = function ( url ) {
         return "unlabeled";
     }
 
-    let parameters = url.split(delimiter+"link=")[1];
-    let kv = parameters.split(/&amp;|=/);
-    let link = kv[0];
+    var parameters = url.split(delimiter+"link=")[1];
+    var kv = parameters.split(/&amp;|=/);
+    var link = kv[0];
     return link;
 }
 
