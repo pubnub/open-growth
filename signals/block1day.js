@@ -41,7 +41,7 @@ opengrowth.signals.block1day = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "block1day" ]
+      "tags" : [ "og_block1day" ]
     };
 
     // Send Email and Track Delight in Librato
