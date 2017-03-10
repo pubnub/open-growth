@@ -41,7 +41,6 @@ export default request => {
         .then(() => {
             return opengrowth.publishLogs();
         }).then(() => {
-            request.message.processed = request.message.processed || {};
             request.message.processed.completed = true;
             return request.ok();
         });
@@ -58,7 +57,6 @@ export default request => {
         }).then(() => {
             return opengrowth.publishLogs();
         }).then(() => {
-            request.message.processed = request.message.processed || {};
             request.message.processed.completed = true;
             return request.ok();
         });
@@ -93,7 +91,6 @@ export default request => {
                 .then(() => {
                     return opengrowth.publishLogs();
                 }).then(() => {
-                    request.message.processed = request.message.processed || {};
                     request.message.processed.completed = true;
                     return request.ok();
                 });
@@ -109,7 +106,6 @@ export default request => {
                     }).then(() => {
                         return opengrowth.publishLogs();
                     }).then(() => {
-                        request.message.processed = request.message.processed || {};
                         request.message.processed.completed = true;
                         return request.ok();
                     });

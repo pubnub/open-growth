@@ -41,7 +41,6 @@ export default request => {
         .then(() => {
             return opengrowth.publishLogs();
         }).then(() => {
-            request.message.processed = request.message.processed || {};
             request.message.processed.completed = true;
             return request.ok();
         });
@@ -56,7 +55,6 @@ export default request => {
         return kvdb.set( email, toStore ).then( result => {
             return opengrowth.modules.librato(opengrowth.libratoUpdates);
         } ).then( () => {
-            request.message.processed = request.message.processed || {};
             request.message.processed.completed = true;
             return request.ok();
         });

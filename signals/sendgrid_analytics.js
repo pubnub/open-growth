@@ -8,7 +8,6 @@ opengrowth.signals.sendgrid_analytics = ( request ) => {
 
     // Tracks a clicked link event in a SendGrid email
     const signalLink = ( action ) => {
-        action.url = getUrlParams(action.url);
         opengrowth.track.signal(`sendgrid_analytics.${action.category}.link.${action.url}`);
         let message = getLogMessage(action);
         opengrowth.log("sendwithus.email", "reaction", message);
@@ -27,26 +26,6 @@ opengrowth.signals.sendgrid_analytics = ( request ) => {
 
         return log;
     };
-
-    // Returns a string of the link name that was clicked in an email
-    const getUrlParams = ( url ) => {
-        var delimiter;
-
-        if ( url.indexOf("&amp;link=") > -1 ) {
-            delimiter = "&amp;";
-        }
-        else if ( url.indexOf("?link=") > -1 ) {
-            delimiter = "?";
-        }
-        else {
-            return "unlabeled";
-        }
-
-        let parameters = url.split(delimiter+"link=")[1];
-        let kv = parameters.split(/&amp;|=/);
-        let link = kv[0];
-        return link;
-    }
 
     var handlers = {
           "click"             : signalLink
