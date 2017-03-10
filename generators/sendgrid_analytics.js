@@ -12,11 +12,10 @@ var default_bcc = "open-growth-activity";
 
 // Returns a string of the link name that was clicked in an email
 var getUrlLabel = function ( url ) {
-    console.log(url);
     var delimiter;
 
-    if ( url.indexOf("&amp;link=") > -1 ) {
-        delimiter = "&amp;";
+    if ( url.indexOf("&link=") > -1 ) {
+        delimiter = "&";
     }
     else if ( url.indexOf("?link=") > -1 ) {
         delimiter = "?";
@@ -26,7 +25,7 @@ var getUrlLabel = function ( url ) {
     }
 
     var parameters = url.split(delimiter+"link=")[1];
-    var kv = parameters.split(/&amp;|=/);
+    var kv = parameters.split(/&|=/);
     var link = kv[0];
     return link;
 }
