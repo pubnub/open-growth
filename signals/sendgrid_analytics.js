@@ -1,34 +1,31 @@
 opengrowth.signals.sendgrid_analytics = ( request ) => {
     // Tracks status of an email sent to a customer through SendGrid
     const categoryEvent = ( action ) => {
-        opengrowth.track.signal(`sendgrid_analytics.${action.category}.${action.event}`);
+        opengrowth.track.reaction(`sendgrid_analytics.${action.category}.${action.event}`, "swu-event-webhook");
+        let message = getLogMessage(action);
+        opengrowth.log("sendwithus.email", "reaction", message);
     }
 
     // Tracks a clicked link event in a SendGrid email
     const signalLink = ( action ) => {
-        let link = getUrlParams(action.url);
-        opengrowth.track.signal(`sendgrid_analytics.${action.category}.link.${link}`);
+        opengrowth.track.reaction(`sendgrid_analytics.${action.category}.click.${action.url}`, "swu-event-webhook");
+        let message = getLogMessage(action);
+        opengrowth.log("sendwithus.email", "reaction", message);
     }
 
-    // Returns a string of the link name that was clicked in an email
-    const getUrlParams = ( url ) => {
-        var delimiter;
+    // Parses Reaction data for logs
+    let getLogMessage = ( action ) => {
+        let log = {
+            "contact" : action.email
+        ,   "delight" : "sendwithus.email"
+        ,   "signal"  : action.category
+        ,   "type"    : action.event
+        };
 
-        if ( url.indexOf("&link=") > -1 ) {
-            delimiter = "&";
-        }
-        else if ( url.indexOf("?link=") > -1 ) {
-            delimiter = "?";
-        }
-        else {
-            return "unlabeled";
-        }
+        if ( action.url ) log["message"] = action.url;
 
-        let parameters = url.split(delimiter+"link=")[1];
-        let kv = parameters.split(/&|=/);
-        let link = kv[0];
-        return link;
-    }
+        return log;
+    };
 
     var handlers = {
           "click"             : signalLink

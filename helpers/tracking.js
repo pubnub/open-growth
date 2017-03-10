@@ -36,6 +36,7 @@ opengrowth.track.delight = ( delight, signal, data ) => {
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Track Reactions
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-opengrowth.track.reaction = (what_goes_here) => {
-    return track(`reactions`);
+opengrowth.track.reaction = ( reaction, data ) => {
+    opengrowth.log(reaction, "reaction", data);
+    return track(`reactions.${reaction}`);
 };

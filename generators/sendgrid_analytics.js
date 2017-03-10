@@ -10,10 +10,30 @@ var bodyParser = require('body-parser')
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 var default_bcc = "open-growth-activity";
 
+// Returns a string of the link name that was clicked in an email
+var getUrlLabel = function ( url ) {
+    var delimiter;
+
+    if ( url.indexOf("&link=") > -1 ) {
+        delimiter = "&";
+    }
+    else if ( url.indexOf("?link=") > -1 ) {
+        delimiter = "?";
+    }
+    else {
+        return "unlabeled";
+    }
+
+    var parameters = url.split(delimiter+"link=")[1];
+    var kv = parameters.split(/&|=/);
+    var link = kv[0];
+    return link;
+}
+
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // SendGrid
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-module.exports = function (app) {
+module.exports = function ( app ) {
     // Tell express to use the body-parser middleware
     app.use(bodyParser.json());
 
@@ -28,12 +48,17 @@ module.exports = function (app) {
                 continue;
             }
 
-            actions.push({
+            var formattedAction = {
                 "email"    : action.email,
                 "category" : action.category,
-                "event"    : action.event,
-                "url"      : action.url
-            });
+                "event"    : action.event
+            };
+
+            if ( action.url ) {
+                formattedAction["url"] = getUrlLabel(action.url);
+            }
+
+            actions.push(formattedAction);
         }
 
         if ( actions.length === 0 ) {
