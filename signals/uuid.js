@@ -35,7 +35,7 @@ opengrowth.signals.uuid = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "uuid" ]
+      "tags" : [ "og_uuid" ]
     };
 
     return opengrowth.delight.sendwithus.email(sendWithUsPostBody);

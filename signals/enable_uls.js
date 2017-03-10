@@ -31,7 +31,7 @@ opengrowth.signals.uls = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "enable_uls" ]
+      "tags" : [ "og_enable_uls" ]
     };
 
     // Send Email and Track Delight in Librato

@@ -41,7 +41,7 @@ opengrowth.signals.signup = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "signup" ]
+      "tags" : [ "og_signup" ]
     };
 
     // Send Email and Track Delight in Librato

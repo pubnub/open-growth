@@ -31,7 +31,7 @@ opengrowth.signals.presence = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "enable_presence" ]
+      "tags" : [ "og_enable_presence" ]
     };
 
     // Send Email and Track Delight in Librato
