@@ -11,7 +11,7 @@ var bodyParser = require('body-parser')
 var default_bcc = "open-growth-activity";
 
 // Returns a string of the link name that was clicked in an email
-var getUrlLabel = ( url ) => {
+var getUrlLabel = function ( url ) {
     console.log(url);
     var delimiter;
 
@@ -34,7 +34,7 @@ var getUrlLabel = ( url ) => {
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // SendGrid
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-module.exports = function (app) {
+module.exports = function ( app ) {
     // Tell express to use the body-parser middleware
     app.use(bodyParser.json());
 
