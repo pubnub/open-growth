@@ -10,6 +10,27 @@ var bodyParser = require('body-parser')
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 var default_bcc = "open-growth-activity";
 
+// Returns a string of the link name that was clicked in an email
+var getUrlLabel = ( url ) => {
+    console.log(url);
+    var delimiter;
+
+    if ( url.indexOf("&amp;link=") > -1 ) {
+        delimiter = "&amp;";
+    }
+    else if ( url.indexOf("?link=") > -1 ) {
+        delimiter = "?";
+    }
+    else {
+        return "unlabeled";
+    }
+
+    let parameters = url.split(delimiter+"link=")[1];
+    let kv = parameters.split(/&amp;|=/);
+    let link = kv[0];
+    return link;
+}
+
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // SendGrid
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -28,12 +49,17 @@ module.exports = function (app) {
                 continue;
             }
 
-            actions.push({
+            var formattedAction = {
                 "email"    : action.email,
                 "category" : action.category,
-                "event"    : action.event,
-                "url"      : action.url
-            });
+                "event"    : action.event
+            };
+
+            if ( action.url ) {
+                formattedAction["url"] = getUrlLabel(action.url);
+            }
+
+            actions.push(formattedAction);
         }
 
         if ( actions.length === 0 ) {

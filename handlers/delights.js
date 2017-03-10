@@ -41,6 +41,7 @@ export default request => {
         .then(() => {
             return opengrowth.publishLogs();
         }).then(() => {
+            request.message.processed = request.message.processed || {};
             request.message.processed.completed = true;
             return request.ok();
         });
@@ -50,13 +51,14 @@ export default request => {
     // such as running ./signals/import.js then
     // we don't need to lookup a customer record
     if (!email) {
-        opengrowth.track.signal( `no-email.${signal}`, message );
+        //opengrowth.track.signal( `no-email.${signal}`, message );
         return opengrowth.signals[signal]( request )
         .then(() => {
             return opengrowth.modules.librato(opengrowth.libratoUpdates);
         }).then(() => {
             return opengrowth.publishLogs();
         }).then(() => {
+            request.message.processed = request.message.processed || {};
             request.message.processed.completed = true;
             return request.ok();
         });
@@ -91,6 +93,7 @@ export default request => {
                 .then(() => {
                     return opengrowth.publishLogs();
                 }).then(() => {
+                    request.message.processed = request.message.processed || {};
                     request.message.processed.completed = true;
                     return request.ok();
                 });
@@ -106,6 +109,7 @@ export default request => {
                     }).then(() => {
                         return opengrowth.publishLogs();
                     }).then(() => {
+                        request.message.processed = request.message.processed || {};
                         request.message.processed.completed = true;
                         return request.ok();
                     });
