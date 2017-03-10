@@ -11,19 +11,25 @@ opengrowth.modules.clearbit.lookup = (email) => {
     });
 
     // B64 Encode Auth Header
-    const libauth = auth.basic( opengrowth.keys.clearbit.apikey, '' );
-    const domain  = 'person-stream.clearbit.com';
-    const url     = 'https://'+ domain +'/v2/combined/find?email=' + email;
+    const libauth    = auth.basic( opengrowth.keys.clearbit.apikey, '' );
+    const requestUrl = '' +
+        'https://person-stream.clearbit.com/v2/combined/find?email=' + email;
 
     // Get Customer Bio
     return new Promise( ( resolve, reject ) => {
-        xhr.fetch( url, {
+        xhr.fetch( requestUrl, {
             method  : 'GET'
         ,   headers : { 'Authorization' : libauth }
-        } ).then( response => {
-            resolve(JSON.parse(response.body));
+        } ).then( res => {
+            //console.log("Clearbit Response:\n", res);
+            opengrowth.log("clearbit", "xhr", res.status);
+            resolve({
+                "customer" : JSON.parse(res.body),
+                "status"   : res.status
+            });
         } ).catch( err => {
-            console.log( 'Clearbit Error:', err );
+            console.log("Clearbit Error:\n", err);
+            opengrowth.log("clearbit", "xhr", err, true);
         } );
     } );
 

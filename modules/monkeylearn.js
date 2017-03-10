@@ -24,13 +24,13 @@ opengrowth.modules.monkeylearn.classify = ( input, classifier ) => {
             method  : 'POST'
         ,   body    : data
         ,   headers : { 'Authorization' : libauth }
-        } ).then( response => {
-            resolve(JSON.parse(response.body).result[0][0]);
+        } ).then( res => {
+            //console.log("MonkeyLearn Response:\n", res );
+            opengrowth.log("monkeylearn", "xhr", res.status);
+            resolve(JSON.parse(res.body).result[0][0]);
         } ).catch( err => {
-            console.log( 'MonkeyLearn Error:', err );
+            console.log("MonkeyLearn Error:\n", err );
+            opengrowth.log("monkeylearn", "xhr", err, true);
         } );
     } );
-
 };
-
-

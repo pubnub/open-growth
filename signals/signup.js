@@ -2,7 +2,7 @@ opengrowth.signals.signup = ( request, customer ) => {
     const user = request.message;
     const csm  = user.csm || {};
     const csm_bccs = csm && csm.bccs ? csm.bccs : [];
-    let email  = user.litmus || 'open-growth-activity+testing@pubnub.com';
+    let email  = user.litmus || 'open-growth-activity+silver@pubnub.com';
     // @if GOLD
     email = user.email;
     // @endif
@@ -45,5 +45,5 @@ opengrowth.signals.signup = ( request, customer ) => {
     };
 
     // Send Email and Track Delight in Librato
-    opengrowth.delight.sendwithus.email(sendWithUsPostBody);
+    return opengrowth.delight.sendwithus.email(sendWithUsPostBody);
 };
