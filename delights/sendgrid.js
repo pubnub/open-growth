@@ -37,8 +37,8 @@ opengrowth.delight.sendgrid.email = ( request ) => {
     //add BCCs for SalesForce
     if ( request.bccs && request.bccs.length && request.bccs.length !== 0 ) {
         data.personalizations[0].bcc = request.bccs;
-        data.personalizations[0].bcc.append({"email": "open-growth-activity@pubnub.com"});
-        data.personalizations[0].bcc.append({"email": "emailtosalesforce@z0trcplsmwbjcm4gbvne2c1ufoaqx9h0vijs8ai21c5d7sqn1.d-e46peaa.na14.le.salesforce.com"});
+        data.personalizations[0].bcc.push({"email": "open-growth-activity@pubnub.com"});
+        data.personalizations[0].bcc.push({"email": "emailtosalesforce@z0trcplsmwbjcm4gbvne2c1ufoaqx9h0vijs8ai21c5d7sqn1.d-e46peaa.na14.le.salesforce.com"});
     } else {
         data.personalizations[0].bcc = [{
             "email": "open-growth-activity@pubnub.com" }, {
