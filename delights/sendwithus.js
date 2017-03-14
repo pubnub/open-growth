@@ -20,22 +20,9 @@ opengrowth.delight.sendwithus.email = ( request ) => {
     //add sendgrid key to request
     request["esp_account"] = opengrowth.keys.swu.espkey
 
-    //add BCCs for SalesForce
-    if ( !request.bcc || !request.bcc.length ) {
-        request.bcc = [{
-            "address": opengrowth.keys.salesforce.bcc}, {
-            "address": opengrowth.keys.pubnub.bcc
-        }];
-    }
-    else {
-        // TODO:
-        // Remove this and have generators send
-        // "address" instead of "email"
-        for ( let i of request.bcc ) {
-            i['address'] = i['email'];
-            delete i['email'];
-        }
-    }
+    //add BCCs
+    request.push({"address": opengrowth.keys.salesforce.bcc});
+    request.push({"address": opengrowth.keys.pubnub.bcc});
 
     // B64 Encode Auth Header for Basic Auth
     const libauth = auth.basic( apikey, '' );
