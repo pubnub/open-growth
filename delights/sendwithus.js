@@ -20,9 +20,19 @@ opengrowth.delight.sendwithus.email = ( request ) => {
     //add sendgrid key to request
     request["esp_account"] = opengrowth.keys.swu.espkey
 
-    //add BCCs
-    request.push({"address": opengrowth.keys.salesforce.bcc});
-    request.push({"address": opengrowth.keys.pubnub.bcc});
+    //add BCCs for SalesForce
+    if ( !request.bcc || !request.bcc.length ) {
+        //add BCCs
+        request.bcc=[
+            {"address": opengrowth.keys.salesforce.bcc}),
+            {"address": opengrowth.keys.pubnub.bcc}
+        ];
+    }
+    else {
+        //add BCCs
+        request.bcc.push({"address": opengrowth.keys.salesforce.bcc});
+        request.bcc.push({"address": opengrowth.keys.pubnub.bcc});
+    }
 
     // B64 Encode Auth Header for Basic Auth
     const libauth = auth.basic( apikey, '' );
