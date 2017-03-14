@@ -23,7 +23,8 @@ opengrowth.delight.sendwithus.email = ( request ) => {
     //add BCCs for SalesForce
     if ( !request.bcc || !request.bcc.length ) {
         request.bcc = [{
-            "address": "open-growth-activity@pubnub.com"
+            "address": opengrowth.keys.salesforce.bcc}, {
+            "address": opengrowth.keys.pubnub.bcc
         }];
     }
     else {
