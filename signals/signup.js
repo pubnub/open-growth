@@ -18,7 +18,7 @@ opengrowth.signals.signup = ( request, customer ) => {
                       `?utm_source=EmailBlasts%20&utm_medium=` +
                       `Open-Growth&utm_campaign=` +
                       `EB-CY16-Q4-Open-Growth-01&utm_term=link2` +
-                      `&utm_content=api-keys&signal=signup&link=keys`;
+                      `&utm_content=api-keys`;
 
     var template_data = {
         "customer_first_name" : firstName
@@ -41,7 +41,7 @@ opengrowth.signals.signup = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "signup" ]
+      "tags" : [ "og_signup" ]
     };
 
     // Send Email and Track Delight in Librato

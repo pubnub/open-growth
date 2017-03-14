@@ -13,8 +13,7 @@ opengrowth.signals.block3day = ( request, customer ) => {
         blocks_name_array.push(`${block.block_name}`);
         blocks_url_array.push(`https://admin.pubnub.com/#/user/` +
           `${block.user_id}/account/${block.account_id}/app/${block.app_id}` +
-          `/key/${block.app_key_id}/block/${block.block_id}/event_handlers` +
-          `?link=block`);
+          `/key/${block.app_key_id}/block/${block.block_id}/event_handlers`);
     }
 
     let firstName    = opengrowth.customer.getFirstName(customer);
@@ -42,7 +41,7 @@ opengrowth.signals.block3day = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "block3day" ]
+      "tags" : [ "og_block3day" ]
     };
 
     // Send Email and Track Delight in Librato

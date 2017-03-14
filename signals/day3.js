@@ -31,7 +31,7 @@ opengrowth.signals.day3 = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "day3" ]
+      "tags" : [ "og_day3" ]
     };
 
     // Send Email and Track Delight in Librato

@@ -31,7 +31,7 @@ opengrowth.signals.multiplexing = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "enable_multiplexing" ]
+      "tags" : [ "og_enable_multiplexing" ]
     };
 
     // Send Email and Track Delight in Librato
