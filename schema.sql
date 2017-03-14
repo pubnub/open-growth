@@ -39,9 +39,11 @@ CREATE TABLE IF NOT EXISTS opengrowth.delights (
 ,   created   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ,   name      VARCHAR(100) NOT NULL
 ,   email     VARCHAR(120) NOT NULL
+,   contact   VARCHAR(120)
 ,   message   TEXT
 );
 CREATE INDEX        delight_created ON opengrowth.delights(created);
+CREATE INDEX        delight_contact ON opengrowth.delights(contact);
 CREATE INDEX        delight_name    ON opengrowth.delights(name);
 CREATE UNIQUE INDEX delight_id      ON opengrowth.delights(id);
 
