@@ -22,18 +22,16 @@ opengrowth.delight.sendwithus.email = ( request ) => {
 
     //add BCCs for SalesForce
     if ( !request.bcc || !request.bcc.length ) {
-        request.bcc = [{
-            "address": "open-growth-activity@pubnub.com"
-        }];
+        //add BCCs
+        request.bcc=[
+            {"address": opengrowth.keys.salesforce.bcc},
+            {"address": opengrowth.keys.pubnub.bcc}
+        ];
     }
     else {
-        // TODO:
-        // Remove this and have generators send
-        // "address" instead of "email"
-        for ( let i of request.bcc ) {
-            i['address'] = i['email'];
-            delete i['email'];
-        }
+        //add BCCs
+        request.bcc.push({"address": opengrowth.keys.salesforce.bcc});
+        request.bcc.push({"address": opengrowth.keys.pubnub.bcc});
     }
 
     // B64 Encode Auth Header for Basic Auth
