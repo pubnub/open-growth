@@ -33,6 +33,11 @@ opengrowth.signals.signup = ( request, customer ) => {
       , "anchor_url"          : anchor_url  //signup
     };
 
+    let unsubId = 2133;
+    let unsubscribeHeader = `{\"to\":[\"${email}\"],` +
+      `\"sub\":{\"asm_preferences_raw_url\":[\"<%asm_preferences_raw_url%>\"]},` +
+      `\"asm_group_id\":${unsubId}}`;
+      
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.signup,
       "recipient": {
@@ -41,7 +46,8 @@ opengrowth.signals.signup = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "og_signup" ]
+      "tags" : [ "og_signup" ],
+      "headers" : { "x-smtpapi" : unsubscribeHeader }
     };
 
     // Send Email and Track Delight in Librato

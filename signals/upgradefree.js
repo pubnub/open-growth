@@ -1,17 +1,15 @@
-opengrowth.signals.uuid = ( request, customer ) => {
+opengrowth.signals.upgrade_free = ( request, customer ) => {
     const user = request.message;
     const csm  = user.csm || {};
     const csm_bccs = csm && csm.bccs ? csm.bccs : [];
     let email  = user.litmus || 'open-growth-activity+silver@pubnub.com';
     // @if GOLD
-    email = user.email;
+    email = csm.email;
     // @endif
 
     let firstName    = opengrowth.customer.getFirstName(customer);
     let lastName     = opengrowth.customer.getLastName(customer);
     let company_name = opengrowth.customer.getCompany(customer);
-    let uuid_count   = user.uuid_count || "0";
-    let ip_count     = user.ip_count || "0";
 
     var template_data = {
         "customer_first_name" : firstName
@@ -22,27 +20,23 @@ opengrowth.signals.uuid = ( request, customer ) => {
       , "csm_email"           : csm.email
       , "csm_phone"           : csm.phone
       , "csm_bccs"            : csm_bccs
-      , "app_name"            : user.app_name
-      , "uuid_count"          : uuid_count.toString()
-      , "ip_count"            : ip_count.toString()
     };
-
-    let unsubId = 2133;
-    let unsubscribeHeader = `{\"to\":[\"${email}\"],` +
-      `\"sub\":{\"asm_preferences_raw_url\":[\"<%asm_preferences_raw_url%>\"]},` +
-      `\"asm_group_id\":${unsubId}}`;
-
+      
     var sendWithUsPostBody = {
-      "template": opengrowth.keys.swu.templates.uuid,
+      "template": opengrowth.keys.swu.templates.upgrade_free,
       "recipient": {
         "name": firstName,
         "address": email
       },
+      "sender": {
+        "name": csm.first_name + " " + csm.last_name,
+        "address": csm.email,
+        "reply_to": csm.email
+      },
       "template_data": template_data,
-      "bcc": csm_bccs,
-      "tags" : [ "og_uuid" ],
-      "headers" : { "x-smtpapi" : unsubscribeHeader }
+      "tags" : [ "og_upgrade_free" ]
     };
 
+    // Send Email and Track Delight in Librato
     return opengrowth.delight.sendwithus.email(sendWithUsPostBody);
 };
