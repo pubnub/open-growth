@@ -48,8 +48,14 @@ opengrowth.delight.sendwithus.email = ( request ) => {
     
     // post email
     return xhr.fetch( apiurl, swuRequest ).then( (res) => {
-        //console.log( "SendWithUs Response:\n" + JSON.stringify(res));
-        opengrowth.log("sendwithus.email", "xhr", res.status);
+        if ( res.status < 200 || res.status > 299 ) {
+            console.log("SendWithUs Error:\n" + res);
+            opengrowth.log("sendwithus.email", "xhr", res, true);
+        }
+        else {
+            //console.log( "SendWithUs Response:\n" + JSON.stringify(res));
+            opengrowth.log("sendwithus.email", "xhr", res.status);
+        }
     })
     .catch( err => {
         console.log("SendWithUs Error:\n" + err);

@@ -25,12 +25,20 @@ opengrowth.modules.monkeylearn.classify = ( input, classifier ) => {
         ,   body    : data
         ,   headers : { 'Authorization' : libauth }
         } ).then( res => {
-            //console.log("MonkeyLearn Response:\n", res );
-            opengrowth.log("monkeylearn", "xhr", res.status);
-            resolve(JSON.parse(res.body).result[0][0]);
+            if ( res.status < 200 || res.status > 299 ) {
+                console.log("MonkeyLearn Error:\n", res );
+                opengrowth.log("monkeylearn", "xhr", res, true);
+                reject();
+            }
+            else {
+                //console.log("MonkeyLearn Response:\n", res );
+                opengrowth.log("monkeylearn", "xhr", res.status);
+                resolve(JSON.parse(res.body).result[0][0]);
+            }
         } ).catch( err => {
             console.log("MonkeyLearn Error:\n", err );
             opengrowth.log("monkeylearn", "xhr", err, true);
+            reject();
         } );
     } );
 };
