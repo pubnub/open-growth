@@ -20,19 +20,16 @@ opengrowth.delight.sendwithus.email = ( request ) => {
     //add sendgrid key to request
     request["esp_account"] = opengrowth.keys.swu.espkey
 
-    //add BCCs for SalesForce
+    //add BCCs for SalesForce and activity email list
     if ( !request.bcc || !request.bcc.length ) {
-        //add BCCs
-        request.bcc=[
-            {"address": opengrowth.keys.salesforce.bcc},
-            {"address": opengrowth.keys.pubnub.bcc}
-        ];
+        request.bcc = [];
     }
-    else {
-        //add BCCs
-        request.bcc.push({"address": opengrowth.keys.salesforce.bcc});
-        request.bcc.push({"address": opengrowth.keys.pubnub.bcc});
-    }
+
+    //add BCCs
+    request.bcc.concat([
+        { "address": opengrowth.keys.salesforce.bcc },
+        { "address": opengrowth.keys.pubnub.bcc }
+    ]);
 
     // B64 Encode Auth Header for Basic Auth
     const libauth = auth.basic( apikey, '' );
@@ -48,13 +45,13 @@ opengrowth.delight.sendwithus.email = ( request ) => {
     
     // post email
     return xhr.fetch( apiurl, swuRequest ).then( (res) => {
-        if ( res.status < 200 || res.status > 299 ) {
-            console.log("SendWithUs Error:\n" + res);
-            opengrowth.log("sendwithus.email", "xhr", res, true);
-        }
-        else {
+        if ( res.status >= 200 && res.status < 300 ) {
             //console.log( "SendWithUs Response:\n" + JSON.stringify(res));
             opengrowth.log("sendwithus.email", "xhr", res.status);
+        }
+        else {
+            console.log("SendWithUs Error:\n" + res);
+            opengrowth.log("sendwithus.email", "xhr", res, true);
         }
     })
     .catch( err => {

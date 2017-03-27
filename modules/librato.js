@@ -43,13 +43,13 @@ opengrowth.modules.librato = ( gaugeArray ) => {
     // Send Recording to Librato
     return xhr.fetch( apiUrl, body )
     .then((res) => {
-        if ( res.status < 200 || res.status > 299 ) {
-            console.log("Librato Error:\n", res );
-            opengrowth.log("librato", "xhr", res, true);
-        }
-        else {
+        if ( res.status >= 200 && res.status < 300 ) {
             //console.log("Librato Response:\n", res );
             opengrowth.log("librato", "xhr", res.status);
+        }
+        else {
+            console.log("Librato Error:\n", res );
+            opengrowth.log("librato", "xhr", res, true);
         }
     })
     .catch((err) => {

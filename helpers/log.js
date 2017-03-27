@@ -8,7 +8,7 @@ opengrowth.log = ( type, event, message, isError ) => {
       , "event"   : event
       , "message" : message
     };
-    if (isError) log.error = true; 
+    if ( isError ) log.error = true; 
     opengrowth.logs.push(log);
 };
 
@@ -17,7 +17,7 @@ opengrowth.log = ( type, event, message, isError ) => {
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.publishLogs = () => {
     return new Promise(( resolve, reject ) => {
-        if (!opengrowth.logs.length) resolve();
+        if ( !opengrowth.logs.length ) resolve();
         
         pubnub.publish({
             "channel": "opengrowth.log",
