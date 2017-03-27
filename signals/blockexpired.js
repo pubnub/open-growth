@@ -33,11 +33,6 @@ opengrowth.signals.blockexpired = ( request, customer ) => {
       , "blocks_url_array"    : blocks_url_array  //blocks expiring only
     };
 
-    let unsubId = 2173;
-    let unsubscribeHeader = `{\"to\":[\"${email}\"],` +
-      `\"sub\":{\"asm_preferences_raw_url\":[\"<%asm_preferences_raw_url%>\"]},` +
-      `\"asm_group_id\":${unsubId}}`;
-
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.blockexpired,
       "recipient": {
@@ -46,8 +41,7 @@ opengrowth.signals.blockexpired = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "og_blockexpired" ],
-      "headers" : { "x-smtpapi" : unsubscribeHeader }
+      "tags" : [ "og_blockexpired" ]
     };
 
     // Send Email and Track Delight in Librato

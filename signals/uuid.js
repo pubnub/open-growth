@@ -27,11 +27,6 @@ opengrowth.signals.uuid = ( request, customer ) => {
       , "ip_count"            : ip_count.toString()
     };
 
-    let unsubId = 2133;
-    let unsubscribeHeader = `{\"to\":[\"${email}\"],` +
-      `\"sub\":{\"asm_preferences_raw_url\":[\"<%asm_preferences_raw_url%>\"]},` +
-      `\"asm_group_id\":${unsubId}}`;
-
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.uuid,
       "recipient": {
@@ -40,8 +35,7 @@ opengrowth.signals.uuid = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "og_uuid" ],
-      "headers" : { "x-smtpapi" : unsubscribeHeader }
+      "tags" : [ "og_uuid" ]
     };
 
     return opengrowth.delight.sendwithus.email(sendWithUsPostBody);

@@ -22,12 +22,7 @@ opengrowth.signals.day7 = ( request, customer ) => {
       , "csm_bccs"            : csm_bccs
       , "app_name"            : user.app_name
     };
-
-    let unsubId = 2133;
-    let unsubscribeHeader = `{\"to\":[\"${email}\"],` +
-      `\"sub\":{\"asm_preferences_raw_url\":[\"<%asm_preferences_raw_url%>\"]},` +
-      `\"asm_group_id\":${unsubId}}`;
-
+    
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.day7,
       "recipient": {
@@ -36,8 +31,7 @@ opengrowth.signals.day7 = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "og_day7" ],
-      "headers" : { "x-smtpapi" : unsubscribeHeader }
+      "tags" : [ "og_day7" ]
     };
 
     // Send Email and Track Delight in Librato
