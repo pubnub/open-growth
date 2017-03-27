@@ -25,9 +25,20 @@ opengrowth.modules.pubnub.silver = (message) => {
     // Get Customer Bio
     return new Promise( ( resolve, reject ) => {
         xhr.fetch(url).then( response => {
-            resolve(JSON.parse(response.body));
+            if ( res.status >= 200 && res.status < 300 ) {
+                //console.log("Clearbit Response:\n", res);
+                opengrowth.log("clearbit", "xhr", res.status);
+                resolve(JSON.parse(response.body));
+            }
+            else {
+                console.log("Clearbit Error:\n", res);
+                opengrowth.log("clearbit", "xhr", res, true);
+                reject();
+            }
         } ).catch( err => {
-            console.log( 'Pubnub Error:', err );
+            console.log("Clearbit Error:\n", err);
+            opengrowth.log("clearbit", "xhr", err, true);
+            reject();
         } );
     } );
 

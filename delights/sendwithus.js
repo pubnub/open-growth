@@ -18,7 +18,7 @@ opengrowth.delight.sendwithus.email = ( request ) => {
     }
 
     //add BCCs
-    request.bcc.concat([
+    request.bcc = request.bcc.concat([
         { "address": opengrowth.keys.salesforce.bcc },
         { "address": opengrowth.keys.pubnub.bcc }
     ]);
