@@ -3,14 +3,6 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.delight.sendwithus = {};
 opengrowth.delight.sendwithus.email = ( request ) => {
-    // Record Delight Activity
-    opengrowth.track.delight( 'sendwithus.email', request.signal, {
-      "email"    : request.recipient.address
-    , "message"  : request.message || "SWU Template"
-    , "bccs"     : request.bcc
-    , "category" : request.tags[0] || "none"
-    } );
-    
     // swu api url
     const apiurl = "https://api.sendwithus.com/api/v1/send";
 
@@ -45,6 +37,14 @@ opengrowth.delight.sendwithus.email = ( request ) => {
         , "Content-Type"  : "application/json"
         }
     }
+
+    // Record Delight Activity
+    opengrowth.track.delight( 'sendwithus.email', request.signal, {
+      "email"    : request.recipient.address
+    , "message"  : request.message || "SWU Template"
+    , "bccs"     : request.bcc
+    , "category" : request.tags[0] || "none"
+    } );
     
     // post email
     return xhr.fetch( apiurl, swuRequest ).then( (res) => {
