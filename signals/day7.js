@@ -31,7 +31,8 @@ opengrowth.signals.day7 = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "og_day7" ]
+      "tags" : [ "og_day7" ],
+      "headers" : { "x-smtpapi" : '{\"asm_group_id\":' + sendgrid.group.default + '}' }
     };
 
     // Send Email and Track Delight in Librato

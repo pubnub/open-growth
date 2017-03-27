@@ -41,7 +41,8 @@ opengrowth.signals.blockexpired = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "og_blockexpired" ]
+      "tags" : [ "og_blockexpired" ],
+      "headers" : { "x-smtpapi" : '{\"asm_group_id\":' + sendgrid.group.limit_warning + '}' }
     };
 
     // Send Email and Track Delight in Librato
