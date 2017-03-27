@@ -15,11 +15,6 @@ opengrowth.signals.usage = ( request, customer ) => {
         "customer_first_name" : firstName
       , "customer_last_name"  : lastName
       , "company_name"        : company_name
-      , "csm_first_name"      : csm.first_name
-      , "csm_last_name"       : csm.last_name
-      , "csm_email"           : csm.email
-      , "csm_phone"           : csm.phone
-      , "csm_bccs"            : csm_bccs
       , "graph_url"           : user.url
     };
 
