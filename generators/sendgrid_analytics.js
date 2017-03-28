@@ -41,6 +41,7 @@ module.exports = function ( app ) {
 
         var actions = [];
         for ( var action of request.body ) {
+            console.log(JSON.stringify(action));
             // Add unsubscribes and resubscribes to publish
             if ( action.event === "group_unsubscribe" ) {
                 action.category = [ "og_unsubscribe" ];
@@ -49,7 +50,7 @@ module.exports = function ( app ) {
             if ( action.event === "group_resubscribe" ) {
                 action.category = [ "og_resubscribe" ];
             }
-            
+
             //only track open growth emails that have "og_" in category
             //no tracking for default bcc
             var category = action.category || [""];
