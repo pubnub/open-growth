@@ -1,0 +1,33 @@
+opengrowth.signals.usage = ( request, customer ) => {
+    const user = request.message;
+    const csm  = user.csm || {};
+    const csm_bccs = csm && csm.bccs ? csm.bccs : [];
+    let email  = user.litmus || 'open-growth-activity+silver@pubnub.com';
+    // @if GOLD
+    email = user.email;
+    // @endif
+
+    let firstName    = opengrowth.customer.getFirstName(customer);
+    let lastName     = opengrowth.customer.getLastName(customer);
+    let company_name = opengrowth.customer.getCompany(customer);
+
+    var template_data = {
+        "customer_first_name" : firstName
+      , "customer_last_name"  : lastName
+      , "company_name"        : company_name
+      , "graph_url"           : user.url
+    };
+
+    var sendWithUsPostBody = {
+      "template": opengrowth.keys.swu.templates.usage,
+      "recipient": {
+        "name": firstName,
+        "address": email
+      },
+      "template_data": template_data,
+      "bcc": csm_bccs,
+      "tags" : [ "og_usage" ]
+    };
+
+    return opengrowth.delight.sendwithus.email(sendWithUsPostBody);
+};
