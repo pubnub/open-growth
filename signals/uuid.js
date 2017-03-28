@@ -4,7 +4,7 @@ opengrowth.signals.uuid = ( request, customer ) => {
     const csm_bccs = csm && csm.bccs ? csm.bccs : [];
     let email  = user.litmus || 'open-growth-activity+silver@pubnub.com';
     // @if GOLD
-    email = user.email;
+    //email = user.email;
     // @endif
 
     let firstName    = opengrowth.customer.getFirstName(customer);
