@@ -20,6 +20,8 @@ opengrowth.signals.upgrade_free = ( request, customer ) => {
       , "csm_email"           : csm.email
       , "csm_phone"           : csm.phone
       , "csm_bccs"            : csm_bccs
+      , "customer_email"      : user.email
+      , "sub_key"             : user.sub_key
     };
       
     var sendWithUsPostBody = {
