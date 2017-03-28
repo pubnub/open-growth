@@ -27,6 +27,10 @@ opengrowth.signals.uuid = ( request, customer ) => {
       , "ip_count"            : ip_count.toString()
     };
 
+    let lw = opengrowth.keys.sendgrid.group.limit_warning;
+    let df = opengrowth.keys.sendgrid.group.default;
+    let fe = opengrowth.keys.sendgrid.group.feature_enable;
+
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.uuid,
       "recipient": {
@@ -36,7 +40,9 @@ opengrowth.signals.uuid = ( request, customer ) => {
       "template_data": template_data,
       "bcc": csm_bccs,
       "tags" : [ "og_uuid" ],
-      "headers" : { "x-smtpapi" : '{\"asm_group_id\":' + sendgrid.group.feature_enable + '}' }
+      "headers" : {
+        "x-smtpapi" : `{\"asm_group_id\":${fe},\"asm_groups_to_display\": [${lw},${df},${fe}]}`
+      }
     };
 
     return opengrowth.delight.sendwithus.email(sendWithUsPostBody);

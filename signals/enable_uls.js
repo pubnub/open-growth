@@ -23,6 +23,10 @@ opengrowth.signals.uls = ( request, customer ) => {
       , "app_name"            : user.app_name
     };
 
+    let lw = opengrowth.keys.sendgrid.group.limit_warning;
+    let df = opengrowth.keys.sendgrid.group.default;
+    let fe = opengrowth.keys.sendgrid.group.feature_enable;
+
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.enable_uls,
       "recipient": {
@@ -32,7 +36,9 @@ opengrowth.signals.uls = ( request, customer ) => {
       "template_data": template_data,
       "bcc": csm_bccs,
       "tags" : [ "og_enable_uls" ],
-      "headers" : { "x-smtpapi" : '{\"asm_group_id\":' + sendgrid.group.feature_enable + '}' }
+      "headers" : {
+        "x-smtpapi" : `{\"asm_group_id\":${fe},\"asm_groups_to_display\": [${lw},${df},${fe}]}`
+      }
     };
 
     // Send Email and Track Delight in Librato

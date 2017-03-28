@@ -22,6 +22,10 @@ opengrowth.signals.day7 = ( request, customer ) => {
       , "csm_bccs"            : csm_bccs
       , "app_name"            : user.app_name
     };
+
+    let lw = opengrowth.keys.sendgrid.group.limit_warning;
+    let df = opengrowth.keys.sendgrid.group.default;
+    let fe = opengrowth.keys.sendgrid.group.feature_enable;
     
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.day7,
@@ -32,7 +36,9 @@ opengrowth.signals.day7 = ( request, customer ) => {
       "template_data": template_data,
       "bcc": csm_bccs,
       "tags" : [ "og_day7" ],
-      "headers" : { "x-smtpapi" : '{\"asm_group_id\":' + sendgrid.group.default + '}' }
+      "headers" : {
+        "x-smtpapi" : `{\"asm_group_id\":${df},\"asm_groups_to_display\": [${lw},${df},${fe}]}`
+      }
     };
 
     // Send Email and Track Delight in Librato
