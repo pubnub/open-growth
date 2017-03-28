@@ -36,6 +36,11 @@ opengrowth.signals.signup = ( request, customer ) => {
     let lw = opengrowth.keys.sendgrid.group.limit_warning;
     let df = opengrowth.keys.sendgrid.group.default;
     let fe = opengrowth.keys.sendgrid.group.feature_enable;
+
+    //let header = `{\"asm_group_id\":${df},\"asm_groups_to_display\": [${lw},${df},${fe}]}`;
+
+    // let header = `{\"sub\":{\"asm_preferences_url\":[\"<%asm_preferences_url%>\"]},\"asm_group_id\":${df}}`;
+    let header =  `{\"sub\":{\"asm_preferences_url\":[\"%asm_preferences_url%\"]},\"asm_group_id\":${df},\"filters\":{\"subscriptiontrack\":{\"settings\":{\"enable\":0}}}}`
       
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.signup,
@@ -47,7 +52,7 @@ opengrowth.signals.signup = ( request, customer ) => {
       "bcc": csm_bccs,
       "tags" : [ "og_signup" ],
       "headers" : {
-        "x-smtpapi" : `{\"asm_group_id\":${df},\"asm_groups_to_display\": [${lw},${df},${fe}]}`
+        "x-smtpapi" : header
       }
     };
 

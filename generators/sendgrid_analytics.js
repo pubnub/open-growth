@@ -43,6 +43,7 @@ module.exports = function ( app ) {
         for ( var action of request.body ) {
             //only track open growth emails that have "og_" in category
             //no tracking for default bcc
+            console.log(action);
             var category = action.category || [""];
 
             if ( category[0].indexOf("og_") < 0 ||
