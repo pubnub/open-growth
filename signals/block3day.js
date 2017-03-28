@@ -33,6 +33,10 @@ opengrowth.signals.block3day = ( request, customer ) => {
       , "blocks_url_array"    : blocks_url_array  //blocks expiring only
     };
 
+    let lw = opengrowth.keys.sendgrid.group.limit_warning;
+    let df = opengrowth.keys.sendgrid.group.default;
+    let fe = opengrowth.keys.sendgrid.group.feature_enable;
+
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.block3day,
       "recipient": {
@@ -41,7 +45,10 @@ opengrowth.signals.block3day = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "og_block3day" ]
+      "tags" : [ "og_block3day" ],
+      "headers" : {
+        "x-smtpapi" : `{\"asm_group_id\":${lw},\"asm_groups_to_display\": [${lw},${df},${fe}]}`
+      }
     };
 
     // Send Email and Track Delight in Librato
