@@ -43,8 +43,16 @@ module.exports = function ( app ) {
         for ( var action of request.body ) {
             //only track open growth emails that have "og_" in category
             //no tracking for default bcc
-            console.log(action);
             var category = action.category || [""];
+
+            // Add unsubscribes and resubscribes to publish
+            if ( action.event === "group_unsubscribe" ) {
+                action.category = [ "og_unsubscribe" ];
+            }
+
+            if ( action.event === "group_resubscribe" ) {
+                action.category = [ "og_resubscribe" ];
+            }
 
             if ( category[0].indexOf("og_") < 0 ||
                  action.email.indexOf(default_bcc) > -1 ) {
