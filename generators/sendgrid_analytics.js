@@ -41,7 +41,7 @@ module.exports = function ( app ) {
 
         var actions = [];
         for ( var action of request.body ) {
-            console.log(action);
+            console.log( action );
             // Add unsubscribes and resubscribes to publish
             if ( action.event === "group_unsubscribe" ) {
                 action.category = [ "og_unsubscribe" ];
