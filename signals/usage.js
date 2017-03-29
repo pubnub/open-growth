@@ -32,7 +32,7 @@ opengrowth.signals.usage = ( request, customer ) => {
       "bcc": csm_bccs,
       "tags" : [ "og_usage" ],
       "headers" : {
-        "x-smtpapi" : `{\"asm_group_id\":${lw},\"asm_groups_to_display\": [${lw},${df},${fe}]}`
+        "x-smtpapi" : `{\"asm_group_id\":${lw},\"asm_groups_to_display\": [${lw},${df},${fe}],\"category\":[\"og_usage\"]}`
       }
     };
 

@@ -37,7 +37,7 @@ opengrowth.signals.uls = ( request, customer ) => {
       "bcc": csm_bccs,
       "tags" : [ "og_enable_uls" ],
       "headers" : {
-        "x-smtpapi" : `{\"asm_group_id\":${fe},\"asm_groups_to_display\": [${lw},${df},${fe}]}`
+        "x-smtpapi" : `{\"asm_group_id\":${fe},\"asm_groups_to_display\": [${lw},${df},${fe}],\"category\":[\"og_enable_uls\"]}`
       }
     };
 

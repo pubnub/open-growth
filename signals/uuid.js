@@ -41,7 +41,7 @@ opengrowth.signals.uuid = ( request, customer ) => {
       "bcc": csm_bccs,
       "tags" : [ "og_uuid" ],
       "headers" : {
-        "x-smtpapi" : `{\"asm_group_id\":${fe},\"asm_groups_to_display\": [${lw},${df},${fe}]}`
+        "x-smtpapi" : `{\"asm_group_id\":${fe},\"asm_groups_to_display\": [${lw},${df},${fe}],\"category\":[\"og_uuid\"]}`
       }
     };
 

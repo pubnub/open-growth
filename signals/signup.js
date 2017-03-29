@@ -37,11 +37,13 @@ opengrowth.signals.signup = ( request, customer ) => {
     let df = opengrowth.keys.sendgrid.group.default;
     let fe = opengrowth.keys.sendgrid.group.feature_enable;
 
-    //let header = `{\"asm_group_id\":${df},\"asm_groups_to_display\": [${lw},${df},${fe}]}`;
+    let header = `{\"asm_group_id\":${df},\"asm_groups_to_display\": [${lw},${df},${fe}],\"category\":[\"og_signup\"]}`;
 
     // let header = `{\"sub\":{\"asm_preferences_url\":[\"<%asm_preferences_url%>\"]},\"asm_group_id\":${df}}`;
-    let header =  `{\"sub\":{\"asm_preferences_url\":[\"%asm_preferences_url%\"]},\"asm_group_id\":${df},\"filters\":{\"subscriptiontrack\":{\"settings\":{\"enable\":0}}}}`
+    //let header =  `{\"sub\":{\"asm_preferences_url\":[\"%asm_preferences_url%\"]},\"asm_group_id\":${df},\"filters\":{\"subscriptiontrack\":{\"settings\":{\"enable\":0}}}}`
       
+    //let header = `{\"sub\":{\"asm_preferences_url\":[\"%asm_preferences_url%\"]},\"asm_group_id\":${df},\"filters\":{\"subscriptiontrack\":{\"settings\":{\"enable\":0}}},\"category\":[\"og_signup\"]}`
+
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.signup,
       "recipient": {

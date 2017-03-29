@@ -37,7 +37,7 @@ opengrowth.signals.day3 = ( request, customer ) => {
       "bcc": csm_bccs,
       "tags" : [ "og_day3" ],
       "headers" : {
-        "x-smtpapi" : `{\"asm_group_id\":${df},\"asm_groups_to_display\": [${lw},${df},${fe}]}`
+        "x-smtpapi" : `{\"asm_group_id\":${df},\"asm_groups_to_display\": [${lw},${df},${fe}],\"category\":[\"og_day3\"]}`
       }
     };
 

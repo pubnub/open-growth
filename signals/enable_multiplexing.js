@@ -37,7 +37,7 @@ opengrowth.signals.multiplexing = ( request, customer ) => {
       "bcc": csm_bccs,
       "tags" : [ "og_enable_multiplexing" ],
       "headers" : {
-        "x-smtpapi" : `{\"asm_group_id\":${fe},\"asm_groups_to_display\": [${lw},${df},${fe}]}`
+        "x-smtpapi" : `{\"asm_group_id\":${fe},\"asm_groups_to_display\": [${lw},${df},${fe}],\"category\":[\"og_enable_multiplexing\"]}`
       }
     };
 
