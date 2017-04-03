@@ -48,14 +48,16 @@ div.one {
     transform: translate( -50%, -50% );
     width: 400px;
     height: 400px;
+    opacity: 0.3;
     border-right: 1px solid rgba(255,215,0,0.4);
     background: radial-gradient(ellipse at center, rgba(255,215,0,0.2) 0%,rgba(255,255,255,0.9) 100%);
-    animation: one 0.2s ease-in-out 0s infinite alternate;
+    animation: one 0.4s ease-in-out 0s infinite alternate;
 }
 @keyframes one {
     0%   { transform: translate( -50%, -50% ) scale(0.8) }
-    40%  { transform: translate( -50%, -50% ) scale(0.9) }
-    100% { transform: translate( -50%, -50% ) scale(0.7) }
+    20%  { transform: translate( -50%, -50% ) scale(1.0) }
+    80%  { transform: translate( -50%, -50% ) scale(0.7) }
+    100% { transform: translate( -50%, -50% ) scale(1.1) }
 }
 div.two {
     position: absolute;
