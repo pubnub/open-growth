@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PubNub - Litmus Test OG</title>
+    <script type="text/javascript" src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.7.0.min.js"></script>
+  </head>
+  <body>
+
+    <h1>Litmus Test for Open Growth</h1>
+    <p>Sends emails to the list of addresses you provide to the signals in the list you provide using the testing Open Growth Block</p>
+    <br />
+    <h2>Emails Addresses</h2>
+    <p>Ex: ["name@pubnub.com"] or ["name@pubnub.com", "othername@pubnub.com"]</p>
+    <input id="to" type="text">
+    <br /><br /><br />
+    <h2>Signals</h2>
+    <p>Current Signals: ["signup", "day3", "day7", "multiplexing", "presence", "uls", "usage", "uuid", "block1day", "block3day", "blockexpired"]</p>
+    <input id="sig" type="text">
+    <br />
+    <input disabled="true" id="send" type="submit" value="publish test signals">
+    <br />
+    <p id="status"></p>
+    <br />
+    <h2>Silver Key Information</h2>
+    <p>This is necessary for the test to work. Enter only the SILVER (testing) key information</p> 
+    <h3>Pub</h3>
+    <input id="pub" type="text">
+    <h3>Sub</h3>
+    <input id="sub" type="text">
+    <h3>Secret</h3>
+    <input id="sec" type="text">
+    <br />
+    <input id="con" type="submit" value="Connect to pubnub">
+  </body>
+</html>
+
+<style type="text/css">
+  input[type=text] {
+    width: 100%;
+    max-width: 1000px;
+  }
+</style>
+
+<script type="text/javascript">
+  var con;
+  var send;
+  var _status;
+  var to;
+  var signals;
+  var publishMessage;
+  var sentEmailCount = 0;
+  
+  window.addEventListener( "load" , function ( event ) {
+
+    con     = document.getElementById('con');
+    send    = document.getElementById('send');
+    to      = document.getElementById('to');
+    signals = document.getElementById('sig');
+    _status = document.getElementById('status');
+
+    con.onclick = connect;
+    send.onclick = sendClick;
+
+    //status.innerHTML = "Not connected";
+  });
+
+  var sendClick = function () {
+    sentEmailCount = 0;
+    var toObj      = to.value;
+    var signalsObj = signals.value;
+
+    try { toObj = JSON.parse(toObj); }
+    catch ( err ) { return fail("Invalid JSON: to"); }
+
+    try { signalsObj = JSON.parse(signalsObj); }
+    catch ( err ) { return fail("Invalid JSON: signals"); }
+
+    if ( !toObj || toObj.constructor !== Array ) {
+      fail("To is not an array");
+    }
+
+    if ( toObj.length === 0 ) {
+      fail("Error: To is blank");
+    }
+     
+    if ( !allValidEmails(toObj) ) {
+      fail("Invalid email in To");
+    }
+
+    if ( !signalsObj || signalsObj.constructor !== Array) {
+      fail("Signals is not an array");
+    }
+
+    if ( signalsObj.length === 0 ) {
+      fail("Error: Signals is blank");
+    }
+
+    publishMessage({
+      "emails"  : toObj,
+      "signals" : signalsObj
+    });
+
+    function fail ( err ) {
+      _status.innerHTML = err;
+      return;
+    }
+
+  }
+
+  var showPublishButton = function () {
+    var send = document.getElementById('send');
+    send.disabled = false;
+  };
+
+  var connect = function () {
+    var pub = document.getElementById('pub').value;
+    var sub = document.getElementById('sub').value;
+    var sec = document.getElementById('sec').value;
+
+    pubnub = new PubNub({
+        "publishKey"   : pub,
+        "subscribeKey" : sub,
+        "secretKey"    : sec
+    });
+    
+    publishMessage = function ( message ) {
+        var publishConfig = {
+            "channel" : "litmus",
+            "message" : message
+        };
+
+        pubnub.publish(publishConfig, function ( theStatus, response ) {
+            if ( theStatus.statusCode === 200 ) {
+                _status.innerHTML = "Getting Previous Prod Publishes (takes about 15s)...";
+            }
+            else {
+                _status.innerHTML = "Message error: " + response;
+            }
+        })
+    }
+       
+    pubnub.addListener({
+        status: function ( statusEvent ) {
+            if (statusEvent.category === "PNConnectedCategory") {
+                showPublishButton();
+                _status.innerHTML = "Connected to PubNub";
+            }
+        },
+        message: function ( message ) {
+            if ( message.message['litmusEmailsSent'] ) {
+                sentEmailCount++;
+                _status.innerHTML = sentEmailCount + " Emails Successfully Sent";
+            }
+        }
+    });
+
+    pubnub.subscribe({
+        channels: ['litmus'] 
+    });
+  };
+
+  function allValidEmails ( arrayEmails ) {
+    for ( let email of arrayEmails ) {
+      var isValid = validateEmail(email);
+      if ( !isValid ) return false; 
+    }
+    return true;
+  }
+
+  function validateEmail ( email ) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+  }
+
+</script>
