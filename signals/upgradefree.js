@@ -1,10 +1,10 @@
-opengrowth.signals.presence = ( request, customer ) => {
+opengrowth.signals.upgrade_free = ( request, customer ) => {
     const user = request.message;
     const csm  = user.csm || {};
     const csm_bccs = csm && csm.bccs ? csm.bccs : [];
     let email  = user.litmus || 'open-growth-activity+silver@pubnub.com';
     // @if GOLD
-    email = user.email;
+    email = csm.email;
     // @endif
 
     let firstName    = opengrowth.customer.getFirstName(customer);
@@ -19,26 +19,24 @@ opengrowth.signals.presence = ( request, customer ) => {
       , "csm_last_name"       : csm.last_name
       , "csm_email"           : csm.email
       , "csm_phone"           : csm.phone
-      , "csm_sf_bcc"          : csm_bccs
-      , "app_name"            : user.app_name
+      , "csm_bccs"            : csm_bccs
+      , "customer_email"      : user.email
+      , "sub_key"             : user.sub_key
     };
-
-    let lw = opengrowth.keys.sendgrid.group.limit_warning;
-    let df = opengrowth.keys.sendgrid.group.default;
-    let fe = opengrowth.keys.sendgrid.group.feature_enable;
-
+      
     var sendWithUsPostBody = {
-      "template": opengrowth.keys.swu.templates.enable_presence,
+      "template": opengrowth.keys.swu.templates.upgrade_free,
       "recipient": {
         "name": firstName,
         "address": email
       },
+      "sender": {
+        "name": csm.first_name + " " + csm.last_name,
+        "address": csm.email,
+        "reply_to": csm.email
+      },
       "template_data": template_data,
-      "bcc": csm_bccs,
-      "tags" : [ "og_enable_presence" ],
-      "headers" : {
-        "x-smtpapi" : `{\"asm_group_id\":${fe},\"asm_groups_to_display\": [${lw},${df},${fe}],\"category\":[\"og_enable_presence\"]}`
-      }
+      "tags" : [ "og_upgrade_free" ]
     };
 
     // Send Email and Track Delight in Librato

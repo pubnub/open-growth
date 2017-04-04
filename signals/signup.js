@@ -33,6 +33,17 @@ opengrowth.signals.signup = ( request, customer ) => {
       , "anchor_url"          : anchor_url  //signup
     };
 
+    let lw = opengrowth.keys.sendgrid.group.limit_warning;
+    let df = opengrowth.keys.sendgrid.group.default;
+    let fe = opengrowth.keys.sendgrid.group.feature_enable;
+
+    let header = `{\"asm_group_id\":${df},\"asm_groups_to_display\": [${lw},${df},${fe}],\"category\":[\"og_signup\"]}`;
+
+    // let header = `{\"sub\":{\"asm_preferences_url\":[\"<%asm_preferences_url%>\"]},\"asm_group_id\":${df}}`;
+    //let header =  `{\"sub\":{\"asm_preferences_url\":[\"%asm_preferences_url%\"]},\"asm_group_id\":${df},\"filters\":{\"subscriptiontrack\":{\"settings\":{\"enable\":0}}}}`
+      
+    //let header = `{\"sub\":{\"asm_preferences_url\":[\"%asm_preferences_url%\"]},\"asm_group_id\":${df},\"filters\":{\"subscriptiontrack\":{\"settings\":{\"enable\":0}}},\"category\":[\"og_signup\"]}`
+
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.signup,
       "recipient": {
@@ -41,7 +52,10 @@ opengrowth.signals.signup = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "og_signup" ]
+      "tags" : [ "og_signup" ],
+      "headers" : {
+        "x-smtpapi" : header
+      }
     };
 
     // Send Email and Track Delight in Librato
