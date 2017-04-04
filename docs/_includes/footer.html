@@ -19,6 +19,12 @@
                 </a></li>
             {% endif %}
 
+            {% if site.litmus %}
+                <li><a target="_litmus" href="{{ site.litmus }}">
+                    Litmus Email Test Tool
+                </a></li>
+            {% endif %}
+
             {% if site.chatroom %}
                 <li><a target="_chatroom" href="{{ site.chatroom }}">
                     Join Live Chatroom
