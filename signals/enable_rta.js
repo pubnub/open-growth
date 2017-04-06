@@ -1,4 +1,4 @@
-opengrowth.signals.multiplexing = ( request, customer ) => {
+opengrowth.signals.realtime_analytics = ( request, customer ) => {
     const user = request.message;
     const csm  = user.csm || {};
     const csm_bccs = csm && csm.bccs ? csm.bccs : [];
@@ -10,6 +10,9 @@ opengrowth.signals.multiplexing = ( request, customer ) => {
     let firstName    = opengrowth.customer.getFirstName(customer);
     let lastName     = opengrowth.customer.getLastName(customer);
     let company_name = opengrowth.customer.getCompany(customer);
+    var display_url  = `https://admin.pubnub.com/#/` + 
+      `user/${user.user_id}/account/${user.account_id}` +
+      `/app/${user.app_id}/key/${user.key_id}/`;
 
     var template_data = {
         "customer_first_name" : firstName
@@ -19,27 +22,20 @@ opengrowth.signals.multiplexing = ( request, customer ) => {
       , "csm_last_name"       : csm.last_name
       , "csm_email"           : csm.email
       , "csm_phone"           : csm.phone
-      , "csm_bccs"            : csm_bccs
+      , "csm_sf_bcc"          : csm_bccs
       , "app_name"            : user.app_name
+      , "display_url"         : display_url
     };
-
-    let lw = opengrowth.keys.sendgrid.group.limit_warning;
-    let df = opengrowth.keys.sendgrid.group.default;
-    let fe = opengrowth.keys.sendgrid.group.feature_enable;
-    let ug = opengrowth.keys.sendgrid.group.usage_info;
-
+    
     var sendWithUsPostBody = {
-      "template": opengrowth.keys.swu.templates.enable_multiplexing,
+      "template": opengrowth.keys.swu.templates.enable_realtime_analytics,
       "recipient": {
         "name": firstName,
         "address": email
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "og_enable_multiplexing" ],
-      "headers" : {
-        "x-smtpapi" : `{\"asm_group_id\":${fe},\"asm_groups_to_display\": [${lw},${df},${fe},${ug}],\"category\":[\"og_enable_multiplexing\"]}`
-      }
+      "tags" : [ "og_enable_realtime_analytics" ]
     };
 
     // Send Email and Track Delight in Librato

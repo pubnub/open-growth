@@ -1,4 +1,4 @@
-opengrowth.signals.multiplexing = ( request, customer ) => {
+opengrowth.signals.apns = ( request, customer ) => {
     const user = request.message;
     const csm  = user.csm || {};
     const csm_bccs = csm && csm.bccs ? csm.bccs : [];
@@ -19,27 +19,19 @@ opengrowth.signals.multiplexing = ( request, customer ) => {
       , "csm_last_name"       : csm.last_name
       , "csm_email"           : csm.email
       , "csm_phone"           : csm.phone
-      , "csm_bccs"            : csm_bccs
+      , "csm_sf_bcc"          : csm_bccs
       , "app_name"            : user.app_name
     };
 
-    let lw = opengrowth.keys.sendgrid.group.limit_warning;
-    let df = opengrowth.keys.sendgrid.group.default;
-    let fe = opengrowth.keys.sendgrid.group.feature_enable;
-    let ug = opengrowth.keys.sendgrid.group.usage_info;
-
     var sendWithUsPostBody = {
-      "template": opengrowth.keys.swu.templates.enable_multiplexing,
+      "template": opengrowth.keys.swu.templates.enable_apns,
       "recipient": {
         "name": firstName,
         "address": email
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "og_enable_multiplexing" ],
-      "headers" : {
-        "x-smtpapi" : `{\"asm_group_id\":${fe},\"asm_groups_to_display\": [${lw},${df},${fe},${ug}],\"category\":[\"og_enable_multiplexing\"]}`
-      }
+      "tags" : [ "og_enable_apns" ]
     };
 
     // Send Email and Track Delight in Librato
