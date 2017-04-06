@@ -26,6 +26,7 @@ opengrowth.signals.presence = ( request, customer ) => {
     let lw = opengrowth.keys.sendgrid.group.limit_warning;
     let df = opengrowth.keys.sendgrid.group.default;
     let fe = opengrowth.keys.sendgrid.group.feature_enable;
+    let ug = opengrowth.keys.sendgrid.group.usage_info;
 
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.enable_presence,
@@ -37,7 +38,7 @@ opengrowth.signals.presence = ( request, customer ) => {
       "bcc": csm_bccs,
       "tags" : [ "og_enable_presence" ],
       "headers" : {
-        "x-smtpapi" : `{\"asm_group_id\":${fe},\"asm_groups_to_display\": [${lw},${df},${fe}],\"category\":[\"og_enable_presence\"]}`
+        "x-smtpapi" : `{\"asm_group_id\":${fe},\"asm_groups_to_display\": [${lw},${df},${fe},${ug}],\"category\":[\"og_enable_presence\"]}`
       }
     };
 

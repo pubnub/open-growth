@@ -4,7 +4,7 @@ opengrowth.signals.uuid = ( request, customer ) => {
     const csm_bccs = csm && csm.bccs ? csm.bccs : [];
     let email  = user.litmus || 'open-growth-activity+silver@pubnub.com';
     // @if GOLD
-    //email = user.email;
+    email = user.email;
     // @endif
 
     let firstName    = opengrowth.customer.getFirstName(customer);
@@ -30,6 +30,7 @@ opengrowth.signals.uuid = ( request, customer ) => {
     let lw = opengrowth.keys.sendgrid.group.limit_warning;
     let df = opengrowth.keys.sendgrid.group.default;
     let fe = opengrowth.keys.sendgrid.group.feature_enable;
+    let ug = opengrowth.keys.sendgrid.group.usage_info;
 
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.uuid,
@@ -41,7 +42,7 @@ opengrowth.signals.uuid = ( request, customer ) => {
       "bcc": csm_bccs,
       "tags" : [ "og_uuid" ],
       "headers" : {
-        "x-smtpapi" : `{\"asm_group_id\":${fe},\"asm_groups_to_display\": [${lw},${df},${fe}],\"category\":[\"og_uuid\"]}`
+        "x-smtpapi" : `{\"asm_group_id\":${fe},\"asm_groups_to_display\": [${lw},${df},${fe},${ug}],\"category\":[\"og_uuid\"]}`
       }
     };
 

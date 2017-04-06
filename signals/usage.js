@@ -21,6 +21,7 @@ opengrowth.signals.usage = ( request, customer ) => {
     let lw = opengrowth.keys.sendgrid.group.limit_warning;
     let df = opengrowth.keys.sendgrid.group.default;
     let fe = opengrowth.keys.sendgrid.group.feature_enable;
+    let ug = opengrowth.keys.sendgrid.group.usage_info;
 
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.usage,
@@ -32,7 +33,7 @@ opengrowth.signals.usage = ( request, customer ) => {
       "bcc": csm_bccs,
       "tags" : [ "og_usage" ],
       "headers" : {
-        "x-smtpapi" : `{\"asm_group_id\":${lw},\"asm_groups_to_display\": [${lw},${df},${fe}],\"category\":[\"og_usage\"]}`
+        "x-smtpapi" : `{\"asm_group_id\":${lw},\"asm_groups_to_display\": [${lw},${df},${fe},${ug}],\"category\":[\"og_usage\"]}`
       }
     };
 
