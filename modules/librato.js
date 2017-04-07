@@ -40,6 +40,10 @@ opengrowth.modules.librato = ( gaugeArray ) => {
     ,   "headers" : headers
     };
 
+    // @if !GOLD
+    body.body = body.body.replace(/opengrowth\./g,'opengrowth.silver.');
+    // @endif
+
     // Send Recording to Librato
     return xhr.fetch( apiUrl, body )
     .then((res) => {
