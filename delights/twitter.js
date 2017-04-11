@@ -2,30 +2,30 @@
 // Tweet at Customer
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.delight.twitter = {};
-opengrowth.delight.twitter.tweet = ( request, tweet ) => {
-    opengrowth.track.delight('twitter.tweet', request.message.signal, {
-        email   : request.message.email
-    ,   message : request.message.message
-    });
-    return submitRequest( request, tweet );
-};
-function submitRequest ( request, tweet ) {
+opengrowth.delight.twitter.tweet = ( request, text ) => {
     const consumerKey = opengrowth.keys.twitter.consumerKey;
     const consumerSecret = opengrowth.keys.twitter.consumerSecret;
     const accessToken = opengrowth.keys.twitter.accessToken;
     const oauthTokenSecret = opengrowth.keys.twitter.oauthTokenSecret;
 
+    opengrowth.track.delight('twitter.tweet', request.message.signal, {
+        email   : request.message.email
+    ,   message : request.message.message
+    });
+
     // Skip if no Twitter API Keys
     if (!(consumerKey && consumerSecret && accessToken && oauthTokenSecret))
         return (new Promise()).resolve('Twitter disabled. No API Keys.');
+
+    if (!text)
+        return (new Promise()).resolve('No text to Tweet');
 
     const httpReqType = "POST";
     const contentType = "application/x-www-form-urlencoded";
     const url         = "https://api.twitter.com/1.1/statuses/update.json";
 
-    let tweetContent = tweet || "";
-    let content = tweetContent ? "status=" + encodeURIComponent(tweetContent) : "";
-
+    let tweetContent = text || "";
+    let content = tweetContent ? "status=" + encodeURIComponent(tweetContent).replace(/[!'()*]/g, escape) : "";
     //Used in Authorization header and to create request signature
     let oauth = {
         "oauth_consumer_key": consumerKey,
@@ -44,14 +44,18 @@ function submitRequest ( request, tweet ) {
         let http_options = {
             "method": httpReqType,
             "headers": {
-                "Content-Type": contentType,
-                "Authorization": authHeaderString
+                "Authorization": authHeaderString,
+                "Content-Type": contentType
+                
             },
             "body": content
         };
-        
-        return xhr.fetch( url, http_options ).then((response) => response.json());
-    }).catch((error) => {
+        return xhr.fetch(url, http_options).then((response) => response.json()).then((response) => {
+            return request.ok();
+        });
+    })
+    .catch((error) => {
+        return request.abort({ "500": "500: Internal server error" });
     });
 };
 
@@ -69,7 +73,7 @@ function getOAuthSignature(oauth, httpReqType, url, consumerSecret, oauthTokenSe
 function objectToRequestString(obj, prepend, head, tail, append) {
     let requestString = prepend || "";
     Object.keys(obj).forEach((key, i) => {
-        requestString += key + head + encodeURIComponent(obj[key]) + tail;
+        requestString += key + head + encodeURIComponent(obj[key]).replace(/[!'()*]/g, escape) + tail;
         i < Object.keys(obj).length-1 ? requestString += append : null;
     });
     return requestString;
