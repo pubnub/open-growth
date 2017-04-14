@@ -7,6 +7,7 @@ opengrowth.signals.day7 = ( request, customer ) => {
     email = user.email;
     // @endif
 
+    console.log(customer);
     let firstName    = opengrowth.customer.getFirstName(customer);
     let lastName     = opengrowth.customer.getLastName(customer);
     let company_name = opengrowth.customer.getCompany(customer);

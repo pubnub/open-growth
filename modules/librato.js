@@ -1,7 +1,7 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Librato
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-opengrowth.modules.librato = ( gaugeArray ) => {
+opengrowth.modules.librato = ( libratoUpdates ) => {
     // Skip if missing your Librato API Keys
     if (!opengrowth.keys.librato.email || !opengrowth.keys.librato.secret)
         return (new Promise()).resolve('Librato disabled. No API Key.');
@@ -15,12 +15,17 @@ opengrowth.modules.librato = ( gaugeArray ) => {
     ].join('&');
 
     let index = 0;
-    for ( let key in gaugeArray ) {
+    for ( let key in libratoUpdates ) {
         data += "&" + `gauges[${index}][name]=${key}` +
             "&" +
-            `gauges[${index}][value]=${gaugeArray[key]}`;
+            `gauges[${index}][value]=${libratoUpdates[key]}`;
         index++;
     }
+    
+    // @if !GOLD
+    // Mark gauges from testing instance with 'silver'
+    data = data.replace(/opengrowth\./g,'opengrowth.silver.');
+    // @endif
 
     // B64 Encode Auth Header
     const libauth = auth.basic(
@@ -39,10 +44,6 @@ opengrowth.modules.librato = ( gaugeArray ) => {
     ,   "body"    : data
     ,   "headers" : headers
     };
-
-    // @if !GOLD
-    body.body = body.body.replace(/opengrowth\./g,'opengrowth.silver.');
-    // @endif
 
     // Send Recording to Librato
     return xhr.fetch( apiUrl, body )

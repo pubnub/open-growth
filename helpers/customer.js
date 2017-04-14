@@ -1,58 +1,60 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Customer Fetch
+// Customer Data Enrichment Functions
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.customer = {};
-opengrowth.customer.getCustomer = ( email, signal ) => {
+opengrowth.customer.getDataFromClearbit = ( email ) => {
+  return opengrowth.modules.clearbit.lookup(email)
+  .then( res => {
+      resolve(res.customer || {});
+  });
+};
 
-    // TODO 
-    // TODO Augment/Extend 'SYNC' User Profile KV Entry
-    // TODO with all new keys supplied in the signal data
-    // TODO so we have a progressively built profile.
-    // TODO 
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Overwrites Signup Data with ClearBit Data
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+opengrowth.customer.enrich = ( customerData, clearbitData ) => {
+  return new Promise( ( resolve, reject ) => {
+    let firstName   = opengrowth.customer.getFirstName(clearbitData);
+    let lastName    = opengrowth.customer.getLastName(clearbitData);
+    let company     = opengrowth.customer.getCompany(clearbitData);
+    let description = opengrowth.customer.getDescription(clearbitData);
 
-    // TODO check kv store
-    // TODO check kv store and MERGE
-    // TODO check kv store
-    const usecase_classifier = 'cl_Lyv9HzfF';
-    return new Promise( ( resolve, reject ) => {
-        opengrowth.modules.clearbit.lookup(email).then( res => {
-            let customerLog = getCustomerLog(res.customer);
-            opengrowth.log("clearbit", "module", customerLog);
-            monkeyLearn( res.customer, resolve, reject );
-        }).catch( err => {
-            opengrowth.log("clearbit", "module", err, true);
-            monkeyLearn( {}, resolve, reject );
-        });
+    let customer = {
+      "email"       : customerData.email,
+      "firstName"   : firstName   || customerData.firstName,
+      "lastName"    : lastName    || customerData.lastName,
+      "phone"       : customerData.phone,
+      "company"     : company     || customerData.company,
+      "description" : description || customerData.description,
+      "usecase"     : customerData.usecase
+    };
 
-        var monkeyLearn = ( customer, resolve, reject ) => {
-            // keep track of details
-            customer.email  = email;
-            customer.signal = signal;
+    resolve(customer);
+  });
+};
 
-            const description = (customer.company||{}).description;
-            if (!description) return resolve(customer);
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Provides a Use Case from MonkeyLearn based on a company description
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+opengrowth.customer.getUseCase = ( customer ) => {
+  return new Promise( ( resolve, reject ) => {
 
-            opengrowth.modules.monkeylearn.classify(
-                description,
-                usecase_classifier
-            ).then( usecase => {
-                customer.email   = email;
-                customer.usecase = usecase;
-                opengrowth.log("monkeylearn", "module", usecase);
-                resolve(customer);
-            } ).catch((err) => {
-              opengrowth.log("monkeylearn", "module", err, true);
-          });
-        };
-    } );
+    if ( !customer.description ) resolve(null);
 
+    // TODO: use the key from the keys file for the classifier
+    opengrowth.modules.monkeylearn.classify(
+        description,
+        usecase_classifier
+    ).then( usecase => { resolve(usecase) })
+    .catch( err     => { resolve(null) });
+  });
 };
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Get first name from a Customer Object, returns null if not found
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.customer.getFirstName = ( customer ) => {
-	let result = null;
+    let result = null;
     if ( customer && customer.person && customer.person.name &&
          customer.person.name.givenName &&
          customer.person.name.givenName !== 'Not Found' &&
@@ -66,7 +68,7 @@ opengrowth.customer.getFirstName = ( customer ) => {
 // Get last name from a Customer Object, returns null if not found
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.customer.getLastName = ( customer ) => {
-	let result = null;
+    let result = null;
     if ( customer && customer.person && customer.person.name &&
          customer.person.name.familyName &&
          customer.person.name.familyName !== 'Not Found' &&
@@ -91,24 +93,15 @@ opengrowth.customer.getCompany = ( customer ) => {
 };
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Parses ClearBit data that Open Growth uses to an object and logs it
+// Get company description from a Customer Object, returns null if not found
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-let getCustomerLog = ( customer ) => {
-    let log = {};
-
-    if ( customer && customer.email ) log.email = customer.email;
-
-    if ( customer && customer.person && customer.person.name ) {
-        log.name = customer.person.name;
+opengrowth.customer.getDescription = ( customer ) => {
+    let result = null;
+    if ( customer && customer.company &&
+         customer.company.description &&
+         customer.company.description !== 'Not Found' &&
+         customer.company.description !== 'null' ) {
+      result = customer.company.description;
     }
-
-    if ( customer && customer.company && customer.company.name ) {
-        log.company = customer.company.name;
-    }
-
-    if ( customer && customer.company && customer.company.description ) {
-        log.company_description = customer.company.description;
-    }
-
-    return log;
+    return result;
 };
