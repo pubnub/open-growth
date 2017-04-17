@@ -91,6 +91,62 @@ opengrowth.customer.getCompany = ( customer ) => {
 };
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get company employees from a Customer Object, returns null if not found
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+opengrowth.customer.getEmployees = ( customer ) => {
+    let result = null;
+    if ( customer && customer.company &&
+         customer.company.metrics.employees &&
+         customer.company.metrics.employees !== 'Not Found' &&
+         customer.company.metrics.employees !== 'null' ) {
+      result = customer.company.metrics.employees;
+    }
+    return result;
+};
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get company revenue from a Customer Object, returns null if not found
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+opengrowth.customer.getRevenue = ( customer ) => {
+    let result = null;
+    if ( customer && customer.company &&
+         customer.company.metrics.annualRevenue &&
+         customer.company.metrics.annualRevenue !== 'Not Found' &&
+         customer.company.metrics.annualRevenue !== 'null' ) {
+      result = customer.company.metrics.annualRevenue;
+    }
+    return result;
+};
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get company raised from a Customer Object, returns null if not found
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+opengrowth.customer.getRaised = ( customer ) => {
+    let result = null;
+    if ( customer && customer.company &&
+         customer.company.metrics.raised &&
+         customer.company.metrics.raised !== 'Not Found' &&
+         customer.company.metrics.raised !== 'null' ) {
+      result = customer.company.metrics.raised;
+    }
+    return result;
+};
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get company market cap from a Customer Object, returns null if not found
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+opengrowth.customer.getMarketcap = ( customer ) => {
+    let result = null;
+    if ( customer && customer.company &&
+         customer.company.metrics.marketCap &&
+         customer.company.metrics.marketCap !== 'Not Found' &&
+         customer.company.metrics.marketCap !== 'null' ) {
+      result = customer.metrics.company.marketCap;
+    }
+    return result;
+};
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Parses ClearBit data that Open Growth uses to an object and logs it
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 let getCustomerLog = ( customer ) => {
