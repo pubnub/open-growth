@@ -1,5 +1,7 @@
 # Open Growth and Neumann
 
+![Neumann is Workforce Automation AI](http://imgur.com/xP3MPNv.png)
+
 > **Neumann** is an artificial intelligence living inside [PubNub BLOCKS serverless compute](https://www.pubnub.com/products/blocks/) for building and scaling realtime applications.
 > Neumann is your customer service AI.  Neumann is open source.
 
