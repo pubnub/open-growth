@@ -15,15 +15,11 @@ opengrowth.signals.blockexpired = ( request, customer ) => {
           `${block.user_id}/account/${block.account_id}/app/${block.app_id}` +
           `/key/${block.app_key_id}/block/${block.block_id}/event_handlers`);
     }
-
-    let firstName    = opengrowth.customer.getFirstName(customer);
-    let lastName     = opengrowth.customer.getLastName(customer);
-    let company_name = opengrowth.customer.getCompany(customer);
-
+    
     var template_data = {
-        "customer_first_name" : firstName
-      , "customer_last_name"  : lastName
-      , "company_name"        : company_name
+        "customer_first_name" : customer.firstName
+      , "customer_last_name"  : customer.lastName
+      , "company_name"        : customer.company
       , "csm_first_name"      : csm.first_name
       , "csm_last_name"       : csm.last_name
       , "csm_email"           : csm.email
@@ -41,7 +37,7 @@ opengrowth.signals.blockexpired = ( request, customer ) => {
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.blockexpired,
       "recipient": {
-        "name": firstName,
+        "name": customer.firstName,
         "address": email
       },
       "template_data": template_data,

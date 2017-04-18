@@ -15,13 +15,16 @@ const pubnub = require('pubnub');
 const query  = require('codec/query_string');
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Open Growth Signals Handler - Before Publish or Fire
+// Open Growth Signals Event Handler - Before Publish or Fire
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 export default request => {
     // Accept incoming email analytics from SendGrid.com
+    // move the POST body to the "actions" property in the message
     if ( request.params.sendgrid_analytics ) {
-        request.message = { "actions" : request.message };
-        request.message.signal = "sendgrid_analytics";
+        request.message = {
+            "signal"  : "sendgrid_analytics",
+            "actions" : request.message
+        };
     }
 
     const message = request.message;
@@ -57,6 +60,9 @@ export default request => {
         }).then( () => {
             request.message.processed.completed = true;
             return request.ok();
+        })
+        .catch( () => {
+            return request.abort();
         });
     }
 
@@ -99,9 +105,14 @@ export default request => {
     .then( () => {
         // Update Librato
         return opengrowth.modules.librato(opengrowth.libratoUpdates);
+    })
+    .then( () => {
+        request.message.processed.completed = true;
+    })
+    .catch( () => {
+        return request.abort();
     });
-
-    request.message.processed.completed = true;
+    
     return request.ok();
 };
 

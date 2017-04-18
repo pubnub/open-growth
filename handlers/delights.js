@@ -72,7 +72,7 @@ export default request => {
         let customer    = stored.customer;
         opengrowth.logs = opengrowth.logs.concat(stored.logs || []); 
         // Run any.js for '*'
-        opengrowth.signals['*']( customer, signal );
+        //opengrowth.signals['*']( customer, signal );
 
         // We don't want to send the same Delight twice!
         // Check for Duplicate Delight Signal
@@ -100,6 +100,7 @@ export default request => {
                 return kvdb.set( duplicate_key, true, duplicate_ttl ).then( () => {
                     // Run the signal's delight handler 
                     // This is in /signals/ directory
+                    console.log('opengrowth.signals',opengrowth.signals);
                     return opengrowth.signals[signal]( request, customer )
                     .then(() => {
                         return opengrowth.modules.librato(opengrowth.libratoUpdates);
@@ -129,4 +130,3 @@ opengrowth.modules = {};
 // Signals
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.signals = {};
-

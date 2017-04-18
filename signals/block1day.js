@@ -1,3 +1,4 @@
+console.log('setting block1day');
 opengrowth.signals.block1day = ( request, customer ) => {
     const user = request.message;
     const csm  = user.csm || {};
@@ -16,14 +17,10 @@ opengrowth.signals.block1day = ( request, customer ) => {
           `/key/${block.app_key_id}/block/${block.block_id}/event_handlers`);
     }
 
-    let firstName    = opengrowth.customer.getFirstName(customer);
-    let lastName     = opengrowth.customer.getLastName(customer);
-    let company_name = opengrowth.customer.getCompany(customer);
-
     var template_data = {
-        "customer_first_name" : firstName
-      , "customer_last_name"  : lastName
-      , "company_name"        : company_name
+        "customer_first_name" : customer.firstName
+      , "customer_last_name"  : customer.lastName
+      , "company_name"        : customer.company
       , "csm_first_name"      : csm.first_name
       , "csm_last_name"       : csm.last_name
       , "csm_email"           : csm.email
@@ -41,7 +38,7 @@ opengrowth.signals.block1day = ( request, customer ) => {
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.block1day,
       "recipient": {
-        "name": firstName,
+        "name": customer.firstName,
         "address": email
       },
       "template_data": template_data,
@@ -55,3 +52,4 @@ opengrowth.signals.block1day = ( request, customer ) => {
     // Send Email and Track Delight in Librato
     return opengrowth.delight.sendwithus.email(sendWithUsPostBody);
 };
+console.log('opengrowth.signals.block1day ',opengrowth.signals.block1day);

@@ -5,7 +5,10 @@ opengrowth.customer = {};
 opengrowth.customer.getDataFromClearbit = ( email ) => {
   return opengrowth.modules.clearbit.lookup(email)
   .then( res => {
-      resolve(res.customer || {});
+      return res.customer || {};
+  })
+  .catch( err => {
+      return {};
   });
 };
 

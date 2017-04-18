@@ -6,15 +6,11 @@ opengrowth.signals.usage = ( request, customer ) => {
     // @if GOLD
     //email = user.email;
     // @endif
-
-    let firstName    = opengrowth.customer.getFirstName(customer);
-    let lastName     = opengrowth.customer.getLastName(customer);
-    let company_name = opengrowth.customer.getCompany(customer);
-
+    
     var template_data = {
-        "customer_first_name" : firstName
-      , "customer_last_name"  : lastName
-      , "company_name"        : company_name
+        "customer_first_name" : customer.firstName
+      , "customer_last_name"  : customer.lastName
+      , "company_name"        : customer.company
       , "graph_url"           : user.url
     };
 
@@ -26,7 +22,7 @@ opengrowth.signals.usage = ( request, customer ) => {
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.usage,
       "recipient": {
-        "name": firstName,
+        "name": customer.firstName,
         "address": email
       },
       "template_data": template_data,

@@ -1,3 +1,4 @@
+console.log('setting signup');
 opengrowth.signals.signup = ( request, customer ) => {
     const user = request.message;
     const csm  = user.csm || {};
@@ -6,11 +7,7 @@ opengrowth.signals.signup = ( request, customer ) => {
     // @if GOLD
     email = user.email;
     // @endif
-
-    let firstName    = opengrowth.customer.getFirstName(customer);
-    let lastName     = opengrowth.customer.getLastName(customer);
-    let company_name = opengrowth.customer.getCompany(customer);
-
+    
     let display_url = `https://admin.pubnub.com/#/user/${user.user_id}/` +
                       `account/${user.account_id}/` +
                       `app/${user.app_id}/key/${user.key_id}/`;
@@ -21,9 +18,9 @@ opengrowth.signals.signup = ( request, customer ) => {
                       `&utm_content=api-keys`;
 
     var template_data = {
-        "customer_first_name" : firstName
-      , "customer_last_name"  : lastName
-      , "company_name"        : company_name
+        "customer_first_name" : customer.firstName
+      , "customer_last_name"  : customer.lastName
+      , "company_name"        : customer.company
       , "csm_first_name"      : csm.first_name
       , "csm_last_name"       : csm.last_name
       , "csm_email"           : csm.email
@@ -43,7 +40,7 @@ opengrowth.signals.signup = ( request, customer ) => {
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.signup,
       "recipient": {
-        "name": firstName,
+        "name": customer.firstName,
         "address": email
       },
       "template_data": template_data,
@@ -54,6 +51,9 @@ opengrowth.signals.signup = ( request, customer ) => {
       }
     };
 
+    console.log('sendWithUsPostBody :',sendWithUsPostBody);
+
     // Send Email and Track Delight in Librato
     return opengrowth.delight.sendwithus.email(sendWithUsPostBody);
 };
+console.log('opengrowth.signals.block1day ',opengrowth.signals.block1day);
