@@ -141,7 +141,7 @@ opengrowth.customer.getMarketcap = ( customer ) => {
          customer.company.metrics.marketCap &&
          customer.company.metrics.marketCap !== 'Not Found' &&
          customer.company.metrics.marketCap !== 'null' ) {
-      result = customer.metrics.company.marketCap;
+      result = customer.company.metrics.marketCap;
     }
     return result;
 };

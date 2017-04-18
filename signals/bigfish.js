@@ -41,7 +41,7 @@ opengrowth.signals.big_fish = (request, customer) => {
     var sendWithUsPostBody = {
         "template": opengrowth.keys.swu.templates.big_fish,
         "recipient": {
-            "name": csm_first_name,
+            "name": csm.first_name,
             "address": email
         },
         "sender": {
