@@ -124,6 +124,9 @@
     });
     
     publishMessage = function ( message ) {
+        message.pubkey = pub;
+        message.subkey = sub;
+
         var publishConfig = {
             "channel" : "litmus",
             "message" : message
@@ -131,7 +134,7 @@
 
         pubnub.publish(publishConfig, function ( theStatus, response ) {
             if ( theStatus.statusCode === 200 ) {
-                _status.innerHTML = "Getting Previous Prod Publishes (takes about 15s)...";
+                _status.innerHTML = "Getting Previous Prod Publishes...";
             }
             else {
                 _status.innerHTML = "Message error: " + response;
