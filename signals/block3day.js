@@ -36,6 +36,7 @@ opengrowth.signals.block3day = ( request, customer ) => {
     let lw = opengrowth.keys.sendgrid.group.limit_warning;
     let df = opengrowth.keys.sendgrid.group.default;
     let fe = opengrowth.keys.sendgrid.group.feature_enable;
+    let ug = opengrowth.keys.sendgrid.group.usage_info;
 
     var sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates.block3day,
@@ -47,7 +48,7 @@ opengrowth.signals.block3day = ( request, customer ) => {
       "bcc": csm_bccs,
       "tags" : [ "og_block3day" ],
       "headers" : {
-        "x-smtpapi" : `{\"asm_group_id\":${lw},\"asm_groups_to_display\": [${lw},${df},${fe}],\"category\":[\"og_block3day\"]}`
+        "x-smtpapi" : `{\"asm_group_id\":${lw},\"asm_groups_to_display\": [${lw},${df},${fe},${ug}],\"category\":[\"og_block3day\"]}`
       }
     };
 
