@@ -22,7 +22,7 @@ opengrowth.modules.clearbit.lookup = (email) => {
         ,   headers : { 'Authorization' : libauth }
         } ).then( res => {
             if ( res.status >= 200 && res.status < 300 ) {
-                //console.log("Clearbit Response:\n", res);
+                // console.log("Clearbit Response:\n", res);
                 opengrowth.log("clearbit", "xhr", res.status);
                 resolve({
                     "customer" : JSON.parse(res.body),
@@ -30,14 +30,14 @@ opengrowth.modules.clearbit.lookup = (email) => {
                 });
             }
             else {
-                console.log("Clearbit Error:\n", res);
+                // console.log("Clearbit Error:\n", res);
                 opengrowth.log("clearbit", "xhr", res, true);
-                reject();
+                resolve({});
             }
         } ).catch( err => {
             console.log("Clearbit Error:\n", err);
             opengrowth.log("clearbit", "xhr", err, true);
-            reject();
+            resolve({});
         } );
     } );
 

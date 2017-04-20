@@ -13,7 +13,8 @@ const readline   = require('readline');
 const args       = process.argv.slice(2);
 
 let apikeys      = {};
-let config     = {};
+let config       = {};
+let silver       = false;
 let gold         = false;
 
 // TODO - GET/MAKE BLOCK labled 'Open Growth'
@@ -39,7 +40,11 @@ switch(args[0]){
         reconfigure();
         break;
     case '--gold':
-        gold = true;//no break, falls through
+        gold = true;
+        deploy();
+        break;
+    case '--silver':
+        silver = true;
     default:
         deploy();
 }
@@ -57,13 +62,21 @@ function deploy(){
         config.login = result.result;
         config.owner_id = config.login.user.id;
 
-        //get list of user's apps and their keys, 
-        return list_apps(config.owner_id);
+        if ( apikeys.pubnub.accountId ) {
+            return Promise.resolve(apikeys.pubnub.accountId);
+        } else {
+            return get_account_id(config.owner_id);
+        }
+    } ).then( result => {
+        config.account_id = result;
+        //get list of user's apps and their keys,
+        return list_apps(config.account_id);
     } ).then( result => {
         //find Open Growth app_id and key_id's or create them
         let app_exists = false;
         let gold_keyset_exists = false;
         let silver_keyset_exists = false;
+        let bronze_keyset_exists = false;
 
         for( let i in result.result ) {
             if( result.result[i].name == "Open Growth" ) { 
@@ -80,6 +93,10 @@ function deploy(){
                         silver_keyset_exists = true;
                         console.log( 'Silver Keyset Found!');
                         config.silver_key_id = result.result[i].keys[j].id;
+                    } else if( result.result[i].keys[j].properties.name == "Bronze - " + process.env.USER ) {
+                        bronze_keyset_exists = true;
+                        console.log( 'Bronze Keyset Found!');
+                        config.bronze_key_id = result.result[i].keys[j].id;
                     }
                 }
             }
@@ -106,12 +123,22 @@ function deploy(){
             });
         }
 
+        if( !bronze_keyset_exists ) {
+            create_keyset(config.app_id, 'Bronze - '+process.env.USER).then( result => {
+                console.log('Created Bronze Keys!');
+                config.bronze_key_id = result.result.id;
+            });
+        }
+
         if(gold){
             config.key_id = config.gold_key_id;
             console.log( 'Deploying to Gold environment!' );
-        } else {
+        } else if (silver) {
             config.key_id = config.silver_key_id;
             console.log( 'Deploying to Silver environment!' );
+        } else {
+            config.key_id = config.bronze_key_id;
+            console.log( 'Deploying to Bronze environment!' );
         }
 
         return list_blocks(config.key_id);
@@ -268,6 +295,9 @@ function generate() {
         crypted += cipher.final('hex');
         fs.writeFileSync('./keys.aes', crypted,'utf8');
         console.log('Keys Encrypted');
+        return;
+    }).then( () => {
+        process.exit()
     });
 }
 
@@ -406,11 +436,11 @@ function list_blocks(key_id) {
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Get list of all apps
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function list_apps(owner_id) {
+function list_apps(account_id) {
     return http({
         method  : 'GET'
     ,   json    : true
-    ,   uri     : `https://admin.pubnub.com/api/apps?owner_id=${owner_id}`
+    ,   uri     : `https://admin.pubnub.com/api/apps?owner_id=${account_id}`
     ,   headers : { 'X-Session-Token' : config.login.token}
     }).catch( error => {
         console.error( 'error', error );
@@ -540,7 +570,8 @@ function librato_annotate_deploy() {
         apikeys.librato.email + ":" + apikeys.librato.secret
     ).toString("base64");
 
-    let desc = '(SILVER)'
+    let desc = '(BRONZE)';
+    if (silver) desc = '(SILVER)';
     if (gold) desc = '(GOLD)';
 
     return http({
@@ -589,6 +620,32 @@ function pubnub_login( email, password ) {
     ,   body   : { 'email' : email, 'password' : password }
     ,   json   : true
     }).catch( error => {
+        console.error( 'error', error );
+    } );
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Login to PubNub
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function get_account_id( user_id ) {
+    return http({
+        method  : 'GET'
+    ,   uri    : `https://admin.pubnub.com/api/accounts?user_id=${user_id}`
+    ,   headers : { 'X-Session-Token' : config.login.token }
+    ,   json    : true
+    })
+    .then( result => {
+        if ( result.result.accounts.length > 1 ) {
+            var msg = `User ${apikeys.pubnub.email} has multiple accounts. `+
+            `Please specify Open Growth Account in your Keys file under `+
+            `pubnub.accountId`;
+            console.log(msg);
+            process.exit();
+        } else {
+            return result.result.accounts[0].id;
+        }
+    })
+    .catch( error => {
         console.error( 'error', error );
     } );
 }

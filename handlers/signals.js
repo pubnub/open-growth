@@ -60,9 +60,6 @@ export default request => {
         }).then( () => {
             request.message.processed.completed = true;
             return request.ok();
-        })
-        .catch( () => {
-            return request.abort();
         });
     }
 
@@ -71,7 +68,7 @@ export default request => {
     // using MonkeyLearn if a description is available
     let customer = {};
     // Clearbit lookup
-    opengrowth.customer.getDataFromClearbit(email)
+    return opengrowth.customer.getDataFromClearbit(email)
     .then( clearbitCustomerData => {
         // Enrich the customer object with ClearBit data
         return opengrowth.customer.enrich(
@@ -100,6 +97,7 @@ export default request => {
             "logs": opengrowth.logs
         };
 
+        console.log('tostore',toStore);
         return kvdb.set(email, toStore);
     })
     .then( () => {
@@ -108,12 +106,10 @@ export default request => {
     })
     .then( () => {
         request.message.processed.completed = true;
-    })
-    .catch( () => {
-        return request.abort();
+        return request.ok();
     });
     
-    return request.ok();
+
 };
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

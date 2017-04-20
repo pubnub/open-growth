@@ -13,7 +13,7 @@ opengrowth.modules.monkeylearn.classify = ( input, classifier ) => {
     // B64 Encode Auth Header
     const libauth = `token ${opengrowth.keys.monkeylearn.apikey}`;
     const domain  = 'api.monkeylearn.com';
-    const data    = { "text_list" : [input] }
+    const data    = { "text_list" : [input] };
     const url     = 'https://' + domain +
                     '/v2/classifiers/' + classifier +
                     '/classify/';
@@ -26,19 +26,19 @@ opengrowth.modules.monkeylearn.classify = ( input, classifier ) => {
         ,   headers : { 'Authorization' : libauth }
         } ).then( res => {
             if ( res.status >= 200 && res.status < 300 ) {
-                //console.log("MonkeyLearn Response:\n", res );
+                // console.log("MonkeyLearn Response:\n", res );
                 opengrowth.log("monkeylearn", "xhr", res.status);
                 resolve(JSON.parse(res.body).result[0][0]);
             }
             else {
-                console.log("MonkeyLearn Error:\n", res );
+                // console.log("MonkeyLearn Error:\n", res );
                 opengrowth.log("monkeylearn", "xhr", res, true);
-                reject();
+                resolve({});
             }
         } ).catch( err => {
             console.log("MonkeyLearn Error:\n", err );
             opengrowth.log("monkeylearn", "xhr", err, true);
-            reject();
+            resolve({});
         } );
     } );
 };

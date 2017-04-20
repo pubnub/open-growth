@@ -3,12 +3,14 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.customer = {};
 opengrowth.customer.getDataFromClearbit = ( email ) => {
-  return opengrowth.modules.clearbit.lookup(email)
-  .then( res => {
-      return res.customer || {};
-  })
-  .catch( err => {
-      return {};
+  return new Promise ( ( resolve, reject ) => {
+    opengrowth.modules.clearbit.lookup(email)
+    .then( res => {
+        resolve(res.customer || {});
+    })
+    .catch( err => {
+        resolve({});
+    });
   });
 };
 
@@ -31,7 +33,7 @@ opengrowth.customer.enrich = ( customerData, clearbitData ) => {
       "description" : description || customerData.description,
       "usecase"     : customerData.usecase
     };
-
+    
     resolve(customer);
   });
 };
@@ -42,14 +44,16 @@ opengrowth.customer.enrich = ( customerData, clearbitData ) => {
 opengrowth.customer.getUseCase = ( customer ) => {
   return new Promise( ( resolve, reject ) => {
 
-    if ( !customer.description ) resolve(null);
+    if ( !customer.description ) {
+      resolve(null);
+    } else {
+      opengrowth.modules.monkeylearn.classify(
+        customer.description,
+        opengrowth.keys.monkeylearn.usecase_classifier
+      ).then( usecase => resolve(usecase) )
+      .catch( err     => resolve(null) );
+    }
 
-    // TODO: use the key from the keys file for the classifier
-    opengrowth.modules.monkeylearn.classify(
-        description,
-        usecase_classifier
-    ).then( usecase => { resolve(usecase) })
-    .catch( err     => { resolve(null) });
   });
 };
 

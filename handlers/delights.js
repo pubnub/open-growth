@@ -63,16 +63,19 @@ export default request => {
     }
 
     // @if !GOLD
-    // No Duplication on Silver 
-    message.dedup = false;
+    // No deduplication on testing envs 
+    message.dedupe = false;
     // @endif
 
     // Get Saved Clearbit / Customer Data
-    return kvdb.get(email).then( stored => {
+    return kvdb.get(email)
+    .then( stored => {
+        stored = stored ? stored : {};
+
         let customer    = stored.customer;
         opengrowth.logs = opengrowth.logs.concat(stored.logs || []); 
         // Run any.js for '*'
-        //opengrowth.signals['*']( customer, signal );
+        opengrowth.signals['*']( customer, signal );
 
         // We don't want to send the same Delight twice!
         // Check for Duplicate Delight Signal
@@ -81,7 +84,7 @@ export default request => {
         return kvdb.get(duplicate_key).then( duplicate => {
             // Duplicate Detected 
             // Abort and Track in Librato
-            if ( duplicate && !(message.dedup === false) ) {
+            if ( duplicate && !(message.dedupe === false) ) {
                 opengrowth.track.delight(
                     `duplicate.${signal}`
                 ,   signal
@@ -100,7 +103,6 @@ export default request => {
                 return kvdb.set( duplicate_key, true, duplicate_ttl ).then( () => {
                     // Run the signal's delight handler 
                     // This is in /signals/ directory
-                    console.log('opengrowth.signals',opengrowth.signals);
                     return opengrowth.signals[signal]( request, customer )
                     .then(() => {
                         return opengrowth.modules.librato(opengrowth.libratoUpdates);
