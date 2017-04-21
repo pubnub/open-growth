@@ -64,12 +64,13 @@ export default request => {
     }
 
     // Enrich the Customer Data with Clearbit
-    // Attempt to determine the company's Use Case
-    // using MonkeyLearn if a description is available
+    // Attempt to determine the company's Use Case using MonkeyLearn
     let customer = {};
+
     // Clearbit lookup
     return opengrowth.customer.getDataFromClearbit(email)
     .then( clearbitCustomerData => {
+
         // Enrich the customer object with ClearBit data
         return opengrowth.customer.enrich(
             initialCustomerData,
@@ -77,6 +78,7 @@ export default request => {
         );
     })
     .then( enrichedCustomer => {
+
         // ClearBit Data takes precedence over signup data
         customer = enrichedCustomer;
 
@@ -97,7 +99,6 @@ export default request => {
             "logs": opengrowth.logs
         };
 
-        console.log('tostore',toStore);
         return kvdb.set(email, toStore);
     })
     .then( () => {

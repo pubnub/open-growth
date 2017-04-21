@@ -3,7 +3,7 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.modules.librato = ( libratoUpdates ) => {
     // Skip if missing your Librato API Keys
-    if (!opengrowth.keys.librato.email || !opengrowth.keys.librato.secret)
+    if ( !opengrowth.keys.librato.email || !opengrowth.keys.librato.secret )
         return (new Promise()).resolve('Librato disabled. No API Key.');
 
     let apiUrl = 'https://metrics-api.librato.com/v1/metrics';
@@ -32,33 +32,28 @@ opengrowth.modules.librato = ( libratoUpdates ) => {
         opengrowth.keys.librato.email
     ,   opengrowth.keys.librato.secret
     );
-
-    // Create Auth Header
-    const headers = {
-        'Authorization' : libauth
-    ,   'Content-Type'  : 'application/x-www-form-urlencoded'
-    };
-
-    const body = {
-        "method"  : 'POST'
-    ,   "body"    : data
-    ,   "headers" : headers
-    };
-
     // Send Recording to Librato
-    return xhr.fetch( apiUrl, body )
-    .then((res) => {
+    return xhr.fetch( apiUrl, {
+        "method"  : 'POST',
+        "body"    : data,
+        "headers" : {
+            "Authorization" : libauth,
+            "Content-Type"  : "application/x-www-form-urlencoded"
+        },
+        "timeout" : 5000
+    } )
+    .then( res => {
         if ( res.status >= 200 && res.status < 300 ) {
-            //console.log("Librato Response:\n", res );
+            // console.log("Librato Response:\n", res );
             opengrowth.log("librato", "xhr", res.status);
         }
         else {
-            console.log("Librato Error:\n", res );
+            // console.log("Librato Error:\n", res );
             opengrowth.log("librato", "xhr", res, true);
         }
     })
-    .catch((err) => {
-        console.log("Librato Error:\n", err );
+    .catch( err => {
+        // console.log("Librato Error:\n", err );
         opengrowth.log("librato", "xhr", err, true);
     });
 };

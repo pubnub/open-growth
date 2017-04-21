@@ -46,7 +46,7 @@ opengrowth.delight.sendwithus.email = ( request ) => {
     // post email
     return xhr.fetch( apiurl, swuRequest ).then( (res) => {
         if ( res.status >= 200 && res.status < 300 ) {
-            //console.log( "SendWithUs Response:\n" + JSON.stringify(res));
+            // console.log( "SendWithUs Response:\n" + JSON.stringify(res));
             opengrowth.log("sendwithus.email", "xhr", res.status);
         }
         else {

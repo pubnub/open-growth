@@ -26,17 +26,8 @@ export default request => {
     opengrowth.logs = [];
     opengrowth.libratoUpdates = {};
 
-    // TODO special track signal 'reaction' for extra metrics
-    // TODO send to SQL DB
-
-    // TODO Augment/Extend the User Profile in the KV Entry
-    //      with all new keys supplied in the signal data
-    //      so we have a progressively built profile.
-    //      Right now it's just overriding the existing customer.
-
-    // Unhandled Signals
-    if (!opengrowth.signals[signal]) {
-        opengrowth.track.signal( `unhandled.${signal}`, message );
+    // Common final tasks for this event handler, to be call last
+    let done = () => {
         return opengrowth.modules.librato(opengrowth.libratoUpdates)
         .then(() => {
             return opengrowth.publishLogs();
@@ -44,22 +35,21 @@ export default request => {
             request.message.processed.completed = true;
             return request.ok();
         });
+    };
+
+    // Unhandled Signals
+    if ( !opengrowth.signals[signal] ) {
+        opengrowth.track.signal( `unhandled.${signal}`, message );
+        return done();
     }
 
     // When processing a Non-delight
     // such as running ./signals/import.js then
     // we don't need to lookup a customer record
-    if (!email) {
+    if ( !email ) {
         //opengrowth.track.signal( `no-email.${signal}`, message );
         return opengrowth.signals[signal]( request )
-        .then(() => {
-            return opengrowth.modules.librato(opengrowth.libratoUpdates);
-        }).then(() => {
-            return opengrowth.publishLogs();
-        }).then(() => {
-            request.message.processed.completed = true;
-            return request.ok();
-        });
+        .then( () => { return done() });
     }
 
     // @if !GOLD
@@ -73,14 +63,14 @@ export default request => {
         stored = stored ? stored : {};
 
         let customer    = stored.customer;
-        opengrowth.logs = opengrowth.logs.concat(stored.logs || []); 
-        // Run any.js for '*'
-        opengrowth.signals['*']( customer, signal );
+        opengrowth.logs = opengrowth.logs.concat(stored.logs || []);
 
         // We don't want to send the same Delight twice!
         // Check for Duplicate Delight Signal
         const duplicate_key = `delight-${signal}-${email}`;
-        const duplicate_ttl = request.message.ttl || 720/*hour*/ * 60/*min*/;
+        // Set TTL of 720 hours
+        const duplicate_ttl = request.message.ttl || 720 * 60;
+
         return kvdb.get(duplicate_key).then( duplicate => {
             // Duplicate Detected 
             // Abort and Track in Librato
@@ -90,32 +80,20 @@ export default request => {
                 ,   signal
                 ,   customer
                 );
-                return opengrowth.modules.librato(opengrowth.libratoUpdates)
-                .then(() => {
-                    return opengrowth.publishLogs();
-                }).then(() => {
-                    request.message.processed.completed = true;
-                    return request.ok();
-                });
+                return done();
             } else {
                 // Record Activity so we can prevent future duplicates
                 // Then run the signal's delight handler.
-                return kvdb.set( duplicate_key, true, duplicate_ttl ).then( () => {
+                return kvdb.set( duplicate_key, true, duplicate_ttl )
+                .then( () => {
                     // Run the signal's delight handler 
                     // This is in /signals/ directory
                     return opengrowth.signals[signal]( request, customer )
-                    .then(() => {
-                        return opengrowth.modules.librato(opengrowth.libratoUpdates);
-                    }).then(() => {
-                        return opengrowth.publishLogs();
-                    }).then(() => {
-                        request.message.processed.completed = true;
-                        return request.ok();
-                    });
-                } );
+                    .then( () => { return done() });
+                });
             }
-        } );
-    } );
+        });
+    });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -132,3 +110,4 @@ opengrowth.modules = {};
 // Signals
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.signals = {};
+

@@ -50,9 +50,7 @@ opengrowth.signals.signup = ( request, customer ) => {
         "x-smtpapi" : header
       }
     };
-
-    console.log('sendWithUsPostBody :',sendWithUsPostBody);
-
+    
     // Send Email and Track Delight in Librato
     return opengrowth.delight.sendwithus.email(sendWithUsPostBody);
 };

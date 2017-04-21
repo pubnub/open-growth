@@ -5,12 +5,8 @@ opengrowth.customer = {};
 opengrowth.customer.getDataFromClearbit = ( email ) => {
   return new Promise ( ( resolve, reject ) => {
     opengrowth.modules.clearbit.lookup(email)
-    .then( res => {
-        resolve(res.customer || {});
-    })
-    .catch( err => {
-        resolve({});
-    });
+    .then(  res => resolve(res.customer || {}) )
+    .catch( err => resolve({}) );
   });
 };
 
@@ -33,7 +29,7 @@ opengrowth.customer.enrich = ( customerData, clearbitData ) => {
       "description" : description || customerData.description,
       "usecase"     : customerData.usecase
     };
-    
+
     resolve(customer);
   });
 };
@@ -43,17 +39,16 @@ opengrowth.customer.enrich = ( customerData, clearbitData ) => {
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.customer.getUseCase = ( customer ) => {
   return new Promise( ( resolve, reject ) => {
-
+    let useCaseClassifierId = opengrowth.keys.monkeylearn.usecase_classifier;
     if ( !customer.description ) {
       resolve(null);
     } else {
       opengrowth.modules.monkeylearn.classify(
         customer.description,
-        opengrowth.keys.monkeylearn.usecase_classifier
+        useCaseClassifierId
       ).then( usecase => resolve(usecase) )
       .catch( err     => resolve(null) );
     }
-
   });
 };
 
