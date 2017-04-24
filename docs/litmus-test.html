@@ -143,13 +143,13 @@
     }
        
     pubnub.addListener({
-        status: function ( statusEvent ) {
+        "status" : function ( statusEvent ) {
             if (statusEvent.category === "PNConnectedCategory") {
                 showPublishButton();
                 _status.innerHTML = "Connected to PubNub";
             }
         },
-        message: function ( message ) {
+        "message" : function ( message ) {
             if ( message.message['litmusEmailsSent'] ) {
                 sentEmailCount++;
                 _status.innerHTML = sentEmailCount + " Emails Successfully Sent";
@@ -158,7 +158,7 @@
     });
 
     pubnub.subscribe({
-        channels: ['litmus'] 
+        channels: ['litmus-ingress','litmus-egress'] 
     });
   };
 
