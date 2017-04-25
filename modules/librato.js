@@ -3,8 +3,9 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.modules.librato = ( libratoUpdates ) => {
     // Skip if missing your Librato API Keys
-    if ( !opengrowth.keys.librato.email || !opengrowth.keys.librato.secret )
-        return (new Promise()).resolve('Librato disabled. No API Key.');
+    if ( !opengrowth.keys.librato.email || !opengrowth.keys.librato.secret ) {
+        return Promise.resolve('Librato disabled. No API Key.');
+    }
 
     let apiUrl = 'https://metrics-api.librato.com/v1/metrics';
 
@@ -40,7 +41,7 @@ opengrowth.modules.librato = ( libratoUpdates ) => {
             "Authorization" : libauth,
             "Content-Type"  : "application/x-www-form-urlencoded"
         },
-        "timeout" : 5000
+        //"timeout" : 2500
     } )
     .then( res => {
         if ( res.status >= 200 && res.status < 300 ) {

@@ -1,4 +1,4 @@
-opengrowth.signals.blockexpired = ( request, customer ) => {
+opengrowth.signals.block_expiration_handler = ( request, customer ) => {
     const user = request.message;
     const csm  = user.csm || {};
     const csm_bccs = csm && csm.bccs ? csm.bccs : [];
@@ -15,7 +15,7 @@ opengrowth.signals.blockexpired = ( request, customer ) => {
           `${block.user_id}/account/${block.account_id}/app/${block.app_id}` +
           `/key/${block.app_key_id}/block/${block.block_id}/event_handlers`);
     }
-    
+
     var template_data = {
         "customer_first_name" : customer.firstName
       , "customer_last_name"  : customer.lastName
@@ -34,20 +34,27 @@ opengrowth.signals.blockexpired = ( request, customer ) => {
     let fe = opengrowth.keys.sendgrid.group.feature_enable;
     let ug = opengrowth.keys.sendgrid.group.usage_info;
 
+    let template = user.signal;
+    let tag      = "og_" + template;
+
     var sendWithUsPostBody = {
-      "template": opengrowth.keys.swu.templates.blockexpired,
+      "template": opengrowth.keys.swu.templates[template],
       "recipient": {
         "name": customer.firstName,
         "address": email
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "og_blockexpired" ],
+      "tags" : [tag],
       "headers" : {
-        "x-smtpapi" : `{\"asm_group_id\":${lw},\"asm_groups_to_display\": [${lw},${df},${fe},${ug}],\"category\":[\"og_blockexpired\"]}`
+        "x-smtpapi" : `{\"asm_group_id\":${lw},\"asm_groups_to_display\": [${lw},${df},${fe},${ug}],\"category\":[\"${tag}\"]}`
       }
     };
 
     // Send Email and Track Delight in Librato
     return opengrowth.delight.sendwithus.email(sendWithUsPostBody);
 };
+
+opengrowth.signals.block1day    = opengrowth.signals.block_expiration_handler;
+opengrowth.signals.block3day    = opengrowth.signals.block_expiration_handler;
+opengrowth.signals.blockexpired = opengrowth.signals.block_expiration_handler;

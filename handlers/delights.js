@@ -6,94 +6,79 @@ var opengrowth = {};
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Libs
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-const xhr    = require('xhr');
-const kvdb   = require('kvstore');
-const auth   = require('codec/auth');
-const base64 = require('codec/base64');
-const crypto = require('crypto');
-const pubnub = require('pubnub');
-const query  = require('codec/query_string');
+const xhr      = require('xhr');
+const kvdb     = require('kvstore');
+const auth     = require('codec/auth');
+const base64   = require('codec/base64');
+const crypto   = require('crypto');
+const pubnub   = require('pubnub');
+const query    = require('codec/query_string');
+const Response = require('response');
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Open Growth Delights Handler
+// Open Growth Delights Event Handler - After Publish or Fire
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 export default request => {
-    const message = request.message;
-    const signal  = message.signal;
-    const email   = message.email;
+    console.log(request.message);
+    const message  = request.message;
+    const signal   = message.signal;
+    const email    = message.email;
+    const customer = message.customer;
 
     // Gets published to logging channel at the end of After Publish EH
-    opengrowth.logs = [];
-    opengrowth.libratoUpdates = {};
+    opengrowth.logs = message.logs || [];
+    opengrowth.rtmUpdates = message.rtmUpdates || {};
 
-    // Common final tasks for this event handler, to be call last
+    // Common tasks to perform at the end of this event handler
     let done = () => {
-        return opengrowth.modules.librato(opengrowth.libratoUpdates)
-        .then(() => {
-            return opengrowth.publishLogs();
-        }).then(() => {
+        return opengrowth.publishLogs()
+        .then( () => {
             request.message.processed.completed = true;
             return request.ok();
         });
     };
 
-    // Unhandled Signals
+    // Track if this is an unhandled Signal
     if ( !opengrowth.signals[signal] ) {
         opengrowth.track.signal( `unhandled.${signal}`, message );
         return done();
     }
 
-    // When processing a Non-delight
-    // such as running ./signals/import.js then
-    // we don't need to lookup a customer record
-    if ( !email ) {
-        //opengrowth.track.signal( `no-email.${signal}`, message );
-        return opengrowth.signals[signal]( request )
-        .then( () => { return done() });
+    // Track if this is a duplicate customer Delight Signal
+    // complete the execution without sending the Delight
+    if ( message.kvRecord && !( message.dedupe === false ) ) {
+        opengrowth.track.delight(
+            `duplicate.${signal}`,
+            signal,
+            customer
+        );
+        return done();
     }
 
-    // @if !GOLD
-    // No deduplication on testing envs 
-    message.dedupe = false;
-    // @endif
+    // Execute signal right away if it is not a customer specific delight
+    // No need to track it in KV Store for Deduplication
+    if ( !email ) {
+        return opengrowth.signals[signal](request)
+        .then(done);
+    }
 
-    // Get Saved Clearbit / Customer Data
-    return kvdb.get(email)
-    .then( stored => {
-        stored = stored ? stored : {};
+    // Record Delight in KV Store to prevent sending a customer
+    // the same delight more than once
+    const delightRecordkey = `delight-${signal}-${email}`;
 
-        let customer    = stored.customer;
-        opengrowth.logs = opengrowth.logs.concat(stored.logs || []);
+    // Set TTL of 1 month
+    const delightRecordTtl = request.message.ttl || 720 * 60;
 
-        // We don't want to send the same Delight twice!
-        // Check for Duplicate Delight Signal
-        const duplicate_key = `delight-${signal}-${email}`;
-        // Set TTL of 720 hours
-        const duplicate_ttl = request.message.ttl || 720 * 60;
-
-        return kvdb.get(duplicate_key).then( duplicate => {
-            // Duplicate Detected 
-            // Abort and Track in Librato
-            if ( duplicate && !(message.dedupe === false) ) {
-                opengrowth.track.delight(
-                    `duplicate.${signal}`
-                ,   signal
-                ,   customer
-                );
-                return done();
-            } else {
-                // Record Activity so we can prevent future duplicates
-                // Then run the signal's delight handler.
-                return kvdb.set( duplicate_key, true, duplicate_ttl )
-                .then( () => {
-                    // Run the signal's delight handler 
-                    // This is in /signals/ directory
-                    return opengrowth.signals[signal]( request, customer )
-                    .then( () => { return done() });
-                });
-            }
-        });
-    });
+    return kvdb.set(delightRecordkey, true, delightRecordTtl)
+    .then( storeError => {
+        if ( storeError ) {
+            opengrowth.log("KvStore", "Set Failure", storeError, true);
+        }
+        else {
+            return opengrowth.signals[signal]( request, customer );
+        }
+    })
+    .then(done);
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

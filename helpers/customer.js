@@ -14,24 +14,22 @@ opengrowth.customer.getDataFromClearbit = ( email ) => {
 // Overwrites Signup Data with ClearBit Data
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.customer.enrich = ( customerData, clearbitData ) => {
-  return new Promise( ( resolve, reject ) => {
-    let firstName   = opengrowth.customer.getFirstName(clearbitData);
-    let lastName    = opengrowth.customer.getLastName(clearbitData);
-    let company     = opengrowth.customer.getCompany(clearbitData);
-    let description = opengrowth.customer.getDescription(clearbitData);
+  let firstName   = opengrowth.customer.getFirstName(clearbitData);
+  let lastName    = opengrowth.customer.getLastName(clearbitData);
+  let company     = opengrowth.customer.getCompany(clearbitData);
+  let description = opengrowth.customer.getDescription(clearbitData);
 
-    let customer = {
-      "email"       : customerData.email,
-      "firstName"   : firstName   || customerData.firstName,
-      "lastName"    : lastName    || customerData.lastName,
-      "phone"       : customerData.phone,
-      "company"     : company     || customerData.company,
-      "description" : description || customerData.description,
-      "usecase"     : customerData.usecase
-    };
+  let customer = {
+    "email"       : customerData.email,
+    "firstName"   : firstName   || customerData.firstName,
+    "lastName"    : lastName    || customerData.lastName,
+    "phone"       : customerData.phone,
+    "company"     : company     || customerData.company,
+    "description" : description || customerData.description,
+    "usecase"     : customerData.usecase
+  };
 
-    resolve(customer);
-  });
+  return customer;
 };
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

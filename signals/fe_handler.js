@@ -44,13 +44,11 @@ opengrowth.signals.feature_enable_handler = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ tag ],
+      "tags" : [tag],
       "headers" : {
         "x-smtpapi" : `{\"asm_group_id\":${fe},\"asm_groups_to_display\": [${lw},${df},${fe},${ug}],\"category\":[\"${tag}\"]}`
       }
     };
-
-    console.log(sendWithUsPostBody);
 
     // Send Email and Track Delight in Librato
     return opengrowth.delight.sendwithus.email(sendWithUsPostBody);

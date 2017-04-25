@@ -2,14 +2,12 @@
 // Lookup Customers with Clearbit
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.modules.clearbit = {};
-opengrowth.modules.clearbit.lookup = (email) => {
-
+opengrowth.modules.clearbit.lookup = email => {
     // Skip if missing API Keys
-    if (!opengrowth.keys.clearbit.apikey) {
-        return (new Promise()).resolve({
-            "email"   : email,
-            "message" : 'Clearbit disabled. No API Key.'
-        });
+    if ( !opengrowth.keys.clearbit.apikey ) {
+        console.log("Clearbit Error:\n", "Missing API Key");
+        opengrowth.log("clearbit", "xhr", "Missing API Key", true);
+        return Promise.resolve({});
     }
 
     // B64 Encode Auth Header
@@ -19,10 +17,16 @@ opengrowth.modules.clearbit.lookup = (email) => {
 
     // Get Customer Bio
     return new Promise( ( resolve, reject ) => {
+        let errorHandler = err => {
+            console.log("Clearbit Error:\n", err);
+            opengrowth.log("clearbit", "xhr", err, true);
+            resolve({});
+        };
+
         xhr.fetch( requestUrl, {
             "method"  : 'GET',
-            "headers" : { 'Authorization' : libauth },
-            "timeout" : 5000
+            "headers" : { 'Authorization' : libauth }
+            //,"timeout" : 2500
         }).then( res => {
             if ( res.status >= 200 && res.status < 300 ) {
                 // console.log("Clearbit Response:\n", res);
@@ -33,15 +37,9 @@ opengrowth.modules.clearbit.lookup = (email) => {
                 });
             }
             else {
-                // console.log("Clearbit Error:\n", res);
-                opengrowth.log("clearbit", "xhr", res, true);
-                resolve({});
+                errorHandler(res);
             }
-        }).catch( err => {
-            // console.log("Clearbit Error:\n", err);
-            opengrowth.log("clearbit", "xhr", err, true);
-            resolve({});
-        });
+        }).catch(errorHandler);
     } );
 
 };
