@@ -1,3 +1,5 @@
+// Tracks SendGrid Updates from the Heroku sendgrid_analytics generator
+
 opengrowth.signals.sendgrid_analytics = ( request ) => {
     // Tracks status of an email sent to a customer through SendGrid
     const categoryEvent = ( action ) => {

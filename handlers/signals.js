@@ -24,7 +24,7 @@ export default request => {
     if ( request.params.sendgrid_analytics ) {
         request.message = {
             "signal"  : "sendgrid_analytics",
-            "actions" : request.message
+            "actions" : Object.assign({}, request.message)
         };
     }
 
