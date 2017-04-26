@@ -1,4 +1,4 @@
-opengrowth.signals.signup_handler = ( request, customer ) => {
+opengrowth.signals.signup_drip_handler = ( request, customer ) => {
     const user = request.message;
     const csm  = user.csm || {};
     const csm_bccs = csm && csm.bccs ? csm.bccs : [];
@@ -52,6 +52,6 @@ opengrowth.signals.signup_handler = ( request, customer ) => {
     return opengrowth.delight.sendwithus.email(sendWithUsPostBody);
 };
 
-opengrowth.signals.signup = opengrowth.signals.signup_handler;
-opengrowth.signals.day3   = opengrowth.signals.signup_handler;
-opengrowth.signals.day7   = opengrowth.signals.signup_handler;
+opengrowth.signals.signup = opengrowth.signals.signup_drip_handler;
+opengrowth.signals.day3   = opengrowth.signals.signup_drip_handler;
+opengrowth.signals.day7   = opengrowth.signals.signup_drip_handler;
