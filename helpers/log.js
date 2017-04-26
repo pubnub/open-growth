@@ -2,17 +2,11 @@
 // Append a log entry to the list of logs
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.log = ( type, event, message, isError ) => {
-    if ( message instanceof Error ) {
-        message = message.toString();
-    }
-    else if ( message instanceof Response ) {
-        //message = JSON.parse(JSON.stringify(message));
-        message = {
-            "body"    : message.body,
-            "headers" : message.headers,
-            "url"     : message.url,
-            "status"  : message.status
-        };
+
+    // No need to log buffers of API responses
+    if ( message.constructor === Object ) {
+        delete message['buffer'];
+        delete message['$buffer'];
     }
 
     let log = {

@@ -31,3 +31,11 @@ opengrowth.track.reaction = ( reaction, data ) => {
     opengrowth.log(reaction, "reaction", data);
     return track(`reactions.${reaction}`);
 };
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Track Errors
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+opengrowth.track.error = ( type, error ) => {
+	opengrowth.log(type, "error", error, true);
+    return track(`error.${type}`);
+};

@@ -13,7 +13,6 @@ const base64   = require('codec/base64');
 const crypto   = require('crypto');
 const pubnub   = require('pubnub');
 const query    = require('codec/query_string');
-const Response = require('response');
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Open Growth Signals Event Handler - Before Publish or Fire

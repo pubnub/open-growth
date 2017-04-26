@@ -13,7 +13,6 @@ const base64   = require('codec/base64');
 const crypto   = require('crypto');
 const pubnub   = require('pubnub');
 const query    = require('codec/query_string');
-const Response = require('response');
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Open Growth Delights Event Handler - After Publish or Fire
@@ -30,6 +29,11 @@ export default request => {
 
     // Common tasks to perform at the end of this event handler
     let done = () => {
+        opengrowth.log(
+            "librato",
+            "rtmUpdates",
+            Object.assign({}, opengrowth.rtmUpdates)
+        );
         return opengrowth.publishLogs()
         .then( () => {
             request.message.processed.completed = true;
@@ -71,7 +75,7 @@ export default request => {
     return kvdb.set(delightRecordkey, true, delightRecordTtl)
     .then( storeError => {
         if ( storeError ) {
-            opengrowth.log("KvStore", "Set Failure", storeError, true);
+            opengrowth.track.error(`kvstore.failure`, storeError);
         }
         else {
             return opengrowth.signals[signal]( request, customer );
