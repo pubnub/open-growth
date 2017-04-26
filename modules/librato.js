@@ -23,9 +23,14 @@ opengrowth.modules.librato = ( libratoUpdates ) => {
         index++;
     }
     
-    // @if !GOLD
-    // Mark gauges from testing instance with 'silver'
+    // @if SILVER
+    // Mark gauges from this testing instance with 'silver'
     data = data.replace(/opengrowth\./g,'opengrowth.silver.');
+    // @endif
+
+    // @if BRONZE
+    // Mark gauges from this testing instance with 'bronze'
+    data = data.replace(/opengrowth\./g,'opengrowth.bronze.');
     // @endif
 
     // B64 Encode Auth Header
@@ -33,28 +38,34 @@ opengrowth.modules.librato = ( libratoUpdates ) => {
         opengrowth.keys.librato.email
     ,   opengrowth.keys.librato.secret
     );
+
     // Send Recording to Librato
-    return xhr.fetch( apiUrl, {
-        "method"  : 'POST',
-        "body"    : data,
-        "headers" : {
-            "Authorization" : libauth,
-            "Content-Type"  : "application/x-www-form-urlencoded"
-        },
-        //"timeout" : 2500
-    } )
-    .then( res => {
-        if ( res.status >= 200 && res.status < 300 ) {
-            // console.log("Librato Response:\n", res );
-            opengrowth.log("librato", "xhr", res.status);
-        }
-        else {
-            // console.log("Librato Error:\n", res );
-            opengrowth.log("librato", "xhr", res, true);
-        }
-    })
-    .catch( err => {
-        // console.log("Librato Error:\n", err );
-        opengrowth.log("librato", "xhr", err, true);
+    return new Promise( ( resolve, reject ) => {
+        let errorHandler = err => {
+            // console.log("Librato Error:\n", err);
+            let error = err ? err.body || err.statusText || err.status : null;
+            opengrowth.log("librato", "xhr", error, true);
+            resolve({});
+        };
+
+        xhr.fetch( apiUrl, {
+            "method"  : 'POST',
+            "body"    : data,
+            "headers" : {
+                "Authorization" : libauth,
+                "Content-Type"  : "application/x-www-form-urlencoded"
+            },
+            "timeout" : 6000
+        })
+        .then( res => {
+            if ( res.status >= 200 && res.status < 300 ) {
+                // console.log("Librato Response:\n", res );
+                opengrowth.log("librato", "xhr", res.status);
+            }
+            else {
+                errorHandler(res);
+            }
+        })
+        .catch(errorHandler);
     });
 };

@@ -12,10 +12,11 @@ const crypto     = require('crypto');
 const readline   = require('readline');
 const args       = process.argv.slice(2);
 
-let apikeys      = {};
-let config       = {};
-let silver       = false;
-let gold         = false;
+let apikeys = {};
+let config  = {};
+let silver  = false;
+let gold    = false;
+let bronze  = false;
 
 // TODO - GET/MAKE BLOCK labled 'Open Growth'
 // TODO - ...
@@ -45,12 +46,15 @@ switch(args[0]){
         break;
     case '--silver':
         silver = true;
+        deploy();
+        break;
     default:
+        bronze = true;
         deploy();
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Deploy to blocks gold or silver
+// Deploy to blocks gold, silver, or bronze - user
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function deploy(){
     prompt('Password: ').then(password =>{
@@ -328,7 +332,7 @@ function build_signals() {
         //,   './delights/*.js'
         //,   './signals/*.js'
         ])
-        .pipe( preprocess( { context: { GOLD: gold } } ) )
+        .pipe( preprocess( { context: { GOLD: gold, SILVER: silver, BRONZE: bronze } } ) )
         .on( 'end',   data  => { resolve(buffer + keys) } )
         .on( 'error', error => { reject(error)          } )
         .on( 'data',  bytes => {
@@ -351,7 +355,7 @@ function build_delights() {
         ,   './delights/*.js'
         ,   './signals/*.js'
         ])
-        .pipe( preprocess( { context: { GOLD: gold } } ) )
+        .pipe( preprocess( { context: { GOLD: gold, SILVER: silver, BRONZE: bronze } } ) )
         .on( 'end',   data  => { resolve(buffer + keys) } )
         .on( 'error', error => { reject(error)          } )
         .on( 'data',  bytes => {

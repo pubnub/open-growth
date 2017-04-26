@@ -19,14 +19,13 @@ const Response = require('response');
 // Open Growth Delights Event Handler - After Publish or Fire
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 export default request => {
-    console.log(request.message);
     const message  = request.message;
     const signal   = message.signal;
     const email    = message.email;
     const customer = message.customer;
 
-    // Gets published to logging channel at the end of After Publish EH
-    opengrowth.logs = message.logs || [];
+    // Gets published to logging channel during done()
+    opengrowth.logs       = message.logs || [];
     opengrowth.rtmUpdates = message.rtmUpdates || {};
 
     // Common tasks to perform at the end of this event handler
@@ -45,7 +44,7 @@ export default request => {
     }
 
     // Track if this is a duplicate customer Delight Signal
-    // complete the execution without sending the Delight
+    // complete logging without resending the Delight
     if ( message.kvRecord && !( message.dedupe === false ) ) {
         opengrowth.track.delight(
             `duplicate.${signal}`,
@@ -79,7 +78,7 @@ export default request => {
         }
     })
     .then(done);
-}
+};
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Ways to Connect with your Customers
@@ -95,4 +94,3 @@ opengrowth.modules = {};
 // Signals
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.signals = {};
-

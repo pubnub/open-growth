@@ -2,7 +2,7 @@
 // Customer Data Enrichment Functions
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.customer = {};
-opengrowth.customer.getDataFromClearbit = ( email ) => {
+opengrowth.customer.clearbitLookup = ( email ) => {
   return new Promise ( ( resolve, reject ) => {
     opengrowth.modules.clearbit.lookup(email)
     .then(  res => resolve(res.customer || {}) )

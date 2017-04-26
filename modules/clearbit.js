@@ -18,16 +18,18 @@ opengrowth.modules.clearbit.lookup = email => {
     // Get Customer Bio
     return new Promise( ( resolve, reject ) => {
         let errorHandler = err => {
-            console.log("Clearbit Error:\n", err);
-            opengrowth.log("clearbit", "xhr", err, true);
+            // console.log("Clearbit Error:\n", err);
+            let error = err ? err.body || err.statusText || err.status : null;
+            opengrowth.log("clearbit", "xhr", error, true);
             resolve({});
         };
 
         xhr.fetch( requestUrl, {
             "method"  : 'GET',
-            "headers" : { 'Authorization' : libauth }
-            //,"timeout" : 2500
-        }).then( res => {
+            "headers" : { 'Authorization' : libauth },
+            "timeout" : 6000
+        })
+        .then( res => {
             if ( res.status >= 200 && res.status < 300 ) {
                 // console.log("Clearbit Response:\n", res);
                 opengrowth.log("clearbit", "xhr", res.status);
@@ -39,8 +41,8 @@ opengrowth.modules.clearbit.lookup = email => {
             else {
                 errorHandler(res);
             }
-        }).catch(errorHandler);
-    } );
-
+        })
+        .catch(errorHandler);
+    });
 };
 

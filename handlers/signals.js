@@ -19,7 +19,6 @@ const Response = require('response');
 // Open Growth Signals Event Handler - Before Publish or Fire
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 export default request => {
-    console.log('executing the before handler - signals');
     // Accept incoming email analytics from SendGrid.com
     // move the POST body to the "actions" property in the message
     if ( request.params.sendgrid_analytics ) {
@@ -54,27 +53,25 @@ export default request => {
     // Real-time monitoring updates configured for Librato by default
     opengrowth.rtmUpdates = {};
 
-    // Record the signal
-    opengrowth.track.signal(signal, message);
+    // Record the signal, pass message by copy
+    opengrowth.track.signal(signal, Object.assign({}, message));
 
     // Track in-line Processed Flag
     request.message.processed = { started: true };
 
     // Common tasks to perform at the end of this event handler
     let done = () => {
-        console.log('done');
-        console.log(opengrowth.logs);
         request.message.logs = opengrowth.logs;
         request.message.rtmUpdates = opengrowth.rtmUpdates;
         request.message.processed.completed = true;
         return request.ok();
     };
 
-    // If there is no email address, we can't enrich with ClearBit
+    // If there is no email address, we can't enrich with Clearbit
     // Continue to the After Event Handler
     if ( !email ) return done();
 
-    // Enrich the Customer Data with Clearbit
+    // Enrich the Customer Data with Clearbit,
     // Attempt to determine the company's Use Case using MonkeyLearn
     let customer = {};
 
@@ -85,17 +82,16 @@ export default request => {
         request.message.kvRecord = duplicate;
         if ( duplicate && !( message.dedupe === false ) ) {
             // Abort, this is a duplicate signal
-            // the After EH will record the activity
+            // the After EH will record activity
             return done();
         }
         else {
             // Clearbit lookup
-            return opengrowth.customer.getDataFromClearbit(email);
+            return opengrowth.customer.clearbitLookup(email);
         }
     })
     .then( clearbitCustomerData => {
-    console.log('clearbitCustomerData ',!!clearbitCustomerData);
-        // Enrich the customer object with ClearBit data
+        // Enrich the customer object with Clearbit data
         customer = opengrowth.customer.enrich(
             initialCustomerData,
             clearbitCustomerData
@@ -106,7 +102,6 @@ export default request => {
         return opengrowth.customer.getUseCase(customer);
     })
     .then( useCase => {
-        console.log('useCase ',useCase);
 
         // Set use case if MonkeyLearn determined it
         if ( useCase ) {

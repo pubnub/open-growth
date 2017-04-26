@@ -21,26 +21,29 @@ opengrowth.modules.monkeylearn.classify = ( input, classifier ) => {
 
     // Get Data
     return new Promise( ( resolve, reject ) => {
+        let errorHandler = err => {
+            // console.log("MonkeyLearn Error:\n", err);
+            let error = err ? err.body || err.statusText || err.status : null;
+            opengrowth.log("monkeylearn", "xhr", error, true);
+            resolve({});
+        };
+
         xhr.fetch( url, {
             "method"  : 'POST',
             "body"    : data,
-            "headers" : { 'Authorization' : libauth }
-            // ,"timeout" : 2500
-        }).then( res => {
+            "headers" : { 'Authorization' : libauth },
+            "timeout" : 6000
+        })
+        .then( res => {
             if ( res.status >= 200 && res.status < 300 ) {
                 // console.log("MonkeyLearn Response:\n", res );
                 opengrowth.log("monkeylearn", "xhr", res.status);
                 resolve(JSON.parse(res.body).result[0][0]);
             }
             else {
-                console.log("MonkeyLearn Error:\n", res);
-                opengrowth.log("monkeylearn", "xhr", res, true);
-                resolve({});
+                errorHandler(res);
             }
-        }).catch( err => {
-            console.log("MonkeyLearn Error:\n", err);
-            opengrowth.log("monkeylearn", "xhr", err, true);
-            resolve({});
-        });
-    } );
+        })
+        .catch(errorHandler);
+    });
 };
