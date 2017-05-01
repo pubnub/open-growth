@@ -39,6 +39,8 @@ module.exports = function ( app ) {
 
     app.post( '/sendgrid', function( request, response ) {
 
+        console.log(request.body);
+        
         var actions = [];
         for ( var action of request.body ) {
             //Track Unsubscribes via SendGrid
