@@ -7,7 +7,7 @@ opengrowth.signals.sendgrid_updates = request => {
   const ogCategoryPrepend = "og_";
 
   // We don't want to track activity for email addresses that contain this
-  const default_bcc = "open-growth-activity";
+  const default_bcc = opengrowth.keys.pubnub.bcc;
 
   // For tracking purposes
   const delightName = "sendwithus.email";

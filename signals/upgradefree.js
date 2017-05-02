@@ -20,8 +20,11 @@ opengrowth.signals.upgrade_free = ( request, customer ) => {
       , "sub_key"             : user.sub_key
     };
       
+    let template = user.signal;
+    let tag      = "og_" + template;
+
     var sendWithUsPostBody = {
-      "template": opengrowth.keys.swu.templates.upgrade_free,
+      "template": opengrowth.keys.swu.templates[template],
       "recipient": {
         "name": customer.firstName,
         "address": email
@@ -32,7 +35,7 @@ opengrowth.signals.upgrade_free = ( request, customer ) => {
         "reply_to": csm.email
       },
       "template_data": template_data,
-      "tags" : [ "og_upgrade_free" ]
+      "tags" : [tag]
     };
 
     // Send Email and Track Delight in Librato

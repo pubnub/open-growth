@@ -14,22 +14,28 @@ opengrowth.signals.usage = ( request, customer ) => {
       , "graph_url"           : user.url
     };
 
+    // TODO: Remove x-smtpapi header when New Unsubscribe is complete or SendWithUs is replaced
     let lw = opengrowth.keys.sendgrid.group.limit_warning;
     let df = opengrowth.keys.sendgrid.group.default;
     let fe = opengrowth.keys.sendgrid.group.feature_enable;
     let ug = opengrowth.keys.sendgrid.group.usage_info;
 
+    let template = user.signal;
+    let tag      = "og_" + template;
+
+    let xsmtpapi = `{\"asm_group_id\":${lw},\"asm_groups_to_display\": [${lw},${df},${fe},${ug}],\"category\":[\"${tag}\"]}`;
+
     var sendWithUsPostBody = {
-      "template": opengrowth.keys.swu.templates.usage,
+      "template": opengrowth.keys.swu.templates[template],
       "recipient": {
         "name": customer.firstName,
         "address": email
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [ "og_usage" ],
+      "tags" : [tag],
       "headers" : {
-        "x-smtpapi" : `{\"asm_group_id\":${lw},\"asm_groups_to_display\": [${lw},${df},${fe},${ug}],\"category\":[\"og_usage\"]}`
+        "x-smtpapi" : xsmtpapi
       }
     };
 
