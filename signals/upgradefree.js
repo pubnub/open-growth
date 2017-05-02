@@ -4,7 +4,7 @@ opengrowth.signals.upgrade_free = ( request, customer ) => {
     const csm_bccs = csm && csm.bccs ? csm.bccs : [];
     let email  = user.litmus || 'open-growth-activity+silver@pubnub.com';
     // @if GOLD
-    email = csm.email;
+    email = user.email;
     // @endif
     
     var template_data = {

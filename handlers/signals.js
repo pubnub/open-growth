@@ -22,8 +22,8 @@ export default request => {
     // move the POST body to the "actions" property in the message
     if ( request.params.sendgrid_analytics ) {
         request.message = {
-            "signal"  : "sendgrid_analytics",
-            "actions" : Object.assign({}, request.message)
+            "signal"  : "sendgrid_updates",
+            "actions" : request.message.slice(0)
         };
     }
 

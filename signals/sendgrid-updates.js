@@ -1,6 +1,7 @@
 // Tracks SendGrid Updates directly from SendGrid POST
 
-opengrowth.signals.sendgrid_updates = ( request ) => {
+opengrowth.signals.sendgrid_updates = request => {
+  let message = request.message;
 
   // All SendGrid category tags on emails sent by Open Growth contain this
   const ogCategoryPrepend = "og_";
@@ -29,33 +30,30 @@ opengrowth.signals.sendgrid_updates = ( request ) => {
       let kv = parameters.split(/&|=/);
       let link = kv[0] || "";
       return link;
-  }
+  };
 
   // Returns the category of email signal indicated by the SendGrid event
   // Returns false if the event is not from an Open Growth email
   const getOgCategoryTag = action => {
     let result = false;
 
-    if ( action.category.constructor === Array ) {
-      for ( category of action.category ) {
-        if ( category.constructor === String &&
-             category.indexOf(ogCategoryPrepend) < 0 ) {
-          result = category;
+    if ( Array.isArray(action.category) ) {
+      for ( let category of action.category ) {
+        if ( typeof category === 'string' &&
+             category.indexOf(ogCategoryPrepend) === 0 ) {
+          result = category.substring(3);
           break;
         }
       }
-    }
-
-    if ( action.category.constructor === String &&
-         category.indexOf(ogCategoryPrepend) < 0 ) {
-      result = action.category;
+    } else if ( action.category.indexOf(ogCategoryPrepend) === 0 ) {
+      result = action.category.substring(3);
     }
 
     return result;
   };
 
   // Parses Reaction data for logs
-  const getLogMessage = ( action ) => {
+  const getLogMessage = action => {
     let log = {
       "contact" : action.email
     , "delight" : delightName
@@ -71,7 +69,7 @@ opengrowth.signals.sendgrid_updates = ( request ) => {
   };
 
   // Track event of a SendGrid email
-  const track = ( action ) => {
+  const track = action => {
     let rtmString = `sendgrid_updates.${action.category}.${action.event}`;
     if ( action.url ) {
       rtmString = `sendgrid_updates.${action.category}.click.${action.url}`;
@@ -87,7 +85,7 @@ opengrowth.signals.sendgrid_updates = ( request ) => {
   // To configure this is the SendGrid Dashboard, go to:
   // Settings -> Mail Settings -> Event Notification
   // Set the HTTP POST URL to your OG instance and signal channel
-  for ( action of request.actions ) {
+  for ( let action of message.actions ) {
 
     let category = getOgCategoryTag(action);
 
@@ -98,7 +96,7 @@ opengrowth.signals.sendgrid_updates = ( request ) => {
 
     let formattedAction = {
       "email"    : action.email,
-      "category" : action.category,
+      "category" : category,
       "event"    : action.event
     };
 
@@ -109,4 +107,5 @@ opengrowth.signals.sendgrid_updates = ( request ) => {
     track(formattedAction);
   }
 
+  return Promise.resolve();
 };
