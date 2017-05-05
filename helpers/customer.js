@@ -3,11 +3,9 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.customer = {};
 opengrowth.customer.clearbitLookup = ( email ) => {
-  return new Promise ( ( resolve, reject ) => {
-    opengrowth.modules.clearbit.lookup(email)
-    .then(  res => resolve(res.customer || {}) )
-    .catch( err => resolve({}) );
-  });
+  return opengrowth.modules.clearbit.lookup(email)
+    .then(  res => Promise.resolve(res.customer || {}) )
+    .catch( err => Promise.resolve({}) );
 };
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -36,18 +34,16 @@ opengrowth.customer.enrich = ( customerData, clearbitData ) => {
 // Provides a Use Case from MonkeyLearn based on a company description
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.customer.getUseCase = ( customer ) => {
-  return new Promise( ( resolve, reject ) => {
-    let useCaseClassifierId = opengrowth.keys.monkeylearn.usecase_classifier;
-    if ( !customer.description ) {
-      resolve(null);
-    } else {
-      opengrowth.modules.monkeylearn.classify(
-        customer.description,
-        useCaseClassifierId
-      ).then( usecase => resolve(usecase) )
-      .catch( err     => resolve(null) );
-    }
-  });
+  let useCaseClassifierId = opengrowth.keys.monkeylearn.usecase_classifier;
+  if ( !customer.description ) {
+    Promise.resolve(null);
+  } else {
+    opengrowth.modules.monkeylearn.classify(
+      customer.description,
+      useCaseClassifierId
+    ).then( usecase => Promise.resolve(usecase) )
+    .catch( err     => Promise.resolve(null) );
+  }
 };
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

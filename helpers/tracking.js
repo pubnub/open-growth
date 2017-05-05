@@ -2,7 +2,7 @@
 // Analytical Tracking of Delights
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.track = {};
-const track = key => {
+const track = ( key ) => {
     // Increment KV Counters
     let count = opengrowth.rtmUpdates[`opengrowth.${key}`];
     opengrowth.rtmUpdates[`opengrowth.${key}`] = count ? count+1 : 1;

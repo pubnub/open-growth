@@ -17,7 +17,7 @@ const query    = require('codec/query_string');
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Open Growth Signals Event Handler - Before Publish or Fire
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-export default request => {
+export default ( request ) => {
     // Accept incoming email analytics from SendGrid.com
     // move the POST body to the "actions" property in the message
     if ( request.params.sendgrid_analytics ) {
@@ -68,7 +68,9 @@ export default request => {
 
     // If there is no email address, we can't enrich with Clearbit
     // Continue to the After Event Handler
-    if ( !email ) return done();
+    if ( !email ) {
+        return done();
+    }
 
     // Enrich the Customer Data with Clearbit,
     // Attempt to determine the company's Use Case using MonkeyLearn
@@ -77,19 +79,19 @@ export default request => {
     // Check for duplicate signal to prevent customers
     // receiving duplicate delights
     return kvdb.get(email, `delight-${signal}-${email}`)
-    .then( duplicate => {
+    .then( ( duplicate ) => {
         request.message.kvRecord = duplicate;
         if ( duplicate && !( message.dedupe === false ) ) {
-            // Abort, this is a duplicate signal
+            // Abort, this is a duplicate delight signal
             // the After EH will record activity
-            return done();
+            throw 'Duplicate Customer Delight!';
         }
         else {
             // Clearbit lookup
             return opengrowth.customer.clearbitLookup(email);
         }
     })
-    .then( clearbitCustomerData => {
+    .then( ( clearbitCustomerData ) => {
         // Enrich the customer object with Clearbit data
         customer = opengrowth.customer.enrich(
             initialCustomerData,
@@ -100,18 +102,19 @@ export default request => {
         // any company description is available
         return opengrowth.customer.getUseCase(customer);
     })
-    .then( useCase => {
+    .then( ( useCase ) => {
 
         // Set use case if MonkeyLearn determined it
         if ( useCase ) {
             customer.useCase = useCase;
         }
-
+        
         // Store customer data in message body
         request.message.customer = customer;
 
         return done();
-    });
+    })
+    .catch(done);
 };
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

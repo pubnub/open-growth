@@ -17,7 +17,7 @@ const query    = require('codec/query_string');
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Open Growth Delights Event Handler - After Publish or Fire
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-export default request => {
+export default ( request ) => {
     const message  = request.message;
     const signal   = message.signal;
     const email    = message.email;
@@ -32,7 +32,7 @@ export default request => {
         opengrowth.log(
             "librato",
             "rtmUpdates",
-            Object.assign({}, opengrowth.rtmUpdates)
+            opengrowth.rtmUpdates
         );
         return opengrowth.publishLogs()
         .then( () => {
@@ -73,9 +73,9 @@ export default request => {
     const delightRecordTtl = request.message.ttl || 720 * 60;
 
     return kvdb.set(delightRecordkey, true, delightRecordTtl)
-    .then( storeError => {
+    .then( ( storeError ) => {
         if ( storeError ) {
-            opengrowth.track.error(`kvstore.failure`, storeError);
+            opengrowth.track.error('kvstore.failure', storeError);
         }
         else {
             return opengrowth.signals[signal]( request, customer );
