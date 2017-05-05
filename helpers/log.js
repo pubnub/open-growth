@@ -4,7 +4,7 @@
 opengrowth.log = ( type, event, message, isError ) => {
 
     // No need to log buffers of API responses
-    if ( message.constructor === Object ) {
+    if ( message && message.constructor === Object ) {
         delete message['buffer'];
         delete message['$buffer'];
     }

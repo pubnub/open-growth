@@ -21,7 +21,7 @@ opengrowth.signals.email_signal_handler = ( request, customer ) => {
     if ( user.blocks ) {
       for ( let block of request.message.blocks ) {
           blocks_name_array.push(`${block.block_name}`);
-          blocks_url_array.push(`https://admin.pubnub.com/#/user/` +
+          blocks_url_array.push('https://admin.pubnub.com/#/user/' +
             `${block.user_id}/account/${block.account_id}/app/${block.app_id}` +
             `/key/${block.app_key_id}/block/${block.block_id}/event_handlers`);
       }
@@ -51,16 +51,33 @@ opengrowth.signals.email_signal_handler = ( request, customer ) => {
       , "anchor_url"          : display_url
     };
 
-    // TODO: Remove x-smtpapi header when New Unsubscribe is complete or SendWithUs is replaced
+    // TODO: Remove when New Unsubscribe is complete or SendWithUs is replaced
     let lw = opengrowth.keys.sendgrid.group.limit_warning;
     let df = opengrowth.keys.sendgrid.group.default;
     let fe = opengrowth.keys.sendgrid.group.feature_enable;
     let ug = opengrowth.keys.sendgrid.group.usage_info;
 
-    let unsubscribe_group = user.unsubscribe_group || "default";
+    // TODO: Remove when New Unsubscribe is complete or SendWithUs is replaced
+    let unsubscribe_groups = {
+        "signup"                    : "default"
+      , "day3"                      : "default"
+      , "day7"                      : "default"
+      , "upgrade_free"              : null
+      , "uuid"                      : "feature_enable"
+      , "usage"                     : "usage_info"
+      , "block1day"                 : "limit_warning"
+      , "block3day"                 : "limit_warning"
+      , "blockexpired"              : "limit_warning"
+      , "enable_realtime_analytics" : "feature_enable"
+      , "enable_history"            : "feature_enable"
+      , "enable_apns"               : "feature_enable"
+      , "enable_multiplexing"       : "feature_enable"
+      , "enable_uls"                : "feature_enable"
+      , "enable_presence"           : "feature_enable"
+    };
 
     // TODO: Remove when New Unsubscribe is complete or SendWithUs is replaced
-    let current = opengrowth.keys.sendgrid.group[user.unsubscribe_group];
+    let current = opengrowth.keys.sendgrid.group[unsubscribe_groups[user.signal]];
 
     let template = user.signal;
     let tag      = "og_" + template;
@@ -76,19 +93,17 @@ opengrowth.signals.email_signal_handler = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": csm_bccs,
-      "tags" : [tag],
+      "tags" : [ tag ],
       "headers" : {
         "x-smtpapi" : xsmtpapi
       }
     };
 
-    // TODO: Remove when New Unsubscribe is complete or SendWithUs is replaced
-    if ( !current ) {
-      delete sendWithUsPostBody.headers;
-    }
-
     // Upgrade Free
     if ( user.signal === 'upgrade_free' ) {
+      // TODO: remove the delete statement after New Unsubscribe is complete or SendWithUs is replaced
+      // Remove unsubscribe link if the email is from the CSM
+      delete sendWithUsPostBody.headers;
       sendWithUsPostBody.sender = {
         "name": csm.first_name + " " + csm.last_name,
         "address": csm.email,
@@ -100,20 +115,19 @@ opengrowth.signals.email_signal_handler = ( request, customer ) => {
     return opengrowth.delight.sendwithus.email(sendWithUsPostBody);
 };
 
-opengrowth.signals.signup = opengrowth.signals.email_signal_handler;
-opengrowth.signals.day3 = opengrowth.signals.email_signal_handler;
-opengrowth.signals.day7 = opengrowth.signals.email_signal_handler;
-opengrowth.signals.usage = opengrowth.signals.email_signal_handler;
-opengrowth.signals.block1day = opengrowth.signals.email_signal_handler;
-opengrowth.signals.block3day = opengrowth.signals.email_signal_handler;
-opengrowth.signals.blockexpired = opengrowth.signals.email_signal_handler;
+opengrowth.signals.signup              = opengrowth.signals.email_signal_handler;
+opengrowth.signals.day3                = opengrowth.signals.email_signal_handler;
+opengrowth.signals.day7                = opengrowth.signals.email_signal_handler;
+opengrowth.signals.block1day           = opengrowth.signals.email_signal_handler;
+opengrowth.signals.block3day           = opengrowth.signals.email_signal_handler;
+opengrowth.signals.blockexpired        = opengrowth.signals.email_signal_handler;
 opengrowth.signals.enable_multiplexing = opengrowth.signals.email_signal_handler;
-opengrowth.signals.enable_presence = opengrowth.signals.email_signal_handler;
-opengrowth.signals.enable_uls = opengrowth.signals.email_signal_handler;
-opengrowth.signals.enable_apns = opengrowth.signals.email_signal_handler;
-opengrowth.signals.enable_history = opengrowth.signals.email_signal_handler;
+opengrowth.signals.enable_presence     = opengrowth.signals.email_signal_handler;
+opengrowth.signals.enable_uls          = opengrowth.signals.email_signal_handler;
+opengrowth.signals.enable_apns         = opengrowth.signals.email_signal_handler;
+opengrowth.signals.enable_history      = opengrowth.signals.email_signal_handler;
 opengrowth.signals.enable_realtime_analytics = opengrowth.signals.email_signal_handler;
 // opengrowth.signals.enable_lms = opengrowth.signals.email_signal_handler;
-opengrowth.signals.upgrade_free = opengrowth.signals.email_signal_handler;
-opengrowth.signals.usage = opengrowth.signals.email_signal_handler;
-opengrowth.signals.uuid = opengrowth.signals.email_signal_handler;
+opengrowth.signals.upgrade_free        = opengrowth.signals.email_signal_handler;
+opengrowth.signals.usage               = opengrowth.signals.email_signal_handler;
+opengrowth.signals.uuid                = opengrowth.signals.email_signal_handler;

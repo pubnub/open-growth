@@ -50,12 +50,12 @@ opengrowth.delight.sendwithus.email = ( request ) => {
             opengrowth.log("sendwithus.email", "xhr", res.status);
         }
         else {
-            console.log("SendWithUs Error:\n" + res);
+            console.log("SendWithUs Error:\n" + JSON.stringify(res));
             opengrowth.log("sendwithus.email", "xhr", res, true);
         }
     })
     .catch( err => {
-        console.log("SendWithUs Error:\n" + err);
+        console.log("SendWithUs Error:\n" + JSON.stringify(err));
         opengrowth.log("sendwithus.email", "xhr", err, true);
     } );
 };

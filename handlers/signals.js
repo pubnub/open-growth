@@ -28,8 +28,11 @@ export default ( request ) => {
     }
 
     // @if !GOLD
-    // No deduplication on testing envs 
-    request.message.dedupe = false;
+    // No deduplication on testing envs
+    // Must be explicitly set to false to disable deduplication
+    if ( request.message.dedupe !== true ) {
+        request.message.dedupe = false;
+    }
     // @endif
 
     const message = request.message;
@@ -78,12 +81,13 @@ export default ( request ) => {
 
     // Check for duplicate signal to prevent customers
     // receiving duplicate delights
-    return kvdb.get(email, `delight-${signal}-${email}`)
+    return kvdb.get(`delight-${signal}-${email}`)
     .then( ( duplicate ) => {
         request.message.kvRecord = duplicate;
         if ( duplicate && !( message.dedupe === false ) ) {
             // Abort, this is a duplicate delight signal
             // the After EH will record activity
+            opengrowth.log("signals", "duplicate", "duplicate_delight", true);
             throw 'Duplicate Customer Delight!';
         }
         else {
