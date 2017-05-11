@@ -124,6 +124,9 @@
     });
     
     publishMessage = function ( message ) {
+        message.pubkey = pub;
+        message.subkey = sub;
+
         var publishConfig = {
             "channel" : "litmus",
             "message" : message
@@ -131,7 +134,7 @@
 
         pubnub.publish(publishConfig, function ( theStatus, response ) {
             if ( theStatus.statusCode === 200 ) {
-                _status.innerHTML = "Getting Previous Prod Publishes (takes about 15s)...";
+                _status.innerHTML = "Getting Previous Prod Publishes...";
             }
             else {
                 _status.innerHTML = "Message error: " + response;
@@ -140,13 +143,13 @@
     }
        
     pubnub.addListener({
-        status: function ( statusEvent ) {
+        "status" : function ( statusEvent ) {
             if (statusEvent.category === "PNConnectedCategory") {
                 showPublishButton();
                 _status.innerHTML = "Connected to PubNub";
             }
         },
-        message: function ( message ) {
+        "message" : function ( message ) {
             if ( message.message['litmusEmailsSent'] ) {
                 sentEmailCount++;
                 _status.innerHTML = sentEmailCount + " Emails Successfully Sent";
@@ -155,7 +158,7 @@
     });
 
     pubnub.subscribe({
-        channels: ['litmus'] 
+        channels: ['litmus-ingress','litmus-egress'] 
     });
   };
 

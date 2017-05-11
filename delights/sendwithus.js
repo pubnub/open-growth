@@ -42,20 +42,20 @@ opengrowth.delight.sendwithus.email = ( request ) => {
     , "bccs"     : request.bcc
     , "category" : request.tags[0] || "none"
     } );
-    
+
     // post email
     return xhr.fetch( apiurl, swuRequest ).then( (res) => {
         if ( res.status >= 200 && res.status < 300 ) {
-            //console.log( "SendWithUs Response:\n" + JSON.stringify(res));
+            // console.log( "SendWithUs Response:\n" + JSON.stringify(res));
             opengrowth.log("sendwithus.email", "xhr", res.status);
         }
         else {
-            console.log("SendWithUs Error:\n" + res);
+            console.log("SendWithUs Error:\n" + JSON.stringify(res));
             opengrowth.log("sendwithus.email", "xhr", res, true);
         }
     })
     .catch( err => {
-        console.log("SendWithUs Error:\n" + err);
+        console.log("SendWithUs Error:\n" + JSON.stringify(err));
         opengrowth.log("sendwithus.email", "xhr", err, true);
     } );
 };
