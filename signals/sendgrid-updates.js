@@ -15,18 +15,16 @@ opengrowth.signals.sendgrid_updates = ( request ) => {
 
   // Returns a string of the link type that was clicked in an email
   const getUrlLabel = ( url ) => {
-    var delimiter;
+    let link = 'unlabeled';
 
-    if ( url.indexOf("link=") > -1 ) {
-        delimiter = "link=";
-    }
-    else {
-        return "unlabeled";
+    let urlParts = url.split('?');
+
+    if ( urlParts.length === 2 ) {
+      let utms = urlParts[1];
+      let paramsObject = query.parse(utms);
+      link = paramsObject.link || link;
     }
 
-    var parameters = url.split("link=")[1];
-    var kv = parameters.split(/&/);
-    var link = kv[0];
     return link;
   };
 
