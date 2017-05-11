@@ -15,16 +15,18 @@ opengrowth.signals.sendgrid_updates = ( request ) => {
 
   // Returns a string of the link type that was clicked in an email
   const getUrlLabel = ( url ) => {
-    let link = 'unlabeled';
+    var delimiter;
 
-    let urlParts = parameters.split('?');
-
-    if ( urlParts.length === 2 ) {
-      utms = urlParts[1];
-      paramsObject = query.parse(utms);
-      link = paramsObject.link || link;
+    if ( url.indexOf("link=") > -1 ) {
+        delimiter = "link=";
+    }
+    else {
+        return "unlabeled";
     }
 
+    var parameters = url.split("link=")[1];
+    var kv = parameters.split(/&/);
+    var link = kv[0];
     return link;
   };
 
@@ -33,13 +35,17 @@ opengrowth.signals.sendgrid_updates = ( request ) => {
   const getOgCategoryTag = ( action ) => {
     let result = false;
 
-    if ( typeof action === 'string' ) action = [ action ];
+    if ( action.category ) {
+      if ( typeof action.category === 'string' ){
+        action.category = [ action.category ];
+      }
 
-    for ( let category of action.category ) {
-      if ( typeof category === 'string' &&
-           category.indexOf(ogCategoryPrepend) === 0 ) {
-        result = category.substring(3);
-        break;
+      for ( let category of action.category ) {
+        if ( typeof category === 'string' &&
+             category.indexOf(ogCategoryPrepend) === 0 ) {
+          result = category.substring(3);
+          break;
+        }
       }
     }
 
@@ -72,6 +78,7 @@ opengrowth.signals.sendgrid_updates = ( request ) => {
     opengrowth.track.reaction(rtmString, 'event-webhook');
 
     let message = getLogMessage(action);
+
     opengrowth.log(delightName, 'reaction', message);
   };
 
@@ -79,6 +86,7 @@ opengrowth.signals.sendgrid_updates = ( request ) => {
   // To configure this is the SendGrid Dashboard, go to:
   // Settings -> Mail Settings -> Event Notification
   // Set the HTTP POST URL to your OG instance and signal channel
+  
   for ( let action of message.actions ) {
 
     let category = getOgCategoryTag(action);
