@@ -24,20 +24,14 @@ opengrowth.delight.sendgrid.email = ( request ) => {
         ,   "substitutions" : request.substitutions
         } ]
     };
-
-    //add BCCs for SalesForce and activity email list
+    
     if ( !request.bccs || !request.bccs.length ) {
-        data.personalizations[0].bcc = [];
+        delete data.personalizations[0].bcc;
     }
-
-    //add BCCs
-    request.bcc = request.bccs.concat([
-        { "email": opengrowth.keys.salesforce.bcc },
-        { "email": opengrowth.keys.pubnub.bcc }
-    ]);
 
     //add content if not using a template on sendgrid
     if ( request.message ) {
+        data.subject = request.subject;
         data.content = [ { "type" : "text/html", "value" : request.message } ];
         delete data.personalizations.substitutions;
         delete data.template_id;
@@ -61,19 +55,22 @@ opengrowth.delight.sendgrid.email = ( request ) => {
     , "category" : request.categories[0]
     } );
 
+    let errorHandler = ( err ) => {
+        console.log("SendGrid Error:\n", err);
+        let error = err ? err.body || err.statusText || err.status : null;
+        opengrowth.log("sendgrid.email", "xhr", error, true);
+    };
+
     // post email
-    return xhr.fetch( apiurl, sendgridRequest ).then( (res) => {
+    return xhr.fetch( apiurl, sendgridRequest )
+    .then( ( res ) => {
         if ( res.status >= 200 && res.status < 300 ) {
             //console.log( "SendGrid Response:\n" + JSON.stringify(res));
             opengrowth.log("sendgrid.email", "xhr", res.status);
         }
         else {
-            console.log("SendGrid Error:\n" + res);
-            opengrowth.log("sendgrid.email", "xhr", res, true);
+            errorHandler(res);
         }
     })
-    .catch( err => {
-        console.log( "SendGrid Error:\n" + err );
-        opengrowth.log("sendgrid.email", "xhr", err, true);
-    } );
+    .catch(errorHandler);
 };

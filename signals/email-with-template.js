@@ -4,7 +4,7 @@
 opengrowth.signals.emailWithTemplate = ( request, customer ) => {
     const message = request.message;
     let email  = customer.email || message.email;
-    let bcc    = ""; // Set to your SalesForce tracking BCC
+    let bcc    = null; // Set to your SalesForce tracking BCC
 
     // Send as a template to SendWithUs with SendGrid
     let template_data = {
@@ -13,7 +13,7 @@ opengrowth.signals.emailWithTemplate = ( request, customer ) => {
       , "company_name"        : customer.company
     };
 
-    let template = user.signal;
+    let template = message.signal;
 
     let sendWithUsPostBody = {
       "template": opengrowth.keys.swu.templates[template],
@@ -23,7 +23,7 @@ opengrowth.signals.emailWithTemplate = ( request, customer ) => {
       },
       "template_data": template_data,
       "bcc": bcc,
-      "tags" : [ "signup" ],
+      "tags" : [ "og_c_signup" ],
       "sender" : {
         "name": "Neumann",
         "address": "neumann@mycompany.com",
