@@ -8,14 +8,14 @@ The signal can be published to [PubNub](https://www.pubnub.com/) using one of th
 
 ```javascript
 {
-  “signal” : “signup”,
-  “email” : customer@customer.com
+  "signal" : "signup",
+  "email" : "customer@customer.com"
 }
 ```
 
 The message you send to PubNub will be changed in transit by the BLOCKS you choose to implement. You can enrich the customer data, decide the content of your email, and finally send the email itself.
 
-We can accomplish this with a [XHR](https://www.pubnub.com/docs/blocks/xhr-module) to Clearbit, MonkeyLearn, and SendGrid.
+We can accomplish this with a [XHR](https://www.pubnub.com/docs/blocks/xhr-module) to **Clearbit**, **MonkeyLearn**, and **SendGrid**.
 
  * [Clearbit](https://clearbit.com/) is used to find a customer’s name, place of work, industry, and other important details, by merely providing the email address.
 
