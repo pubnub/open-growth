@@ -1,5 +1,9 @@
 # Open Growth Signals and Delights
 
+**Signal** - An indication of a task that needs to be done automatically using Open Growth
+
+**Delight** - A method of outreach to your customer i.e. email, text, tweet, special delivery of cake :cake:
+
 The core vision of Open Growth is to automate tedious workforce tasks and give humans more time to work on the big picture. Open Growth’s **Signals** and **Delights** are an excellent resource to automate email correspondence with your vast customer base. A lone developer can get an automatic email system up and running in a few minutes using Open Growth. We will explain how to set up an automatic email to your newest customers when they sign up for your service.
 
 First, there needs to be a source of the emails you send. We will call this a **Signal Generator**. The Signal Generator needs to collect customer information, like email address and name (if available), and publish the Signal to Open Growth. This can be accomplished by a program that automatically runs every so often using a service like [Cron](https://en.wikipedia.org/wiki/Cron). The program can query your customer database for any new sign ups, and publish a message to your PubNub Open Growth instance immediately. 
@@ -13,9 +17,9 @@ The signal can be published to [PubNub](https://www.pubnub.com/) using one of th
 }
 ```
 
-The message you send to PubNub will be changed in transit by the [BLOCKS](https://www.pubnub.com/products/blocks/) you choose to implement. You can enrich the customer data, decide the content of your email, and finally send the email.
+The message you send to PubNub will be enriched in transit by [BLOCKS](https://www.pubnub.com/products/blocks/) and it will be sent to your customer by the **delight** of your choosing `open-growth/delights/`. You can enrich the customer data, decide the content of your email, and finally send the email using the SendGrid or SendWithUs delight.
 
-We can accomplish this with a [XHR](https://www.pubnub.com/docs/blocks/xhr-module) to **Clearbit**, **MonkeyLearn**, and **SendGrid**.
+We can accomplish this with an [XHR](https://www.pubnub.com/docs/blocks/xhr-module) to **Clearbit**, **MonkeyLearn**, and **SendGrid**.
 
  * [Clearbit](https://clearbit.com/) is used to find a customer’s name, place of work, industry, and other important details, by merely providing an email address.
 
@@ -27,7 +31,7 @@ The data enrichment modules should be called in the [signals.js](https://github.
 
 The delight function should be called in the [delights.js](https://github.com/pubnub/open-growth/blob/master/handlers/delights.js) handler, which is an [After Publish or Fire handler](https://www.pubnub.com/docs/blocks/event-handler-types#async-et-after-pub-fire).
 
-In this example, we will make a XHR to Clearbit to get customer name, job title, and company name and then MonkeyLearn to determine this customer’s use case from company description, and/or job title.
+In this example, we will make an XHR to Clearbit to get customer name, job title, and company name and then MonkeyLearn to determine this customer’s use case from company description, and/or job title.
 
 After we have enriched our customer JSON object, we can decide the content of their email based on the signal name. Using logic, we can produce an email body like:
 ```
