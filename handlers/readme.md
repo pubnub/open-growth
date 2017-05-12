@@ -39,7 +39,10 @@ Hi Bob!
 
 Thanks for signing up for our service!
 We see you are a C developer and you work at IOT company.
-Here is a link to our [C SDK](https://www.pubnub.com/docs/posix-c/pubnub-c-sdk) and here is a link to an [Arduino Tutorial](https://www.pubnub.com/docs/arduino/data-streams-publish-and-subscribe).
+Here is a link to our C SDK and here is a link to an Arduino Tutorial.
+
+https://www.pubnub.com/docs/posix-c/pubnub-c-sdk
+https://www.pubnub.com/docs/arduino/data-streams-publish-and-subscribe
 
 Welcome!
 
