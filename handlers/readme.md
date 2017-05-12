@@ -17,7 +17,7 @@ The signal can be published to [PubNub](https://www.pubnub.com/) using one of th
 }
 ```
 
-The message you send to PubNub will be enriched in transit by [BLOCKS](https://www.pubnub.com/products/blocks/) and it will be sent to your customer by the **delight** of your choosing `open-growth/delights/`. You can enrich the customer data, decide the content of your email, and finally send the email using the SendGrid or SendWithUs delight.
+The message you send to PubNub will be enriched in transit by [BLOCKS](https://www.pubnub.com/products/blocks/) and it will be sent to your customer by the **delight** of your choosing (`open-growth/delights/`). You can enrich the customer data, decide the content of your email, and finally send the email using the SendGrid or SendWithUs delight.
 
 We can accomplish this with an [XHR](https://www.pubnub.com/docs/blocks/xhr-module) to **Clearbit**, **MonkeyLearn**, and **SendGrid**.
 
@@ -39,7 +39,7 @@ Hi Bob!
 
 Thanks for signing up for our service!
 We see you are a C developer and you work at IOT company.
-Here is a link to our C SDK and here is a link to an Arduino Tutorial.
+Here is a link to our [C SDK](https://www.pubnub.com/docs/posix-c/pubnub-c-sdk) and here is a link to an [Arduino Tutorial](https://www.pubnub.com/docs/arduino/data-streams-publish-and-subscribe).
 
 Welcome!
 
