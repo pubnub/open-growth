@@ -31,9 +31,11 @@ In this example, we will make an XHR to Clearbit to get customer name, job title
 
 After we have enriched our customer based on just their email address, we can decide the content of their email based on the signal name. Using logic, we can produce an email body like:
 ```
-Hi, Bob!
+Hi Bob!
 
-Thanks for signing up for our service! We see you are a C developer and you work at IOT company. Here is a link to our C SDK and here is a link to an Arduino Tutorial.
+Thanks for signing up for our service!
+We see you are a C developer and you work at IOT company.
+Here is a link to our C SDK and here is a link to an Arduino Tutorial.
 
 Welcome!
 
