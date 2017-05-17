@@ -8,7 +8,7 @@ The core vision of Open Growth is to automate tedious workforce tasks and give h
 
 First, there needs to be a source of the emails you send. We will call this a **Signal Generator**. The Signal Generator needs to collect customer information, like email address and name (if available), and publish the Signal to Open Growth. This can be accomplished by a program that automatically runs every so often using a service like [Cron](https://en.wikipedia.org/wiki/Cron). The program can query your customer database for any new sign ups, and publish a message to your PubNub Open Growth instance immediately. 
 
-The signal can be published to [PubNub](https://www.pubnub.com/) using one of the [70+ SDKs](https://www.pubnub.com/docs), or with a [HTTP POST](https://www.pubnub.com/http-rest-push-api/) request. 
+The signal can be published to [PubNub](https://www.pubnub.com/) using one of the [70+ SDKs](https://www.pubnub.com/docs), or with an [HTTP](https://www.pubnub.com/http-rest-push-api/) request. 
 
 ```javascript
 {
@@ -17,13 +17,13 @@ The signal can be published to [PubNub](https://www.pubnub.com/) using one of th
 }
 ```
 
-The message you send to PubNub will be enriched in transit by [BLOCKS](https://www.pubnub.com/products/blocks/) and it will be sent to your customer by the **delight** of your choosing (`open-growth/delights/`). You can enrich the customer data, decide the content of your email, and finally send the email using the SendGrid or SendWithUs delight.
+The message you send to PubNub will be enriched, in transit, by [BLOCKS](https://www.pubnub.com/products/blocks/) and it will be sent to your customer by the **delight** of your choosing (`open-growth/delights/`). You can enrich the customer data, decide the content of your email, and finally send the email using the SendGrid or SendWithUs delight.
 
 We can accomplish this with an [XHR](https://www.pubnub.com/docs/blocks/xhr-module) to **Clearbit**, **MonkeyLearn**, and **SendGrid**.
 
  * [Clearbit](https://clearbit.com/) is used to find a customer’s name, place of work, industry, and other important details, by merely providing an email address.
 
- * [MonkeyLearn](http://monkeylearn.com/) is used to determine a customer’s use case for your service, by using past customer data and machine learning.
+ * [MonkeyLearn](http://monkeylearn.com/) is a Machine Learning API which we use to determine a customer’s use case for your service, by using past customer data and ML.
 
 * The [SendGrid](https://sendgrid.com/) Delight is used to send the email by plain text, or with a colorful HTML/CSS template.
 
