@@ -3,6 +3,7 @@
 **Signal** - An indication of a task that needs to be done automatically using Open Growth
 
 **Delight** - A method of outreach to your customer i.e. email, text, tweet, special delivery of cake :cake:
+
 See our existing delights in `open-growth/delights/`
 
 The core vision of Open Growth is to automate tedious workforce tasks and give humans more time to work on the big picture. Open Growth’s **Signals** and **Delights** are an excellent resource to automate email correspondence with your vast customer base. A lone developer can get an automatic email system up and running in a few minutes using Open Growth. We will explain how to set up an automatic email to your newest customers when they sign up for your service.
