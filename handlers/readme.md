@@ -21,7 +21,7 @@ The signal can be published to [PubNub](https://www.pubnub.com/) using one of th
 
 The message you send to PubNub will be enriched, in transit, by [BLOCKS](https://www.pubnub.com/products/blocks/) and it will be sent to your customer by the **delight** of your choosing (`open-growth/delights/`). You can enrich the customer data, decide the content of your email, and finally send the email using the SendGrid or SendWithUs delight. If you use a different email API service, you can create your own delight!
 
-We can accomplish this with an [XHR](https://www.pubnub.com/docs/blocks/xhr-module) to **Clearbit**, **MonkeyLearn**, and **SendGrid**.
+We can accomplish automation with an [XHR](https://www.pubnub.com/docs/blocks/xhr-module) to **Clearbit**, **MonkeyLearn**, and **SendGrid**.
 
  * [Clearbit](https://clearbit.com/) is used to find a customer’s name, place of work, industry, and other important details, by **providing only an email address**.
 
