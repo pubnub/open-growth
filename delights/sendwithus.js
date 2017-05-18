@@ -42,7 +42,7 @@ opengrowth.delight.sendwithus.email = ( request ) => {
     , "bccs"     : request.bcc
     , "category" : request.tags[0] || "none"
     } );
-    
+
     // post email
     return xhr.fetch( apiurl, swuRequest ).then( (res) => {
         if ( res.status >= 200 && res.status < 300 ) {
