@@ -44,8 +44,8 @@ opengrowth.signals.signup = ( request, customer ) => {
 
 ```
 
-Open Growth Signal handlers can also listen for signals like [webhooks](https://en.wikipedia.org/wiki/Webhook). If you use SendGrid to send emails, you may want to track the activity of those emails, like delivery, open rate, links clicked, marked as spam, etc. SendGrid offers an [Event Webhook](https://sendgrid.com/docs/API_Reference/Webhooks/event.html). If you enable this feature, SendGrid will periodically send a POST request to a URL of your choosing. The POST body will contain latest email activity.
+Open Growth Signal handlers can also listen for signals like [webhooks](https://en.wikipedia.org/wiki/Webhook). If you use SendGrid to send emails, you may want to track the activity of those emails, like delivery, open rate, links clicked, marked as spam, etc. SendGrid offers an [Event Webhook](https://sendgrid.com/docs/API_Reference/Webhooks/event.html). If you enable this feature, SendGrid will periodically send a POST request to a URL of your choosing. The POST body will contain the latest email activity.
 
-Open Growth has a signal handler to process POSTs for SendGrid's Event Webhook in `open-growth/signals/sendgrid-updates.js`. Any emails that are marked with the category beginning with "og_" are dissected and logged in Open Growth's logs.
+Open Growth has a signal handler to process POSTs for SendGrid's Event Webhook in `open-growth/signals/sendgrid-updates.js`. Any emails that are marked with a [category](https://sendgrid.com/docs/Glossary/categories.html) (or SendWithUs [tag](https://www.sendwithus.com/docs/api#send-an-email)) beginning with "og_" are dissected and logged in Open Growth's logs.
 
 This example of a Webhook endpoint can be used as a guide when writing your own handler for Open Growth. Remember that all files you add to `open-growth/signals/` will be concatenated to your delights.js event handler when you deploy to BLOCKS.
