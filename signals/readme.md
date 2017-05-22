@@ -25,7 +25,7 @@ opengrowth.signals.signup = ( request, customer ) => {
       , "subject"      : "Welcome!"
       , "sender_email" : "neumann@mycompany.com"
       , "reply_email"  : "support@mycompany.com"
-      , "categories"   : [ "og_c_signup" ]
+      , "categories"   : [ "og_signup" ]
       , "bccs"         : [ { "email" : bcc } ]
     };
 

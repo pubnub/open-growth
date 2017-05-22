@@ -22,8 +22,8 @@ opengrowth.signals.emailWithTemplate = ( request, customer ) => {
         "address": email
       },
       "template_data": template_data,
-      "bcc": bcc,
-      "tags" : [ "og_c_signup" ],
+      "bcc": [ { "address": bcc } ],
+      "tags" : [ "og_signup" ],
       "sender" : {
         "name": "Neumann",
         "address": "neumann@mycompany.com",
