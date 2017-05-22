@@ -4,7 +4,8 @@
 opengrowth.signals.signup = ( request, customer ) => {
     const message = request.message;
     let email  = customer.email || message.email;
-    let bcc    = ""; // Set to your SalesForce tracking BCC
+    // Set to your SalesForce tracking BCC or your company tracking BCC
+    let bcc    = "email-tracking@mycompany.com";
 
     let product = "Product";
     let tutorial = "Tutorial";
@@ -14,9 +15,11 @@ opengrowth.signals.signup = ( request, customer ) => {
         "email"        : email
       , "name"         : customer.firstName
       , "subject"      : "Welcome!"
-      , "sender_email" : "neumann@pubnub.com"
-      , "reply_email"  : "support@pubnub.com"
+      , "sender_email" : "neumann@mycompany.com"
+      , "reply_email"  : "support@mycompany.com"
       , "categories"   : [ "og_c_signup" ]
+      , "bccs"         : [ { "email" : bcc } ]
+
       // Include these if you choose to use SendGrid's templates
       // , "template_id"   : opengrowth.keys.sendgrid.templates.signup
       // , "substitutions" : {

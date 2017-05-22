@@ -12,7 +12,8 @@ We prepare our POST body, and then call `opengrowth.delight.sendgrid.email` to s
 opengrowth.signals.signup = ( request, customer ) => {
     const message = request.message;
     let email     = customer.email || message.email;
-    let bcc       = ""; // Set to your tracking email address
+    // Set to your SalesForce tracking BCC or your company tracking BCC
+    let bcc    = "email-tracking@mycompany.com";
 
     let product  = opengrowth.modules.customer.getProduct(customer.usecase);
     let tutorial = opengrowth.modules.customer.getTutorial(customer.jobTitle);
@@ -22,9 +23,10 @@ opengrowth.signals.signup = ( request, customer ) => {
         "email"        : email
       , "name"         : customer.firstName
       , "subject"      : "Welcome!"
-      , "sender_email" : "neumann@company.com"
-      , "reply_email"  : "support@company.com"
-      , "categories"   : [ "og_signup" ]
+      , "sender_email" : "neumann@mycompany.com"
+      , "reply_email"  : "support@mycompany.com"
+      , "categories"   : [ "og_c_signup" ]
+      , "bccs"         : [ { "email" : bcc } ]
     };
 
     // Plain text email with SendGrid
