@@ -6,12 +6,10 @@
 
 The **signals.js** and **delights.js** files in `open-growth/handlers/` are PubNub BLOCKS [Event Handlers](https://www.pubnub.com/docs/blocks/event-handlers). This is the code that is executed when a PubNub message is in transit.
 
-The **Signals Handler** is a [Before Publish or Fire handler](https://www.pubnub.com/docs/blocks/event-handler-types#sync-et-before-pub-fire) and the **Delights Handler** is an [After Publish or Fire handler](https://www.pubnub.com/docs/blocks/event-handler-types#async-et-after-pub-fire).
+The **Signals Handler** is a [Before Publish or Fire handler](https://www.pubnub.com/docs/blocks/event-handler-types#sync-et-before-pub-fire) and the **Delights Handler** is an [After Publish or Fire handler](https://www.pubnub.com/docs/blocks/event-handler-types#async-et-after-pub-fire). The PubNub message that is sent is called a **Signal**. Open Growth processes Signals from your Signal Generator and sends **Delights** to your customers.
 
-The PubNub message that is sent is called a **Signal**. Open Growth processes Signals and sends **Delights** to your customers
-
-In Open Growth, we perform data enrichment in the Signals Handler, and send [Customer Delights](https://github.com/pubnub/open-growth/tree/master/delights) from the Delights Handler.
+With the defualt setup for Open Growth, we perform data enrichment in the Signals Handler, and send [Customer Delights](https://github.com/pubnub/open-growth/tree/master/delights) from the Delights Handler.
 
 Example execution flow for a new sign up:
 
-![open-growth-signal-diagram](http://i.imgur.com/7KgsdV1.png)
+![open-growth-signal-diagram](http://i.imgur.com/pGskE9v.png)
