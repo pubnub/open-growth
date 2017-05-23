@@ -8,8 +8,12 @@ The **signals.js** and **delights.js** files in `open-growth/handlers/` are PubN
 
 The **Signals Handler** is a [Before Publish or Fire handler](https://www.pubnub.com/docs/blocks/event-handler-types#sync-et-before-pub-fire) and the **Delights Handler** is an [After Publish or Fire handler](https://www.pubnub.com/docs/blocks/event-handler-types#async-et-after-pub-fire). The PubNub message that is sent is called a **Signal**. Open Growth processes Signals from your Signal Generator and sends **Delights** to your customers.
 
-With the defualt setup for Open Growth, we perform data enrichment in the Signals Handler, and send [Customer Delights](https://github.com/pubnub/open-growth/tree/master/delights) from the Delights Handler.
+With the default setup for Open Growth, we perform data enrichment in the Signals Handler, and send [Customer Delights](https://github.com/pubnub/open-growth/tree/master/delights) from the Delights Handler.
 
 Example execution flow for a new sign up:
 
 ![open-growth-signal-diagram](http://i.imgur.com/pGskE9v.png)
+
+The Signal Generator can be an existing web application, Cron job, etc. that publishes a PubNub message to your Open Growth instance whenever there is a new sign up for your service. The message can be sent by using one of the 70+ PubNub SDKs or an HTTP POST request.
+
+Note that the Delights Handler can also send updates to your services and customer delights at the same time. By default, the Delights Handler logs all of your Open Growth BLOCK activity to the `opengrowth.logs` channel.
