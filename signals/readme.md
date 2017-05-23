@@ -33,7 +33,7 @@ opengrowth.signals.signup = ( request, customer ) => {
     sendgridPostBody.message = '' +
       `Hi ${customer.firstName || 'there'}!\n` +
       `Thanks for signing up for our service!\n` +
-      `We see you are a ${customer.title } and you work at ${customer.company}.\n` +
+      `We see you are a ${customer.title} and you work at ${customer.company}.\n` +
       `Here is a link to our ${product} and here is a link to an ${tutorial}.\n` +
       `Welcome!\n` +
       `Neumann`;
