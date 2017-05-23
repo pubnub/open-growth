@@ -14,6 +14,6 @@ Example execution flow for a new sign up:
 
 ![open-growth-signal-diagram](http://i.imgur.com/pGskE9v.png)
 
-The Signal Generator can be an existing web application, Cron job, etc. that publishes a PubNub message to your Open Growth instance whenever there is a new sign up for your service. The message can be sent by using one of the 70+ PubNub SDKs or an HTTP POST request.
+The Signal Generator can be an existing web application, [Cron](https://en.wikipedia.org/wiki/Cron) job, etc. that publishes a PubNub message to your Open Growth instance whenever there is a new sign up for your service. The message can be sent by using one of the [70+ PubNub SDKs](https://www.pubnub.com/docs#all-sdks-home) or an [HTTP POST](https://www.pubnub.com/http-rest-push-api/) request.
 
-Note that the Delights Handler can also send updates to your services and customer delights at the same time. By default, the Delights Handler logs all of your Open Growth BLOCK activity to the `opengrowth.logs` channel.
+Note that the Delights Handler can also send updates to your services and customer delights at the same time. By default, the Delights Handler **logs** all of your Open Growth BLOCK activity to the `opengrowth.logs` channel.
