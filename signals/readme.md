@@ -2,9 +2,9 @@
 
 **Signal** - An indication of a task that needs to be done automatically using Open Growth
 
-Signal handlers are our controllers for each type of signal we send to Open Growth. Signal handlers are executed in the **delights.js** event handler, which is an [After Publish or Fire handler](https://www.pubnub.com/docs/blocks/event-handler-types#async-et-after-pub-fire). Signal handlers can trigger a customer **delight** or **module** depending on the end goal of the signal.
+Signal handlers are the controllers for each type of signal sent to Open Growth. Signal handlers are executed in the **delights.js** event handler, which is an [After Publish or Fire handler](https://www.pubnub.com/docs/blocks/event-handler-types#async-et-after-pub-fire). Signal handlers can trigger a customer **delight** or **module** depending on the end goal of the signal.
 
-For customer delights (sending an email, text, phone call, tweet, slice of cake, etc.), we can prepare a request to an external API in the signal handler. After we prepare the data we want to send, we call the delight of our choosing. Here is an example of constructing a sign up email using a signal handler.
+For customer delights (sending an email, text, phone call, tweet, slice of cake 🍰, etc.), we can prepare a request to an external API in the signal handler. After we prepare the data we want to send, we call the delight of our choosing. Here is an example of constructing a sign up email using a signal handler.
 
 We prepare our POST body, and then call `opengrowth.delight.sendgrid.email` to send our request to the SendGrid API.
 
@@ -48,4 +48,4 @@ Open Growth Signal handlers can also listen for signals like [webhooks](https://
 
 Open Growth has a signal handler to process POSTs for SendGrid's Event Webhook in `open-growth/signals/sendgrid-updates.js`. Any emails that are marked with a [category](https://sendgrid.com/docs/Glossary/categories.html) (or SendWithUs [tag](https://www.sendwithus.com/docs/api#send-an-email)) beginning with "og_" are dissected and logged in Open Growth's logs.
 
-This example of a Webhook endpoint can be used as a guide when writing your own handler for Open Growth. Remember that all files you add to `open-growth/signals/` will be concatenated to your delights.js event handler when you deploy to BLOCKS.
+This example of a Webhook endpoint can be used as a guide when writing your own handler for Open Growth. Remember that all files you add to `open-growth/signals/` will be concatenated to your delights.js event [handler](https://github.com/pubnub/open-growth/tree/master/handlers) when you deploy to BLOCKS.
