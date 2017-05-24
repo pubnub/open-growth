@@ -5,6 +5,7 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 const gulp = require('gulp');
 const preprocess = require('gulp-preprocess');
+<<<<<<< HEAD
 const http = require('request-promise');
 const crypto = require('crypto');
 const fs = require('fs');
@@ -17,6 +18,7 @@ let config = {};
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Main
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+<<<<<<< HEAD
 main();
 async function main() {
     printSplash();
@@ -127,7 +129,7 @@ function buildSignalHandler() {
             ])
             .pipe(preprocess({
                 context: {
-                    GOLD: gold
+                    ENV: config.env
                 }
             }))
             .on('end', data => {
@@ -156,7 +158,7 @@ function buildDelightHandler() {
             ])
             .pipe(preprocess({
                 context: {
-                    GOLD: gold
+                    ENV: config.env
                 }
             }))
             .on('end', data => {
@@ -290,6 +292,7 @@ function listEventHandlers(keyId, blockId) {
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Create Event Handler
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+<<<<<<< HEAD
 function createEventHandler(keyId, blockId, name, event) {
     return http({
         method: 'POST',
