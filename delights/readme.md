@@ -1,4 +1,4 @@
-# Open Growth Delights
+# Delights
 
 **Delight** - A method of outreach to your customer i.e. email, text, tweet, special delivery of cake 🍰
 

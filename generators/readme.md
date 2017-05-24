@@ -2,4 +2,6 @@
 
 **Signal Generators** are the automated trigger of Open Growth functions.
 
-In order to send our customer delights at any hour of the day, there needs to be an always on generator to indicate the precise moment a customer is ready to be delighted. Generators can be shaped from an existing web application, a simple script powered by [Cron](https://en.wikipedia.org/wiki/Cron), an external service that offers [Webhooks](https://en.wikipedia.org/wiki/Webhook), or anything in between. The generator must be able to publish to PubNub to interact with your Open Growth instance. PubNub has [70+ SDKs](https://www.pubnub.com/docs#all-sdks-home) and a [REST API](https://www.pubnub.com/http-rest-push-api/) so you can create a Generator with any internet connected device and programming language.
+In order to send our customer delights at any hour of the day, there needs to be an always on generator to indicate the precise moment a customer is ready to be delighted. Generators can be shaped from an existing web application, a simple script powered by [Cron](https://en.wikipedia.org/wiki/Cron), an external service that offers [Webhooks](https://en.wikipedia.org/wiki/Webhook), or anything in between.
+
+The generator must be able to publish to PubNub to interact with your Open Growth instance. PubNub has [70+ SDKs](https://www.pubnub.com/docs#all-sdks-home) and a [REST API](https://www.pubnub.com/http-rest-push-api/) so you can create a Generator with almost any internet connected device and programming language.
