@@ -5,7 +5,6 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 const gulp = require('gulp');
 const preprocess = require('gulp-preprocess');
-<<<<<<< HEAD
 const http = require('request-promise');
 const crypto = require('crypto');
 const fs = require('fs');
@@ -18,7 +17,6 @@ let config = {};
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Main
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-<<<<<<< HEAD
 main();
 async function main() {
     printSplash();
@@ -118,7 +116,6 @@ function restart() {
 // Compile Signal/Before Handler Code
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function buildSignalHandler() {
-    let gold = (config.env == 'Gold') ? true : false;
     let buffer = '';
     let keys = 'opengrowth.keys = ' + JSON.stringify(config.keys) + ';'
     return new Promise((resolve, reject) => {
@@ -149,7 +146,6 @@ function buildSignalHandler() {
 // Compile Delight/After Handler Code
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function buildDelightHandler() {
-    let gold = (config.env == 'Gold') ? true : false;
     let buffer = '';
     let keys = 'opengrowth.keys = ' + JSON.stringify(config.keys) + ';'
     return new Promise((resolve, reject) => {
@@ -292,7 +288,6 @@ function listEventHandlers(keyId, blockId) {
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Create Event Handler
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-<<<<<<< HEAD
 function createEventHandler(keyId, blockId, name, event) {
     return http({
         method: 'POST',
@@ -367,12 +362,13 @@ function createBlock(name, desc, keyId) {
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 async function getKeyId() {
     let list = await listApps(config.ownerId, config.token);
+    let env = (config.env == 'Bronze') ? config.env + ' - ' + process.env.USER : config.env;
     let id = undefined;
 
     for (let i in list.result) {
         if (list.result[i].name == "Open Growth") {
             for (let j in list.result[i].keys) {
-                if (list.result[i].keys[j].properties.name == config.env) {
+                if (list.result[i].keys[j].properties.name == env) {
                     console.log('Open Growth Key ID:', list.result[i].keys[j].id);
                     return list.result[i].keys[j].id;
                 }
@@ -380,7 +376,7 @@ async function getKeyId() {
         }
     }
 
-    let key = await createKey(config.appId, config.env);
+    let key = await createKey(config.appId, env);
     console.log('Created Open Growth Key (' + config.env + '):', key.result.id);
     return key.result.id;
 }
@@ -549,7 +545,7 @@ async function checkEnvironment() {
         env = 'Silver';
         console.log('\tDeploying to Silver\t'.black.bgWhite);
     } else {
-        env = 'Bronze - ' + process.env.USER;
+        env = 'Bronze';
         console.log('\tDeploying to Bronze\t'.black.bgGreen);
     }
     config.env = env;

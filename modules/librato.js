@@ -22,13 +22,12 @@ opengrowth.modules.librato = ( libratoUpdates ) => {
             `gauges[${index}][value]=${libratoUpdates[key]}`;
         index++;
     }
-    
-    // @if SILVER
+    // @if ENV='Silver'
     // Mark gauges from this testing instance with 'silver'
     data = data.replace(/opengrowth\./g,'opengrowth.silver.');
     // @endif
 
-    // @if BRONZE
+    // @if ENV='Bronze'
     // Mark gauges from this testing instance with 'bronze'
     data = data.replace(/opengrowth\./g,'opengrowth.bronze.');
     // @endif
