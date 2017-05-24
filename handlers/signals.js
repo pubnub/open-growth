@@ -27,7 +27,7 @@ export default ( request ) => {
         };
     }
 
-    // @if !GOLD
+    // @if ENV != 'Gold'
     // No deduplication on testing envs
     // Must be explicitly set to false to disable deduplication
     if ( request.message.dedupe !== true ) {

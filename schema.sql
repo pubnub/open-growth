@@ -60,3 +60,20 @@ CREATE TABLE IF NOT EXISTS opengrowth.reactions (
 );
 CREATE INDEX        reaction_created ON opengrowth.reactions(created);
 CREATE UNIQUE INDEX reaction_id      ON opengrowth.reactions(id);
+
+-- Cohort View
+-- View which shows day-by-day cohort progression of Click/Open Rates
+CREATE ALGORITHM=UNDEFINED DEFINER=`overmind_admin`@`%` SQL SECURITY DEFINER VIEW `og_reactions_cohort` AS
+SELECT `og_reactions`.`signal_name` AS `signal`,
+       `og_reactions`.`type` AS `action`,
+       `og_reactions`.`contact` AS `contact`,
+       date_format(`og_reactions`.`created`,'%Y-%m-%d') AS `yearmonth`,
+       (to_days(now()) - to_days(`og_reactions`.`created`)) AS `cohort`
+FROM `og_reactions`
+WHERE ((not((`og_reactions`.`contact` LIKE 'emailtosalesforce@%')))
+       AND (`og_reactions`.`type` = 'delivered'))
+GROUP BY `og_reactions`.`contact`,
+         `yearmonth`,
+         `og_reactions`.`type`,
+         `og_reactions`.`signal_name`
+ORDER BY `yearmonth` DESC;
