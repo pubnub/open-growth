@@ -1,4 +1,4 @@
-# Open Growth Helpers
+# Helpers
 
 The files in the `open-growth/helpers/` directory are appended to both the **signals.js** and **delights.js** event handlers, so they can be called from anywhere in your Open Growth BLOCK.
 

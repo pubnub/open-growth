@@ -1,4 +1,4 @@
-# Open Growth Signals and Delights
+# Signals and Delights
 
 **Signal** - An indication of a task that needs to be done automatically using Open Growth
 

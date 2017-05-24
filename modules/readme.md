@@ -1,4 +1,4 @@
-# Open Growth Modules
+# Modules
 
 Modules are used to make [XHRs](https://www.pubnub.com/docs/blocks/xhr-module) from your Open Growth BLOCK. They simplify getting data from external APIs like [Clearbit](https://clearbit.com/), or passing Open Growth data along to an API like [Librato](https://www.librato.com/) for real-time monitoring.
 
