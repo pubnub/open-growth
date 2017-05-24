@@ -3,14 +3,14 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Libs
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-const gulp        = require('gulp');
+const gulp = require('gulp');
 const preprocess = require('gulp-preprocess');
-const http        = require('request-promise');
-const crypto      = require('crypto');
-const fs          = require('fs');
-const prompt      = require('prompt-promise');
-const colors      = require('colors');
-const args        = process.argv.slice(2);
+const http = require('request-promise');
+const crypto = require('crypto');
+const fs = require('fs');
+const prompt = require('prompt-promise');
+const colors = require('colors');
+const args = process.argv.slice(2);
 
 let config = {};
 
@@ -26,15 +26,15 @@ async function main() {
 }
 
 async function deploy() {
-    config.login          = await pubnubLogin();
-    config.token          = config.login.result.token;
-    config.ownerId        = config.login.result.user.id;
-    config.appId          = await getAppId();
-    config.keyId          = await getKeyId();
-    config.blockId        = await getBlockId();
-    config.handlers       = await getEventHandlers();
-    config.signalCode     = await buildSignalHandler();
-    config.delightCode    = await buildDelightHandler();
+    config.login = await pubnubLogin();
+    config.token = config.login.result.token;
+    config.ownerId = config.login.result.user.id;
+    config.appId = await getAppId();
+    config.keyId = await getKeyId();
+    config.blockId = await getBlockId();
+    config.handlers = await getEventHandlers();
+    config.signalCode = await buildSignalHandler();
+    config.delightCode = await buildDelightHandler();
 
     console.log('Uploading Signal Handler...');
     await uploadSignalHandler();
@@ -65,279 +65,302 @@ function instructions() {
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Log Deploy to Librato
+// Log an Annotation on Librato
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function librato() {
-    const auth = "Basic " + new Buffer(
-        config.keys.librato.email + ":" + config.keys.librato.secret
-    ).toString("base64");
-
-    let desc = process.env.USER + ' - ' + config.env;
-
     return http({
-        method  : 'POST'
-    ,   uri     : 'https://metrics-api.librato.com/v1/annotations' + 
-                  '/opengrowth.deploy.blocks'
-    ,   body    : {
-            title       : 'Deployed JavaScript to BLOCKS'
-        ,   description : desc
-    }
-    ,   headers : { 'Authorization' : auth }
-    ,   json    : true
-    }).catch( error => {
-        console.error( 'Failed to annotate librato'.black.bgRed );
-        console.error( error.message.black.bgRed );
-    } );
+        method: 'POST',
+        uri: 'https://metrics-api.librato.com/v1/annotations' +
+            '/opengrowth.deploy.blocks',
+        body: {
+            title: 'Deployed JavaScript to BLOCKS',
+            description: process.env.USER + ' - ' + config.env
+        },
+        headers: {
+            'Authorization': "Basic " + new Buffer(
+        config.keys.librato.email + ":" + config.keys.librato.secret
+    ).toString("base64")
+        },
+        json: true
+    }).catch(error => {
+        console.error('Failed to annotate librato'.black.bgRed);
+        console.error(error.message.black.bgRed);
+    });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Restart Event Handler
+// Restart the BLOCK
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function restart() {
     return http({
-        method  : 'POST'
-    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  `/blocks/key/${config.keyId}/`   +
-                  `block/${config.blockId}/start`
-    ,   body    : {
-            block_id : config.blockId
-        ,   key_id   : config.keyId
-        ,   action   : 'start' 
-    }
-    ,   headers : { 'X-Session-Token' : config.token }
-    ,   json    : true
-    }).catch( error => {
-        console.error( 'Failed to restart block'.black.bgRed );
-        console.error( error );
-    } );
+        method: 'POST',
+        uri: 'https://admin.pubnub.com/api/v1' +
+            `/blocks/key/${config.keyId}/` +
+            `block/${config.blockId}/start`,
+        body: {
+            block_id: config.blockId,
+            key_id: config.keyId,
+            action: 'start'
+        },
+        headers: {
+            'X-Session-Token': config.token
+        },
+        json: true
+    }).catch(error => {
+        console.error('Failed to restart block'.black.bgRed);
+        console.error(error);
+    });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Build Event Handler Code
+// Compile Signal/Before Handler Code
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function buildSignalHandler() {
     let gold = (config.env == 'gold') ? true : false;
     let buffer = ''
-    let keys   = 'opengrowth.keys = ' + JSON.stringify(config.keys) + ';'
-    return new Promise( ( resolve, reject ) => {
+    let keys = 'opengrowth.keys = ' + JSON.stringify(config.keys) + ';'
+    return new Promise((resolve, reject) => {
         gulp.src([
-            './handlers/signals.js'
-        ,   './helpers/*.js'
-        ,   './modules/*.js'
-        //,   './delights/*.js'
-        //,   './signals/*.js'
-        ])
-        .pipe( preprocess( { context: { GOLD: gold } } ) )
-        .on( 'end',   data  => { resolve(buffer + keys) } )
-        .on( 'error', error => { reject(error)          } )
-        .on( 'data',  bytes => {
-            buffer += bytes.contents.toString().trim();
-        } );
+                './handlers/signals.js', './helpers/*.js', './modules/*.js'
+                //,   './delights/*.js'
+                //,   './signals/*.js'
+            ])
+            .pipe(preprocess({
+                context: {
+                    GOLD: gold
+                }
+            }))
+            .on('end', data => {
+                resolve(buffer + keys)
+            })
+            .on('error', error => {
+                reject(error)
+            })
+            .on('data', bytes => {
+                buffer += bytes.contents.toString().trim();
+            });
         console.log('Built Signal Handler');
-    } );
+    });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Build Event Handler Code
+// Compile Delight/After Handler Code
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function buildDelightHandler() {
     let gold = (config.env == 'gold') ? true : false;
     let buffer = ''
-    let keys   = 'opengrowth.keys = ' + JSON.stringify(config.keys) + ';'
-    return new Promise( ( resolve, reject ) => {
+    let keys = 'opengrowth.keys = ' + JSON.stringify(config.keys) + ';'
+    return new Promise((resolve, reject) => {
         gulp.src([
-            './handlers/delights.js'
-        ,   './helpers/*.js'
-        ,   './modules/*.js'
-        ,   './delights/*.js'
-        ,   './signals/*.js'
-        ])
-        .pipe( preprocess( { context: { GOLD: gold } } ) )
-        .on( 'end',   data  => { resolve(buffer + keys) } )
-        .on( 'error', error => { reject(error)          } )
-        .on( 'data',  bytes => {
-            buffer += bytes.contents.toString().trim();
-        } );
+                './handlers/delights.js', './helpers/*.js', './modules/*.js', './delights/*.js', './signals/*.js'
+            ])
+            .pipe(preprocess({
+                context: {
+                    GOLD: gold
+                }
+            }))
+            .on('end', data => {
+                resolve(buffer + keys)
+            })
+            .on('error', error => {
+                reject(error)
+            })
+            .on('data', bytes => {
+                buffer += bytes.contents.toString().trim();
+            });
         console.log('Built Delight Handler');
-    } );
+    });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Upload Signals Handler Code
+// Upload Signal/Before Handler Code
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function uploadSignalHandler() {
     return http({
-        method  : 'PUT'
-    ,   json    : true
-    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  `/blocks/key/${config.keyId}/`   +
-                  `event_handler/${config.handlers.before}`
-    ,   headers : { 'X-Session-Token' : config.token }
-    ,   body    : {
-            key_id    : config.keyId
-        ,   block_id  : config.blockId
-        ,   id        : config.handlers.before
-        ,   code      : config.signalCode
-        ,   channels  : 'opengrowth.signals'
-        ,   event     : 'js-before-publish'
-        ,   type      : 'js'
-        ,   log_level : 'debug'
-        ,   name      : 'Signal Handler'
-        ,   output    : 'opengrowth.signals-info'
+        method: 'PUT',
+        json: true,
+        uri: 'https://admin.pubnub.com/api/v1' +
+            `/blocks/key/${config.keyId}/` +
+            `event_handler/${config.handlers.before}`,
+        headers: {
+            'X-Session-Token': config.token
+        },
+        body: {
+            key_id: config.keyId,
+            block_id: config.blockId,
+            id: config.handlers.before,
+            code: config.signalCode,
+            channels: 'opengrowth.signals',
+            event: 'js-before-publish',
+            type: 'js',
+            log_level: 'debug',
+            name: 'Signal Handler',
+            output: 'opengrowth.signals-info'
         }
-    }).catch( error => {
-        console.error( 'Failed to upload signal handler'.black.bgRed );
-        console.error( error.black.bgRed );
-    } );
+    }).catch(error => {
+        console.error('Failed to upload signal handler'.black.bgRed);
+        console.error(error.black.bgRed);
+    });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Upload Delights Handler Code
+// Upload Delight/After Handler Code
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function uploadDelightHandler() {
     return http({
-        method  : 'PUT'
-    ,   json    : true
-    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  `/blocks/key/${config.keyId}/`   +
-                  `event_handler/${config.handlers.after}`
-    ,   headers : { 'X-Session-Token' : config.token }
-    ,   body    : {
-            key_id    : config.keyId
-        ,   block_id  : config.blockId
-        ,   id        : config.handlers.after
-        ,   code      : config.delightCode
-        ,   channels  : 'opengrowth.signals'
-        ,   event     : 'js-after-publish'
-        ,   type      : 'js'
-        ,   log_level : 'debug'
-        ,   name      : 'Delight Handler'
-        ,   output    : 'opengrowth.delights-info'
+        method: 'PUT',
+        json: true,
+        uri: 'https://admin.pubnub.com/api/v1' +
+            `/blocks/key/${config.keyId}/` +
+            `event_handler/${config.handlers.after}`,
+        headers: {
+            'X-Session-Token': config.token
+        },
+        body: {
+            key_id: config.keyId,
+            block_id: config.blockId,
+            id: config.handlers.after,
+            code: config.delightCode,
+            channels: 'opengrowth.signals',
+            event: 'js-after-publish',
+            type: 'js',
+            log_level: 'debug',
+            name: 'Delight Handler',
+            output: 'opengrowth.delights-info'
         }
-    }).catch( error => {
-        console.error( 'Failed to upload delight handler'.black.bgRed );
-        console.error( error.black.bgRed );
-    } );
+    }).catch(error => {
+        console.error('Failed to upload delight handler'.black.bgRed);
+        console.error(error.black.bgRed);
+    });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Get OG block id
+// Get Event Handler ids
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 async function getEventHandlers() {
     let list = await listEventHandlers(config.keyId, config.blockId);
     list = list.payload[0].event_handlers;
-    let payload = { 'before': null, 'after': null }
-    for ( let i in list ) {
-        if( list[i].event == 'js-before-publish' ) {
-            console.log( 'Open Growth Before Handler:', list[i].id);
+    let payload = {
+        'before': null,
+        'after': null
+    }
+    for (let i in list) {
+        if (list[i].event == 'js-before-publish') {
+            console.log('Open Growth Before Handler:', list[i].id);
             payload.before = list[i].id;
-        } else if( list[i].event == 'js-after-publish' ) {
-            console.log( 'Open Growth After Handler:', list[i].id);
+        } else if (list[i].event == 'js-after-publish') {
+            console.log('Open Growth After Handler:', list[i].id);
             payload.after = list[i].id;
         };
     }
 
     if (payload.before == null) {
-        let handler = await createEventHandler(config.keyId, config.blockId, 'Signals Handler','js-before-publish');
+        let handler = await createEventHandler(config.keyId, config.blockId, 'Signals Handler', 'js-before-publish');
         payload.before = handler.payload.id;
-        console.log( 'Created Open Growth Before Handler:', payload.before);
+        console.log('Created Open Growth Before Handler:', payload.before);
     }
 
     if (payload.after == null) {
-        let handler2 = await createEventHandler(config.keyId, config.blockId, 'Delights Handler','js-after-publish');
+        let handler2 = await createEventHandler(config.keyId, config.blockId, 'Delights Handler', 'js-after-publish');
         payload.after = handler2.payload.id;
-        console.log( 'Created Open Growth After Handler:', payload.after);
+        console.log('Created Open Growth After Handler:', payload.after);
     }
     return payload;
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Upload Signals Handler Code
+// List Event Handlers
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function listEventHandlers(keyId, blockId) {
     return http({
-        method  : 'GET'
-    ,   json    : true
-    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  `/blocks/key/${keyId}`   +
-                  `/block/${blockId}`
-    ,   headers : { 'X-Session-Token' : config.token }
-    }).catch( error => {
-        console.error( 'Failed to list event handlers'.black.bgRed)
-        console.error( error.black.bgRed );
+        method: 'GET',
+        json: true,
+        uri: 'https://admin.pubnub.com/api/v1' +
+            `/blocks/key/${keyId}` +
+            `/block/${blockId}`,
+        headers: {
+            'X-Session-Token': config.token
+        }
+    }).catch(error => {
+        console.error('Failed to list event handlers'.black.bgRed)
+        console.error(error.black.bgRed);
     });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Upload Signals Handler Code
+// Create Event Handler
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function createEventHandler(keyId, blockId, name, event) {
     return http({
-        method  : 'POST'
-    ,   json    : true
-    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  `/blocks/key/${keyId}/`   +
-                  `event_handler`
-    ,   headers : { 'X-Session-Token' : config.token }
-    ,   body    : {
-            key_id : keyId
-        ,   block_id: blockId
-        ,   type: 'js'
-        ,   event: event
-        ,   channels: 'opengrowth.signals'
-        ,   name: name
-        ,   code: "console.log('hi');"
-        ,   output: 'output-0.5823105682419438'
+        method: 'POST',
+        json: true,
+        uri: 'https://admin.pubnub.com/api/v1' +
+            `/blocks/key/${keyId}/` +
+            `event_handler`,
+        headers: {
+            'X-Session-Token': config.token
+        },
+        body: {
+            key_id: keyId,
+            block_id: blockId,
+            type: 'js',
+            event: event,
+            channels: 'opengrowth.signals',
+            name: name,
+            code: "console.log('hi');",
+            output: 'output-0.5823105682419438'
         }
-    }).catch( error => {
-        console.error( 'Failed to create event handler'.black.bgRed );
-        console.error( error.error.message.black.bgRed );
-    } );
+    }).catch(error => {
+        console.error('Failed to create event handler'.black.bgRed);
+        console.error(error.error.message.black.bgRed);
+    });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Get OG block id
+// Get BLOCK id
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 async function getBlockId() {
     let list = await listBlocks(config.keyId);
 
-    for( let i in list.payload ) {
-        if( list.payload[i].name == "Open Growth" ) {
+    for (let i in list.payload) {
+        if (list.payload[i].name == "Open Growth") {
             config.block_id = list.payload[i].id;
-            console.log( 'Open Growth Block ID:', list.payload[i].id );
+            console.log('Open Growth Block ID:', list.payload[i].id);
             return list.payload[i].id;
         }
     }
 
-    let block = await createBlock('Open Growth','10x your business!', config.keyId);
+    let block = await createBlock('Open Growth', '10x your business!', config.keyId);
     console.log('Created Open Growth Block:', block.payload.id);
     return block.payload.id;
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Create a block
+// Create a BLOCK
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function createBlock(name, desc, keyId) {
     return http({
-        method  : 'POST'
-    ,   json    : true
-    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  `/blocks/key/${keyId}/`   +
-                  `block`
-    ,   headers : { 'X-Session-Token' : config.token }
-    ,   body    : {
-            key_id : keyId
-        ,   name: name
-        ,   description: desc
+        method: 'POST',
+        json: true,
+        uri: 'https://admin.pubnub.com/api/v1' +
+            `/blocks/key/${keyId}/` +
+            `block`,
+        headers: {
+            'X-Session-Token': config.token
+        },
+        body: {
+            key_id: keyId,
+            name: name,
+            description: desc
         }
-    }).catch( error => {
-        console.error( 'Failed to create block'.black.bgRed )
-        console.error( error.error.message.black.bgRed );
-    } );
+    }).catch(error => {
+        console.error('Failed to create block'.black.bgRed)
+        console.error(error.error.message.black.bgRed);
+    });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Get OG app id from result list
+// Get key id
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 async function getKeyId() {
     let list = await listApps(config.ownerId, config.token);
@@ -345,8 +368,8 @@ async function getKeyId() {
 
     for (let i in list.result) {
         if (list.result[i].name == "Open Growth") {
-            for (let j in list.result[i].keys ) {
-                if( list.result[i].keys[j].properties.name == config.env ) {
+            for (let j in list.result[i].keys) {
+                if (list.result[i].keys[j].properties.name == config.env) {
                     console.log('Open Growth Key ID:', list.result[i].keys[j].id);
                     return list.result[i].keys[j].id;
                 }
@@ -355,38 +378,39 @@ async function getKeyId() {
     }
 
     let key = await createKey(config.appId, config.env);
-    console.log('Created Open Growth Key (' + config.env + '):',key.result.id);
+    console.log('Created Open Growth Key (' + config.env + '):', key.result.id);
     return key.result.id;
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Get list of all blocks
+// Get list of BLOCKS
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function listBlocks(keyId) {
     return http({
-        method  : 'GET'
-    ,   json    : true
-    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  `/blocks/key/${keyId}/`   +
-                  `block`
-    ,   headers : { 'X-Session-Token' : config.token }
-    }).catch( error => {
-        console.error( 'Failed to list blocks'.black.bgRed );
-        console.error( error );
+        method: 'GET',
+        json: true,
+        uri: 'https://admin.pubnub.com/api/v1' +
+            `/blocks/key/${keyId}/` +
+            `block`,
+        headers: {
+            'X-Session-Token': config.token
+        }
+    }).catch(error => {
+        console.error('Failed to list blocks'.black.bgRed);
+        console.error(error);
     });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Get OG app id from result list
+// Get app id
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
 async function getAppId() {
     let list = await listApps(config.ownerId, config.token);
     let id = undefined;
     let appExists = false;
 
-    for( let i in list.result ) {
-        if( list.result[i].name == "Open Growth" ) { 
+    for (let i in list.result) {
+        if (list.result[i].name == "Open Growth") {
             console.log('Open Growth App ID:', list.result[i].id);
             return list.result[i].id;
         }
@@ -398,22 +422,26 @@ async function getAppId() {
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Create a keyset
+// Create a key
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function createKey(appId, name) {
     return http({
-        method  : 'POST'
-    ,   json    : true
-    ,   uri     : 'https://admin.pubnub.com/api/keys'
-    ,   headers : { 'X-Session-Token' : config.token }
-    ,   body    : { 
-            app_id: appId
-        ,   properties : { name : name }
+        method: 'POST',
+        json: true,
+        uri: 'https://admin.pubnub.com/api/keys',
+        headers: {
+            'X-Session-Token': config.token
+        },
+        body: {
+            app_id: appId,
+            properties: {
+                name: name
+            }
         }
-    }).catch( error => {
-        console.error( 'Failed to create key set'.black.bgRed)
-        console.error( error.error.black.bgRed );
-    } );
+    }).catch(error => {
+        console.error('Failed to create key set'.black.bgRed)
+        console.error(error.error.black.bgRed);
+    });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -421,18 +449,20 @@ function createKey(appId, name) {
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function createApp(name) {
     return http({
-        method  : 'POST'
-    ,   json    : true
-    ,   uri     : 'https://admin.pubnub.com/api/apps'
-    ,   headers : { 'X-Session-Token' : config.token }
-    ,   body    : {
-            owner_id : config.ownerId
-        ,   name: name
+        method: 'POST',
+        json: true,
+        uri: 'https://admin.pubnub.com/api/apps',
+        headers: {
+            'X-Session-Token': config.token
+        },
+        body: {
+            owner_id: config.ownerId,
+            name: name
         }
-    }).catch( error => {
-        console.error( 'Failed to create app'.black.bgRed)
-        console.error( error.error.black.bgRed );
-    } );
+    }).catch(error => {
+        console.error('Failed to create app'.black.bgRed)
+        console.error(error.error.black.bgRed);
+    });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -440,42 +470,48 @@ function createApp(name) {
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function pubnubLogin() {
     return http({
-        method : 'POST'
-    ,   uri    : 'https://admin.pubnub.com/api/me'
-    ,   body   : { 'email' : config.keys.pubnub.email, 'password' : config.keys.pubnub.password }
-    ,   json   : true
-    }).catch( error => {
-        console.error( 'PubNub Login Failed!'.black.bgRed);
+        method: 'POST',
+        uri: 'https://admin.pubnub.com/api/me',
+        body: {
+            'email': config.keys.pubnub.email,
+            'password': config.keys.pubnub.password
+        },
+        json: true
+    }).catch(error => {
+        console.error('PubNub Login Failed'.black.bgRed);
         console.error(error.error.error.black.bgRed);
-    } );
-}
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Get list of all apps
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function listApps(owner_id, token) {
-    return http({
-        method  : 'GET'
-    ,   json    : true
-    ,   uri     : `https://admin.pubnub.com/api/apps?owner_id=${owner_id}`
-    ,   headers : { 'X-Session-Token' : token}
-    }).catch( error => {
-        console.error( 'Failed to get app list'.black.bgRed);
-        console.error( error.error.black.bgRed );
+        process.exit();
     });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Deploy to blocks gold or silver
+// Get list of apps
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-async function getKeys(){
+function listApps(owner_id, token) {
+    return http({
+        method: 'GET',
+        json: true,
+        uri: `https://admin.pubnub.com/api/apps?owner_id=${owner_id}`,
+        headers: {
+            'X-Session-Token': token
+        }
+    }).catch(error => {
+        console.error('Failed to get app list'.black.bgRed);
+        console.error(error.error.black.bgRed);
+    });
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get user API keys
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+async function getKeys() {
     let encryptedFileExists = fs.existsSync('keys.aes');
     let password = '';
-    if (!encryptedFileExists){
+    if (!encryptedFileExists) {
         let unencryptedFile = fs.existsSync('keys.json');
-        if (!unencryptedFile){
-            console.error('No keys files found, please create it from keys.json.example');
-            return false;
+        if (!unencryptedFile) {
+            console.error('No keys files found, please create it from keys.json.example'.black.bgRed);
+            process.exit(); 
         } else {
             console.log('Keys file has not been encrypted, encrypting...');
             password = await encrypt();
@@ -488,19 +524,21 @@ async function getKeys(){
         password = await prompt.password('Encryption Password: ');
     }
 
-    let keys = decrypt(password);
+    let keys = await decrypt(password);
     return keys;
 }
 
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Determine GOLD (production) or SILVER (testing) deployment
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 async function checkEnvironment() {
     let env = 'Silver';
-    if (args.includes('--gold')){
+    if (args.includes('--gold')) {
         console.log('\tDeploying to Gold\t'.black.bgYellow);
-        try { 
+        try {
             let confirm = await prompt.confirm('Are you sure? ');
             env = 'Gold';
-        }
-        catch (e) { 
+        } catch (e) {
             console.log('\tCancelling Deployment\t'.black.bgRed);
             process.exit();
         }
@@ -510,43 +548,43 @@ async function checkEnvironment() {
     config.env = env;
 }
 
-async function decrypt(password){
-    let keys = await decryptFile(password);
-    return keys;
-}
-
-function decryptFile(password){
-    let text = fs.readFileSync('./keys.aes','utf8')
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Decrypt the users API key file
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function decrypt(password) {
+    let text = fs.readFileSync('./keys.aes', 'utf8')
     let decipher = crypto.createDecipher('aes-256-ctr', password);
-    let dec = decipher.update(text,'hex','utf8');
+    let dec = decipher.update(text, 'hex', 'utf8');
     dec += decipher.final('utf8');
-    try{
+    try {
         let keys = JSON.parse(dec);
         console.log('Keys Decrypted');
         return keys;
-    } catch(e){
+    } catch (e) {
         console.error('Password Incorrect'.black.bgRed);
+        process.exit();
     }
 }
 
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Encrypt the users API key file, return password if running during deploy
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 async function encrypt() {
     let password = await prompt.password('Enter New Encryption Password: ');
     prompt.done();
-    let encryption = await encryptFile(password);
-    return password;
-};
-
-function encryptFile(password){
     console.log('Creating keys.aes from keys.json...')
-    let text = fs.readFileSync('./keys.json','utf8')
+    let text = fs.readFileSync('./keys.json', 'utf8')
     let cipher = crypto.createCipher('aes-256-ctr', password);
-    let crypted = cipher.update(text,'utf8','hex');
+    let crypted = cipher.update(text, 'utf8', 'hex');
     crypted += cipher.final('hex');
-    fs.writeFileSync('./keys.aes', crypted,'utf8');
-    return true;
+    fs.writeFileSync('./keys.aes', crypted, 'utf8');
+    return password;
 }
 
-async function printSplash() {
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Pretend we're in the 90s and keygen chiptunes are playing
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function printSplash() {
     process.stdout.write('\033c');
     console.log("\n\n                                     .````` ".green);
     console.log("                                    ://oo+/- ".green);
