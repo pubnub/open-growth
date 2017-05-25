@@ -20,8 +20,8 @@ opengrowth.delight.sendgrid.email = ( request ) => {
     , "categories"        : request.categories
     , "template_id"       : request.template_id
     , "personalizations"  : [ {
-            "to"  : [ { "email" : request.email, "name" : request.name } ],
-            "bcc" : request.bccs,
+            "to"  : [ { "email" : request.email, "name" : request.name } ]
+        ,   "bcc" : request.bccs
         ,   "substitutions" : request.substitutions
         } ]
     };
