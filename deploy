@@ -26,7 +26,7 @@ async function main() {
 }
 
 async function deploy() {
-    config.login = await pubnubLogin();
+        config.login = await pubnubLogin();
     config.token = config.login.result.token;
     config.ownerId = config.login.result.user.id;
     config.appId = await getAppId();
@@ -117,7 +117,7 @@ function restart() {
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function buildSignalHandler() {
     let buffer = '';
-    let keys = 'opengrowth.keys = ' + JSON.stringify(config.keys) + ';'
+    let keys = 'opengrowth.keys = ' + JSON.stringify(config.keys) + ';';
     return new Promise((resolve, reject) => {
         gulp.src([
                 './handlers/signals.js', './helpers/*.js', './modules/*.js'
@@ -133,7 +133,7 @@ function buildSignalHandler() {
                 resolve(buffer + keys)
             })
             .on('error', error => {
-                reject(error)
+                reject(error);
             })
             .on('data', bytes => {
                 buffer += bytes.contents.toString().trim();
@@ -241,18 +241,18 @@ async function getEventHandlers() {
     let payload = {
         'before': null,
         'after': null
-    }
-    for (let i in list) {
-        if (list[i].event == 'js-before-publish') {
-            console.log('Open Growth Before Handler:', list[i].id);
-            payload.before = list[i].id;
-        } else if (list[i].event == 'js-after-publish') {
-            console.log('Open Growth After Handler:', list[i].id);
-            payload.after = list[i].id;
-        };
+    };
+    for (let item of list) {
+        if (item.event == 'js-before-publish') {
+            console.log('Open Growth Before Handler:', item.id);
+            payload.before = item.id;
+        } else if (item.event == 'js-after-publish') {
+            console.log('Open Growth After Handler:', item.id);
+            payload.after = item.id;
+        }
     }
 
-    if (payload.before == null) {
+    if (!payload.before) {
         let handler = await createEventHandler(config.keyId, config.blockId, 'Signals Handler', 'js-before-publish');
         payload.before = handler.payload.id;
         console.log('Created Open Growth Before Handler:', payload.before);
@@ -320,11 +320,11 @@ function createEventHandler(keyId, blockId, name, event) {
 async function getBlockId() {
     let list = await listBlocks(config.keyId);
 
-    for (let i in list.payload) {
-        if (list.payload[i].name == "Open Growth") {
-            config.block_id = list.payload[i].id;
-            console.log('Open Growth Block ID:', list.payload[i].id);
-            return list.payload[i].id;
+    for (let block of list.payload) {
+        if (block.name == "Open Growth") {
+            config.block_id = block.id;
+            console.log('Open Growth Block ID:', block.id);
+            return block.id;
         }
     }
 
@@ -363,14 +363,13 @@ function createBlock(name, desc, keyId) {
 async function getKeyId() {
     let list = await listApps(config.ownerId, config.token);
     let env = (config.env == 'Bronze') ? config.env + ' - ' + process.env.USER : config.env;
-    let id = undefined;
 
-    for (let i in list.result) {
-        if (list.result[i].name == "Open Growth") {
-            for (let j in list.result[i].keys) {
-                if (list.result[i].keys[j].properties.name == env) {
-                    console.log('Open Growth Key ID:', list.result[i].keys[j].id);
-                    return list.result[i].keys[j].id;
+    for (let app of list.result) {
+        if (app.name == "Open Growth") {
+            for (let key of app.keys) {
+                if (key.properties.name == env) {
+                    console.log('Open Growth Key ID:', key.id);
+                    return key.id;
                 }
             }
         }
@@ -405,13 +404,11 @@ function listBlocks(keyId) {
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 async function getAppId() {
     let list = await listApps(config.ownerId, config.token);
-    let id = undefined;
-    let appExists = false;
 
-    for (let i in list.result) {
-        if (list.result[i].name == "Open Growth") {
-            console.log('Open Growth App ID:', list.result[i].id);
-            return list.result[i].id;
+    for (let app of list.result) {
+        if (app.name == "Open Growth") {
+            console.log('Open Growth App ID:', app.id);
+            return app.id;
         }
     }
 
@@ -505,7 +502,7 @@ function listApps(owner_id, token) {
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 async function getKeys() {
     let encryptedFileExists = fs.existsSync('keys.aes');
-    let password = '';
+    let password;
     if (!encryptedFileExists) {
         let unencryptedFile = fs.existsSync('keys.json');
         if (!unencryptedFile) {
@@ -519,7 +516,7 @@ async function getKeys() {
         console.log('Encrypted keys file found');
     }
 
-    if (password == '') {
+    if (!password) {
         password = await prompt.password('Encryption Password: ');
     }
 
@@ -531,7 +528,7 @@ async function getKeys() {
 // Determine GOLD (production) or SILVER (testing) deployment
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 async function checkEnvironment() {
-    let env = 'Silver';
+    let env;
     if (args.includes('--gold')) {
         console.log('\tDeploying to Gold\t'.black.bgYellow);
         try {

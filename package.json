@@ -32,10 +32,11 @@
   },
   "homepage": "https://github.com/pubnub/open-growth#readme",
   "dependencies": {
-    "request": "latest",
-    "request-promise": "latest",
+    "colors": "^1.1.2",
     "gulp": "latest",
     "gulp-preprocess": "latest",
-    "prompt-promise": "latest"
+    "prompt-promise": "latest",
+    "request": "latest",
+    "request-promise": "latest"
   }
 }
