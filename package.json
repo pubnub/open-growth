@@ -1,6 +1,9 @@
 {
   "name": "opengrowth",
   "version": "0.0.1",
+  "engines" : {
+    "node" : ">=7.6.0"
+  },
   "description": "Open Growth - An open source project for developers at API companies to delight your customers with ML/AI.",
   "main": "index.js",
   "scripts": {
