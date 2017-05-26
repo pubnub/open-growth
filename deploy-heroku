@@ -1,4 +1,0 @@
-#!/bin/bash
-git subtree push --prefix generators heroku master
-#heroku ps:scale web=1
-#heroku ps:scale tc_scrape_proc=1

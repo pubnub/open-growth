@@ -14,7 +14,7 @@ Neumann is your AI employee. He can send emails, texts, tweets, phone calls, and
 
 ## ❤️  Delight Your Customers
 
-> **Sendgrid + ScaleAPI + PubNub + MonkeyLearn + Twilio**
+> **Sendgrid + Clearbit + PubNub + MonkeyLearn + Librato**
 
 The modern growth engine asks your customers to connect,
 only when they are ready.

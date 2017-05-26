@@ -1,8 +1,7 @@
 ---
-layout: post
-title:  "Getting Started"
-date:   2017-05-22 05:00:00 -0700
-categories: update
+layout: page
+title:  Getting Started
+permalink: /getting-started/
 ---
 
 **Signal** - An indication of a task that needs to be done automatically using Open Growth
