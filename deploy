@@ -26,55 +26,64 @@ async function main() {
 }
 
 async function deploy() {
+    //stuff that doesn't set anything
+    try{
         config.login = await pubnubLogin();
-    config.token = config.login.result.token;
-    config.ownerId = config.login.result.user.id;
-    config.appId = await getAppId();
-    config.keyId = await getKeyId();
-    config.blockId = await getBlockId();
-    config.handlers = await getEventHandlers();
-    config.signalCode = await buildSignalHandler();
-    config.delightCode = await buildDelightHandler();
+        config.token = config.login.result.token;
+        config.userId = config.login.result.user.id;
+    } catch (e) {
+        console.error(e.black.bgRed);
+        console.error('Nothing has been deployed, this incident has not been logged'.black.bgRed);
+        process.exit();
+    }
 
-    console.log('Uploading Signal Handler...');
-    await uploadSignalHandler();
-    console.log('Uploading Delight...');
-    await uploadDelightHandler();
-    console.log('Restarting Block...');
-    await restart();
-    console.log('Annotating in Librato...');
-    await librato();
-    await instructions();
-}
+    //stuff that might set things
+    try{
+        config.accId = await getAccId();
+        config.appId = await getAppId();
+        config.keyId = await getKeyId();
+        config.blockId = await getBlockId();
+        config.handlers = await getEventHandlers();
+        config.signalCode = await buildSignalHandler();
+        config.delightCode = await buildDelightHandler();
+        console.log('Uploading Signal Handler...');
+        await uploadSignalHandler();
+        console.log('Uploading Delight...');
+        await uploadDelightHandler();
+        console.log('Restarting Block...');
+        await restart();
+    } catch (e) {
+        console.error(e.black.bgRed);
+        try {
+            console.error('Annotating failure in Librato...'.black.bgRed);
+            await librato('*FAILED* ' + process.env.USER + ' - ' + config.env + ' - ' + e);
+        } catch (e) {
+            console.error('That failed too lol'.black.bgRed);
+        }
+        process.exit();
+    }
 
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Print cURL Example
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function instructions() {
-    const pub = config.keys.pubnub.publish;
-    const sub = config.keys.pubnub.subscribe;
-    const chn = 'opengrowth.signals';
-    const msg = `\\{"signal":"signup","email":"stephen@pubnub.com"\\}`;
+    try{
+        console.log('Annotating in Librato...');
+        await librato(process.env.USER + ' - ' + config.env);
+    } catch (e) {
+        console.error('Annotation Failed'.black.bgRed);
+    }
 
-    // Done Printing Instructions
-    console.log(`
-        ## Try it out!
-        curl 'https://ps.pubnub.com/subscribe/${sub}/${chn}/0/-1' &
-        curl 'https://ps.pubnub.com/publish/${pub}/${sub}/0/${chn}/0/${msg}'
-    `);
+    console.log('Deployment Complete!');
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Log an Annotation on Librato
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function librato() {
+function librato(desc) {
     return http({
         method: 'POST',
         uri: 'https://metrics-api.librato.com/v1/annotations' +
             '/opengrowth.deploy.blocks',
         body: {
             title: 'Deployed JavaScript to BLOCKS',
-            description: process.env.USER + ' - ' + config.env
+            description: desc
         },
         headers: {
             'Authorization': "Basic " + new Buffer(
@@ -83,8 +92,7 @@ function librato() {
         },
         json: true
     }).catch(error => {
-        console.error('Failed to annotate librato'.black.bgRed);
-        console.error(error.message.black.bgRed);
+        throw error.message;
     });
 }
 
@@ -108,7 +116,7 @@ function restart() {
         json: true
     }).catch(error => {
         console.error('Failed to restart block'.black.bgRed);
-        console.error(error);
+        throw error.error.message.text;
     });
 }
 
@@ -197,7 +205,7 @@ function uploadSignalHandler() {
         }
     }).catch(error => {
         console.error('Failed to upload signal handler'.black.bgRed);
-        console.error(error.black.bgRed);
+        throw error.error.message.text;
     });
 }
 
@@ -228,7 +236,7 @@ function uploadDelightHandler() {
         }
     }).catch(error => {
         console.error('Failed to upload delight handler'.black.bgRed);
-        console.error(error.black.bgRed);
+        throw error.error.message.text;
     });
 }
 
@@ -281,7 +289,7 @@ function listEventHandlers(keyId, blockId) {
         }
     }).catch(error => {
         console.error('Failed to list event handlers'.black.bgRed)
-        console.error(error.black.bgRed);
+        throw error;
     });
 }
 
@@ -310,7 +318,7 @@ function createEventHandler(keyId, blockId, name, event) {
         }
     }).catch(error => {
         console.error('Failed to create event handler'.black.bgRed);
-        console.error(error.error.message.black.bgRed);
+        throw error.error.message;
     });
 }
 
@@ -353,7 +361,7 @@ function createBlock(name, desc, keyId) {
         }
     }).catch(error => {
         console.error('Failed to create block'.black.bgRed)
-        console.error(error.error.message.black.bgRed);
+        throw error.error.message;
     });
 }
 
@@ -361,7 +369,7 @@ function createBlock(name, desc, keyId) {
 // Get key id
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 async function getKeyId() {
-    let list = await listApps(config.ownerId, config.token);
+    let list = await listApps(config.userId, config.token);
     let env = (config.env == 'Bronze') ? config.env + ' - ' + process.env.USER : config.env;
 
     for (let app of list.result) {
@@ -395,15 +403,45 @@ function listBlocks(keyId) {
         }
     }).catch(error => {
         console.error('Failed to list blocks'.black.bgRed);
-        console.error(error);
+        throw error;
     });
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get account id
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+async function getAccId() {
+    let numbers = /^\d+$/;
+    let list = await listAccs(config.userId, config.token);
+    list = list.result.accounts;
+
+    for (let i=0;i<list.length;i++) {
+        console.log(i + ') ' + list[i].properties.company);
+    }
+
+    while(true){
+        try{
+            let choice = await prompt('Account: (0) ');
+            prompt.done();
+            if (!choice) choice = 0;
+            if (numbers.test(choice)) {
+                return list[choice].id;
+            } else {
+                console.log('Not a number');
+            }
+        }
+        catch (e) {
+            console.log('Not a choice');
+        }
+    }
+
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Get app id
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 async function getAppId() {
-    let list = await listApps(config.ownerId, config.token);
+    let list = await listApps(config.accId, config.token);
 
     for (let app of list.result) {
         if (app.name == "Open Growth") {
@@ -435,8 +473,8 @@ function createKey(appId, name) {
             }
         }
     }).catch(error => {
-        console.error('Failed to create key set'.black.bgRed)
-        console.error(error.error.black.bgRed);
+        console.error('Failed to create key set'.black.bgRed);
+        throw error.error;
     });
 }
 
@@ -452,12 +490,12 @@ function createApp(name) {
             'X-Session-Token': config.token
         },
         body: {
-            owner_id: config.ownerId,
+            owner_id: config.accId,
             name: name
         }
     }).catch(error => {
         console.error('Failed to create app'.black.bgRed)
-        console.error(error.error.black.bgRed);
+        throw error.error;
     });
 }
 
@@ -475,25 +513,41 @@ function pubnubLogin() {
         json: true
     }).catch(error => {
         console.error('PubNub Login Failed'.black.bgRed);
-        console.error(error.error.error.black.bgRed);
-        process.exit();
+        throw error.error.error;
+    });
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get list of accounts
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function listAccs(userId, token) {
+    return http({
+        method: 'GET',
+        json: true,
+        uri: `https://admin.pubnub.com/api/accounts?user_id=${userId}`,
+        headers: {
+            'X-Session-Token': token
+        }
+    }).catch(error => {
+        console.error('Failed to get account list'.black.bgRed);
+        throw error.error;
     });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Get list of apps
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function listApps(owner_id, token) {
+function listApps(accId, token) {
     return http({
         method: 'GET',
         json: true,
-        uri: `https://admin.pubnub.com/api/apps?owner_id=${owner_id}`,
+        uri: `https://admin.pubnub.com/api/apps?owner_id=${accId}`,
         headers: {
             'X-Session-Token': token
         }
     }).catch(error => {
         console.error('Failed to get app list'.black.bgRed);
-        console.error(error.error.black.bgRed);
+        throw error.error;
     });
 }
 
@@ -517,7 +571,7 @@ async function getKeys() {
     }
 
     if (!password) {
-        password = await prompt.password('Encryption Password: ');
+        password = await prompt.password('Encryption Password: ', 'Δ');
     }
 
     let keys = await decrypt(password);
@@ -561,7 +615,7 @@ function decrypt(password) {
         console.log('Keys Decrypted');
         return keys;
     } catch (e) {
-        console.error('Password Incorrect'.black.bgRed);
+        console.error('Failed to decrypt keys, check your password'.black.bgRed);
         process.exit();
     }
 }
