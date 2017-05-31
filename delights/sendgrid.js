@@ -20,7 +20,8 @@ opengrowth.delight.sendgrid.email = ( request ) => {
     , "categories"        : request.categories
     , "template_id"       : request.template_id
     , "personalizations"  : [ {
-            "to" : [ { "email" : request.email, "name" : request.name } ]
+            "to"  : [ { "email" : request.email, "name" : request.name } ]
+        ,   "bcc" : request.bccs
         ,   "substitutions" : request.substitutions
         } ]
     };
@@ -33,7 +34,7 @@ opengrowth.delight.sendgrid.email = ( request ) => {
     if ( request.message ) {
         data.subject = request.subject;
         data.content = [ { "type" : "text/html", "value" : request.message } ];
-        delete data.personalizations.substitutions;
+        delete data.personalizations[0].substitutions;
         delete data.template_id;
     }
     
