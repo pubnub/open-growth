@@ -369,7 +369,7 @@ function createBlock(name, desc, keyId) {
 // Get key id
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 async function getKeyId() {
-    let list = await listApps(config.userId, config.token);
+    let list = await listApps(config.accId, config.token);
     let env = (config.env == 'Bronze') ? config.env + ' - ' + process.env.USER : config.env;
 
     for (let app of list.result) {
