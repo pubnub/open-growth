@@ -3,684 +3,669 @@
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Libs
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-const http       = require('request-promise');
-const gulp       = require('gulp');
+const gulp = require('gulp');
 const preprocess = require('gulp-preprocess');
-const fs         = require('fs');
-const prompt     = require('prompt-promise');
-const crypto     = require('crypto');
-const readline   = require('readline');
-const args       = process.argv.slice(2);
+const http = require('request-promise');
+const crypto = require('crypto');
+const fs = require('fs');
+const prompt = require('prompt-promise');
+const colors = require('colors');
+const args = process.argv.slice(2);
 
-let apikeys = {};
-let config  = {};
-let silver  = false;
-let gold    = false;
-let bronze  = false;
-
-// TODO - GET/MAKE BLOCK labled 'Open Growth'
-// TODO - ...
-// TODO - wait for BLOCK to boot
-// TODO - test BLOCK
-// TODO - show DEBUG output
-// TODO - 
-// TODO - print Signal cURLS and JS Functions for reporing a signal
-// TODO - 
+let config = {};
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Main
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-switch(args[0]){
-    case '--generate':
-        generate();
-        break;
-    case '--password':
-        password();
-        break;
-    case '--reconfigure':
-        reconfigure();
-        break;
-    case '--gold':
-        gold = true;
-        deploy();
-        break;
-    case '--silver':
-        silver = true;
-        deploy();
-        break;
-    default:
-        bronze = true;
-        deploy();
+main();
+async function main() {
+    printSplash();
+    await checkEnvironment();
+    config.keys = await getKeys();
+    deploy();
 }
 
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Deploy to blocks gold, silver, or bronze - user
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function deploy(){
-    prompt('Password: ').then(password =>{
-        apikeys = decrypt(password);
-        return pubnub_login(apikeys.pubnub.email, apikeys.pubnub.password);
-    }).then( result => {
-        //login and save token
-        console.log( 'Logged In!', result.result.user_id );
-        config.login = result.result;
-        config.owner_id = config.login.user.id;
-
-        if ( apikeys.pubnub.accountId ) {
-            return Promise.resolve(apikeys.pubnub.accountId);
-        } else {
-            return get_account_id(config.owner_id);
-        }
-    } ).then( result => {
-        config.account_id = result;
-        //get list of user's apps and their keys,
-        return list_apps(config.account_id);
-    } ).then( result => {
-        //find Open Growth app_id and key_id's or create them
-        let app_exists = false;
-        let gold_keyset_exists = false;
-        let silver_keyset_exists = false;
-        let bronze_keyset_exists = false;
-
-        for( let i in result.result ) {
-            if( result.result[i].name == "Open Growth" ) { 
-                app_exists = true;
-                console.log( 'Open Growth App Found!');
-                config.app_id = result.result[i].id;
-                
-                for( let j in result.result[i].keys ) {
-                    if( result.result[i].keys[j].properties.name == "Gold" ) {
-                        gold_keyset_exists = true;
-                        console.log( 'Gold Keyset Found!');
-                        config.gold_key_id = result.result[i].keys[j].id;
-                    } else if( result.result[i].keys[j].properties.name == "Silver" ) {
-                        silver_keyset_exists = true;
-                        console.log( 'Silver Keyset Found!');
-                        config.silver_key_id = result.result[i].keys[j].id;
-                    } else if( result.result[i].keys[j].properties.name == "Bronze - " + process.env.USER ) {
-                        bronze_keyset_exists = true;
-                        console.log( 'Bronze Keyset Found!');
-                        config.bronze_key_id = result.result[i].keys[j].id;
-                    }
-                }
-            }
-        }
-
-        if( !app_exists ) {
-            create_app('Open Growth').then( result => {
-                console.log('Created Open Growth App!');
-                config.app_id = result.result.id;
-            });
-        }
-
-        if( !gold_keyset_exists ) {
-            create_keyset(config.app_id, 'Gold').then( result => {
-                console.log('Created Gold Keys!');
-                config.gold_key_id = result.result.id;
-            });
-        }
-
-        if( !silver_keyset_exists ) {
-            create_keyset(config.app_id, 'Silver').then( result => {
-                console.log('Created Silver Keys!');
-                config.silver_key_id = result.result.id;
-            });
-        }
-
-        if( !bronze_keyset_exists ) {
-            create_keyset(config.app_id, 'Bronze - '+process.env.USER).then( result => {
-                console.log('Created Bronze Keys!');
-                config.bronze_key_id = result.result.id;
-            });
-        }
-
-        if(gold){
-            config.key_id = config.gold_key_id;
-            console.log( 'Deploying to Gold environment!' );
-        } else if (silver) {
-            config.key_id = config.silver_key_id;
-            console.log( 'Deploying to Silver environment!' );
-        } else {
-            config.key_id = config.bronze_key_id;
-            console.log( 'Deploying to Bronze environment!' );
-        }
-
-        return list_blocks(config.key_id);
-
-    } ).then( result => {
-
-        let block_exists = false;
-
-        for( let i in result.payload ) {
-            if( result.payload[i].name == "Open Growth" ) {
-                block_exists = true;
-                config.block_id = result.payload[i].id;
-                console.log( 'Block Found!' );
-            }
-        }
-
-        if( !block_exists ) { 
-            create_block("Open Growth", "10x your business!", config.key_id).then( result => {
-                config.block_id = result.payload.id;
-                console.log( 'Block Created!' );
-            }); 
-        }
-
-        return list_event_handlers(config.key_id, config.block_id);
-    } ).then( result => {
-        let event_handlers = result.payload[0].event_handlers;
-        let before_publish_exists = false;
-        let after_publish_exists = false;
-
-        for( let i in event_handlers ){
-            if( event_handlers[i].event == 'js-before-publish' ){
-                before_publish_exists = true;
-                config.signals_id = event_handlers[i].id;
-                console.log( 'Signals Event Handler Found!' );
-            } else if( event_handlers[i].event == 'js-after-publish' ){
-                after_publish_exists = true;
-                config.delights_id = event_handlers[i].id;
-                console.log( 'Delights Event Handler Found!' );
-            }
-        }
-
-        if( !before_publish_exists ){
-            create_event_handler(config.key_id, config.block_id, 'Signals Handler', 'js-before-publish').then( result => {
-                config.signals_id=result.payload.id;
-                console.log( 'Signals Event Handler Created!' );
-            });
-        }
-
-        if( !before_publish_exists ){
-            create_event_handler(config.key_id, config.block_id, 'Delights Handler', 'js-after-publish').then( result => {
-                config.delights_id=result.payload.id;
-                console.log( 'Delights Event Handler Created!' );
-            });
-        }
-
-        // Build Signals Handler
-        return build_signals();
-
-    } ).then( result => {
-
-        console.log( 'Built Signals Handler!', result.length );
-        config.signals_code = result;
-
-        // Build Delights Handler
-        return build_delights();
-
-    } ).then( result => {
-
-        console.log( 'Built Delights Handler!', result.length );
-        config.delights_code = result;
-
-        // Upload Signals
-        return upload_signals_handler();
-
-    } ).then( result => {
-
-        console.log( 'Uploaded Signals Handler!', result );
-
-        // Upload Delights
-        return upload_delights_handler();
-
-    } ).then( result => {
-
-        console.log( 'Uploaded Delights Handler!', result );
-        // Sent Restart Signal
-        return restart();
-
-    } ).then( result => {
-
-        console.log( 'Restarting!', result );
-
-        return librato_annotate_deploy();
-
-    } ).then( result => {
-
-        console.log( 'Annotating in Librato!', result );
-
-        return instructions();
-    } ).then(()=>{process.exit()});
-}
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Encrypt keys from keys.json
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function reconfigure() {
-    let firstKey = '';
-    let secondKey = '';
-    let value = '';
-    let pass = '';
-
-    prompt("Password: ")
-    .then(password => {
-        pass = password;
-        apikeys = decrypt(password);
-        console.log('\nCurrent Keys: ')
-        for(key in apikeys){
-            console.log('\t'+key);
-        }
-        return prompt('Enter Key: ');
-    }).then(entry=>{
-        firstKey = entry;
-        console.log('\nSubkeys: ')
-        for(key in apikeys[entry]){
-            console.log('\t'+key);
-        }
-        return prompt('Enter Subkey: ')
-    }).then(entry=>{
-        secondKey = entry;
-        console.log('Current Value: ' + apikeys[firstKey][secondKey]);
-        return prompt('New Value: ');
-    }).then(entry=>{
-        value = entry;
-        console.log('Upserting '+firstKey+' { '+secondKey+': '+value+' } to keys file');
-        if(firstKey in apikeys){
-            apikeys[firstKey][secondKey] = value;
-        } else {
-            apikeys[firstKey] = {};
-            apikeys[firstKey][secondKey] = value;
-        }
-        encrypt(pass);
-    });
-}
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Encrypt keys from keys.json
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function generate() {
-    prompt('Set password: ')
-    .then(password => {
-        console.log('Creating keys.aes from keys.json...')
-        let text = fs.readFileSync('./keys.json','utf8')
-        let cipher = crypto.createCipher('aes-256-ctr', password);
-        let crypted = cipher.update(text,'utf8','hex');
-        crypted += cipher.final('hex');
-        fs.writeFileSync('./keys.aes', crypted,'utf8');
-        console.log('Keys Encrypted');
-        return;
-    }).then( () => {
-        process.exit()
-    });
-}
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Change encryption password on keys.aes
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function password() {
-    prompt('Password: ')
-    .then(password => {
-        apikeys = decrypt(password);
-        return prompt('New Password: ');
-    }).then(newpass => {
-        encrypt(newpass);
-    });
-}
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Build Event Handler Code
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function build_signals() {
-    var buffer = ''
-    var keys   = 'opengrowth.keys = ' + JSON.stringify(apikeys) + ';'
-    return new Promise( ( resolve, reject ) => {
-        gulp.src([
-            './handlers/signals.js'
-        ,   './helpers/*.js'
-        ,   './modules/*.js'
-        //,   './delights/*.js'
-        //,   './signals/*.js'
-        ])
-        .pipe( preprocess( { context: { GOLD: gold, SILVER: silver, BRONZE: bronze } } ) )
-        .on( 'end',   data  => { resolve(buffer + keys) } )
-        .on( 'error', error => { reject(error)          } )
-        .on( 'data',  bytes => {
-            buffer += bytes.contents.toString().trim();
-        } );
-    } );
-}
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Build Event Handler Code
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function build_delights() {
-    var buffer = ''
-    var keys   = 'opengrowth.keys = ' + JSON.stringify(apikeys) + ';'
-    return new Promise( ( resolve, reject ) => {
-        gulp.src([
-            './handlers/delights.js'
-        ,   './helpers/*.js'
-        ,   './modules/*.js'
-        ,   './delights/*.js'
-        ,   './signals/*.js'
-        ])
-        .pipe( preprocess( { context: { GOLD: gold, SILVER: silver, BRONZE: bronze } } ) )
-        .on( 'end',   data  => { resolve(buffer + keys) } )
-        .on( 'error', error => { reject(error)          } )
-        .on( 'data',  bytes => {
-            buffer += bytes.contents.toString().trim();
-        } );
-    } );
-}
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Create a block
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function create_block(name, desc, key_id) {
-    return http({
-        method  : 'POST'
-    ,   json    : true
-    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  `/blocks/key/${key_id}/`   +
-                  `block`
-    ,   headers : { 'X-Session-Token' : config.login.token }
-    ,   body    : {
-            key_id : config.key_id
-        ,   name: name
-        ,   description: desc
-        }
-    }).catch( error => {
-        console.error( 'error', error );
-    } );
-}
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Create a block
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function create_app(name) {
-    return http({
-        method  : 'POST'
-    ,   json    : true
-    ,   uri     : 'https://admin.pubnub.com/api/apps'
-    ,   headers : { 'X-Session-Token' : config.login.token }
-    ,   body    : {
-            owner_id : config.owner_id
-        ,   name: name
-        }
-    }).catch( error => {
-        console.error( 'error', error );
-    } );
-}
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Create a keyset
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function create_keyset(app_id, name) {
-    return http({
-        method  : 'POST'
-    ,   json    : true
-    ,   uri     : 'https://admin.pubnub.com/api/keys'
-    ,   headers : { 'X-Session-Token' : config.login.token }
-    ,   body    : { 
-            app_id: app_id
-        ,   properties : { name : name }
-        }
-    }).catch( error => {
-        console.error( 'error', error );
-    } );
-}
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Get list of all blocks
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function list_blocks(key_id) {
-    return http({
-        method  : 'GET'
-    ,   json    : true
-    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  `/blocks/key/${key_id}/`   +
-                  `block`
-    ,   headers : { 'X-Session-Token' : config.login.token }
-    }).catch( error => {
-        console.error( 'error', error );
-    } );
-}
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Get list of all apps
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function list_apps(account_id) {
-    return http({
-        method  : 'GET'
-    ,   json    : true
-    ,   uri     : `https://admin.pubnub.com/api/apps?owner_id=${account_id}`
-    ,   headers : { 'X-Session-Token' : config.login.token}
-    }).catch( error => {
-        console.error( 'error', error );
-    } );
-}
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Upload Signals Handler Code
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function list_event_handlers(key_id, block_id) {
-    return http({
-        method  : 'GET'
-    ,   json    : true
-    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  `/blocks/key/${key_id}`   +
-                  `/block/${block_id}`
-    ,   headers : { 'X-Session-Token' : config.login.token }
-    }).catch( error => {
-        console.error( 'error', error );
-    } );
-}
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Upload Signals Handler Code
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function create_event_handler(key_id, block_id, name, event) {
-    return http({
-        method  : 'POST'
-    ,   json    : true
-    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  `/blocks/key/${key_id}/`   +
-                  `event_handler`
-    ,   headers : { 'X-Session-Token' : config.login.token }
-    ,   body    : {
-            key_id : key_id
-        ,   block_id: block_id
-        ,   type: 'js'
-        ,   event: event
-        ,   channels: 'opengrowth.signals'
-        ,   name: name
-        ,   code: "console.log('hi');"
-        ,   output: 'output-0.5823105682419438'
-        }
-    }).catch( error => {
-        console.error( 'error', error );
-    } );
-}
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Upload Signals Handler Code
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function upload_signals_handler() {
-    return http({
-        method  : 'PUT'
-    ,   json    : true
-    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  `/blocks/key/${config.key_id}/`   +
-                  `event_handler/${config.signals_id}`
-    ,   headers : { 'X-Session-Token' : config.login.token }
-    ,   body    : {
-            key_id    : config.key_id
-        ,   block_id  : config.block_id
-        ,   id        : config.signals_id
-        ,   code      : config.signals_code
-        ,   channels  : 'opengrowth.signals'
-        ,   event     : 'js-before-publish'
-        ,   type      : 'js'
-        ,   log_level : 'debug'
-        ,   name      : 'Open Growth Signal Handler'
-        ,   output    : 'opengrowth.signals-info'
-        }
-    }).catch( error => {
-        console.error( 'error', error );
-    } );
-}
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Upload Delights Handler Code
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function upload_delights_handler() {
-    return http({
-        method  : 'PUT'
-    ,   json    : true
-    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  `/blocks/key/${config.key_id}/`   +
-                  `event_handler/${config.delights_id}`
-    ,   headers : { 'X-Session-Token' : config.login.token }
-    ,   body    : {
-            key_id    : config.key_id
-        ,   block_id  : config.block_id
-        ,   id        : config.delights_id
-        ,   code      : config.delights_code
-        ,   channels  : 'opengrowth.signals'
-        ,   event     : 'js-after-publish'
-        ,   type      : 'js'
-        ,   log_level : 'debug'
-        ,   name      : 'Open Growth Delights Handler'
-        ,   output    : 'opengrowth.delights-info'
-        }
-    }).catch( error => {
-        console.error( 'error', error );
-    } );
-}
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Print cURL Example
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function instructions() {
-    const pub = apikeys.pubnub.publish;
-    const sub = apikeys.pubnub.subscribe;
-    const chn = 'opengrowth.signals';
-    const msg = `\\{"signal":"signup","email":"stephen@pubnub.com"\\}`;
-
-    // Done Printing Instructions
-    console.log(`
-        ## Try it out!
-        curl 'https://ps.pubnub.com/subscribe/${sub}/${chn}/0/-1' &
-        curl 'https://ps.pubnub.com/publish/${pub}/${sub}/0/${chn}/0/${msg}'
-    `);
-}
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Log Deploy to Librato
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function librato_annotate_deploy() {
-    const auth = "Basic " + new Buffer(
-        apikeys.librato.email + ":" + apikeys.librato.secret
-    ).toString("base64");
-
-    let desc = '(BRONZE)';
-    if (silver) desc = '(SILVER)';
-    if (gold) desc = '(GOLD)';
-
-    return http({
-        method  : 'POST'
-    ,   uri     : 'https://metrics-api.librato.com/v1/annotations' + 
-                  '/opengrowth.deploy.blocks'
-    ,   body    : {
-            title       : 'Deployed JavaScript to BLOCKS'
-        ,   description : desc
+async function deploy() {
+    //stuff that doesn't set anything
+    try{
+        config.login = await pubnubLogin();
+        config.token = config.login.result.token;
+        config.userId = config.login.result.user.id;
+    } catch (e) {
+        console.error(e.black.bgRed);
+        console.error('Nothing has been deployed, this incident has not been logged'.black.bgRed);
+        process.exit();
     }
-    ,   headers : { 'Authorization' : auth }
-    ,   json    : true
-    }).catch( error => {
-        console.error( 'error', error );
-    } );
+
+    //stuff that might set things
+    try{
+        config.accId = await getAccId();
+        config.appId = await getAppId();
+        config.keyId = await getKeyId();
+        config.blockId = await getBlockId();
+        config.handlers = await getEventHandlers();
+        config.signalCode = await buildSignalHandler();
+        config.delightCode = await buildDelightHandler();
+        console.log('Uploading Signal Handler...');
+        await uploadSignalHandler();
+        console.log('Uploading Delight...');
+        await uploadDelightHandler();
+        console.log('Restarting Block...');
+        await restart();
+    } catch (e) {
+        console.error(e.black.bgRed);
+        try {
+            console.error('Annotating failure in Librato...'.black.bgRed);
+            await librato('*FAILED* ' + process.env.USER + ' - ' + config.env + ' - ' + e);
+        } catch (e) {
+            console.error('That failed too lol'.black.bgRed);
+        }
+        process.exit();
+    }
+
+    try{
+        console.log('Annotating in Librato...');
+        await librato(process.env.USER + ' - ' + config.env);
+    } catch (e) {
+        console.error('Annotation Failed'.black.bgRed);
+    }
+
+    console.log('Deployment Complete!');
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Restart Event Handler
+// Log an Annotation on Librato
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function librato(desc) {
+    return http({
+        method: 'POST',
+        uri: 'https://metrics-api.librato.com/v1/annotations' +
+            '/opengrowth.deploy.blocks',
+        body: {
+            title: 'Deployed JavaScript to BLOCKS',
+            description: desc
+        },
+        headers: {
+            'Authorization': "Basic " + new Buffer(
+        config.keys.librato.email + ":" + config.keys.librato.secret
+    ).toString("base64")
+        },
+        json: true
+    }).catch(error => {
+        throw error.message;
+    });
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Restart the BLOCK
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 function restart() {
     return http({
-        method  : 'POST'
-    ,   uri     : 'https://admin.pubnub.com/api/v1' + 
-                  `/blocks/key/${config.key_id}/`   +
-                  `block/${config.block_id}/start`
-    ,   body    : {
-            block_id : config.block_id
-        ,   key_id   : config.key_id
-        ,   action   : 'start' 
-    }
-    ,   headers : { 'X-Session-Token' : config.login.token }
-    ,   json    : true
-    }).catch( error => {
-        console.error( 'error', error );
-    } );
+        method: 'POST',
+        uri: 'https://admin.pubnub.com/api/v1' +
+            `/blocks/key/${config.keyId}/` +
+            `block/${config.blockId}/start`,
+        body: {
+            block_id: config.blockId,
+            key_id: config.keyId,
+            action: 'start'
+        },
+        headers: {
+            'X-Session-Token': config.token
+        },
+        json: true
+    }).catch(error => {
+        console.error('Failed to restart block'.black.bgRed);
+        throw error.error.message.text;
+    });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Login to PubNub
+// Compile Signal/Before Handler Code
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function pubnub_login( email, password ) {
-    return http({
-        method : 'POST'
-    ,   uri    : 'https://admin.pubnub.com/api/me'
-    ,   body   : { 'email' : email, 'password' : password }
-    ,   json   : true
-    }).catch( error => {
-        console.error( 'error', error );
-    } );
+function buildSignalHandler() {
+    let buffer = '';
+    let keys = 'opengrowth.keys = ' + JSON.stringify(config.keys) + ';';
+    return new Promise((resolve, reject) => {
+        gulp.src([
+                './handlers/signals.js', './helpers/*.js', './modules/*.js'
+                //,   './delights/*.js'
+                //,   './signals/*.js'
+            ])
+            .pipe(preprocess({
+                context: {
+                    ENV: config.env
+                }
+            }))
+            .on('end', data => {
+                resolve(buffer + keys)
+            })
+            .on('error', error => {
+                reject(error);
+            })
+            .on('data', bytes => {
+                buffer += bytes.contents.toString().trim();
+            });
+        console.log('Built Signal Handler');
+    });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Login to PubNub
+// Compile Delight/After Handler Code
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function get_account_id( user_id ) {
+function buildDelightHandler() {
+    let buffer = '';
+    let keys = 'opengrowth.keys = ' + JSON.stringify(config.keys) + ';'
+    return new Promise((resolve, reject) => {
+        gulp.src([
+                './handlers/delights.js', './helpers/*.js', './modules/*.js', './delights/*.js', './signals/*.js'
+            ])
+            .pipe(preprocess({
+                context: {
+                    ENV: config.env
+                }
+            }))
+            .on('end', data => {
+                resolve(buffer + keys)
+            })
+            .on('error', error => {
+                reject(error)
+            })
+            .on('data', bytes => {
+                buffer += bytes.contents.toString().trim();
+            });
+        console.log('Built Delight Handler');
+    });
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Upload Signal/Before Handler Code
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function uploadSignalHandler() {
     return http({
-        method  : 'GET'
-    ,   uri    : `https://admin.pubnub.com/api/accounts?user_id=${user_id}`
-    ,   headers : { 'X-Session-Token' : config.login.token }
-    ,   json    : true
-    })
-    .then( result => {
-        if ( result.result.accounts.length > 1 ) {
-            var msg = `User ${apikeys.pubnub.email} has multiple accounts. `+
-            `Please specify Open Growth Account in your Keys file under `+
-            `pubnub.accountId`;
-            console.log(msg);
-            process.exit();
-        } else {
-            return result.result.accounts[0].id;
+        method: 'PUT',
+        json: true,
+        uri: 'https://admin.pubnub.com/api/v1' +
+            `/blocks/key/${config.keyId}/` +
+            `event_handler/${config.handlers.before}`,
+        headers: {
+            'X-Session-Token': config.token
+        },
+        body: {
+            key_id: config.keyId,
+            block_id: config.blockId,
+            id: config.handlers.before,
+            code: config.signalCode,
+            channels: 'opengrowth.signals',
+            event: 'js-before-publish',
+            type: 'js',
+            log_level: 'debug',
+            name: 'Signal Handler',
+            output: 'opengrowth.signals-info'
         }
-    })
-    .catch( error => {
-        console.error( 'error', error );
-    } );
+    }).catch(error => {
+        console.error('Failed to upload signal handler'.black.bgRed);
+        throw error.error.message.text;
+    });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Encrypt keys
+// Upload Delight/After Handler Code
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function encrypt( password ) {
-    let keysText = JSON.stringify(apikeys);
-    let cipher = crypto.createCipher('aes-256-ctr', password);
-    let crypted = cipher.update(keysText,'utf8','hex');
-    crypted += cipher.final('hex');
-    fs.writeFileSync('./keys.aes', crypted,'utf8');
-    console.log('Keys Encrypted');
-    process.exit();
+function uploadDelightHandler() {
+    return http({
+        method: 'PUT',
+        json: true,
+        uri: 'https://admin.pubnub.com/api/v1' +
+            `/blocks/key/${config.keyId}/` +
+            `event_handler/${config.handlers.after}`,
+        headers: {
+            'X-Session-Token': config.token
+        },
+        body: {
+            key_id: config.keyId,
+            block_id: config.blockId,
+            id: config.handlers.after,
+            code: config.delightCode,
+            channels: 'opengrowth.signals',
+            event: 'js-after-publish',
+            type: 'js',
+            log_level: 'debug',
+            name: 'Delight Handler',
+            output: 'opengrowth.delights-info'
+        }
+    }).catch(error => {
+        console.error('Failed to upload delight handler'.black.bgRed);
+        throw error.error.message.text;
+    });
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// Decrypt keys
+// Get Event Handler ids
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function decrypt( password ) {
-    let text = fs.readFileSync('./keys.aes','utf8')
+async function getEventHandlers() {
+    let list = await listEventHandlers(config.keyId, config.blockId);
+    list = list.payload[0].event_handlers;
+    let payload = {
+        'before': null,
+        'after': null
+    };
+    for (let item of list) {
+        if (item.event == 'js-before-publish') {
+            console.log('Open Growth Before Handler:', item.id);
+            payload.before = item.id;
+        } else if (item.event == 'js-after-publish') {
+            console.log('Open Growth After Handler:', item.id);
+            payload.after = item.id;
+        }
+    }
+
+    if (!payload.before) {
+        let handler = await createEventHandler(config.keyId, config.blockId, 'Signals Handler', 'js-before-publish');
+        payload.before = handler.payload.id;
+        console.log('Created Open Growth Before Handler:', payload.before);
+    }
+
+    if (payload.after == null) {
+        let handler2 = await createEventHandler(config.keyId, config.blockId, 'Delights Handler', 'js-after-publish');
+        payload.after = handler2.payload.id;
+        console.log('Created Open Growth After Handler:', payload.after);
+    }
+    return payload;
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// List Event Handlers
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function listEventHandlers(keyId, blockId) {
+    return http({
+        method: 'GET',
+        json: true,
+        uri: 'https://admin.pubnub.com/api/v1' +
+            `/blocks/key/${keyId}` +
+            `/block/${blockId}`,
+        headers: {
+            'X-Session-Token': config.token
+        }
+    }).catch(error => {
+        console.error('Failed to list event handlers'.black.bgRed)
+        throw error;
+    });
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Create Event Handler
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function createEventHandler(keyId, blockId, name, event) {
+    return http({
+        method: 'POST',
+        json: true,
+        uri: 'https://admin.pubnub.com/api/v1' +
+            `/blocks/key/${keyId}/` +
+            `event_handler`,
+        headers: {
+            'X-Session-Token': config.token
+        },
+        body: {
+            key_id: keyId,
+            block_id: blockId,
+            type: 'js',
+            event: event,
+            channels: 'opengrowth.signals',
+            name: name,
+            code: "console.log('hi');",
+            output: 'output-0.5823105682419438'
+        }
+    }).catch(error => {
+        console.error('Failed to create event handler'.black.bgRed);
+        throw error.error.message;
+    });
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get BLOCK id
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+async function getBlockId() {
+    let list = await listBlocks(config.keyId);
+
+    for (let block of list.payload) {
+        if (block.name == "Open Growth") {
+            config.block_id = block.id;
+            console.log('Open Growth Block ID:', block.id);
+            return block.id;
+        }
+    }
+
+    let block = await createBlock('Open Growth', '10x your business!', config.keyId);
+    console.log('Created Open Growth Block:', block.payload.id);
+    return block.payload.id;
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Create a BLOCK
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function createBlock(name, desc, keyId) {
+    return http({
+        method: 'POST',
+        json: true,
+        uri: 'https://admin.pubnub.com/api/v1' +
+            `/blocks/key/${keyId}/` +
+            `block`,
+        headers: {
+            'X-Session-Token': config.token
+        },
+        body: {
+            key_id: keyId,
+            name: name,
+            description: desc
+        }
+    }).catch(error => {
+        console.error('Failed to create block'.black.bgRed)
+        throw error.error.message;
+    });
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get key id
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+async function getKeyId() {
+    let list = await listApps(config.accId, config.token);
+    let env = (config.env == 'Bronze') ? config.env + ' - ' + process.env.USER : config.env;
+
+    for (let app of list.result) {
+        if (app.name == "Open Growth") {
+            for (let key of app.keys) {
+                if (key.properties.name == env) {
+                    console.log('Open Growth Key ID:', key.id);
+                    return key.id;
+                }
+            }
+        }
+    }
+
+    let key = await createKey(config.appId, env);
+    console.log('Created Open Growth Key (' + config.env + '):', key.result.id);
+    return key.result.id;
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get list of BLOCKS
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function listBlocks(keyId) {
+    return http({
+        method: 'GET',
+        json: true,
+        uri: 'https://admin.pubnub.com/api/v1' +
+            `/blocks/key/${keyId}/` +
+            `block`,
+        headers: {
+            'X-Session-Token': config.token
+        }
+    }).catch(error => {
+        console.error('Failed to list blocks'.black.bgRed);
+        throw error;
+    });
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get account id
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+async function getAccId() {
+    let numbers = /^\d+$/;
+    let list = await listAccs(config.userId, config.token);
+    list = list.result.accounts;
+
+    for (let i=0;i<list.length;i++) {
+        console.log(i + ') ' + list[i].properties.company);
+    }
+
+    while(true){
+        try{
+            let choice = await prompt('Account: (0) ');
+            prompt.done();
+            if (!choice) choice = 0;
+            if (numbers.test(choice)) {
+                return list[choice].id;
+            } else {
+                console.log('Not a number');
+            }
+        }
+        catch (e) {
+            console.log('Not a choice');
+        }
+    }
+
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get app id
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+async function getAppId() {
+    let list = await listApps(config.accId, config.token);
+
+    for (let app of list.result) {
+        if (app.name == "Open Growth") {
+            console.log('Open Growth App ID:', app.id);
+            return app.id;
+        }
+    }
+
+    let app = await createApp('Open Growth');
+    console.log('Created Open Growth App: ', app.result.id);
+    return app.result.id;
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Create a key
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function createKey(appId, name) {
+    return http({
+        method: 'POST',
+        json: true,
+        uri: 'https://admin.pubnub.com/api/keys',
+        headers: {
+            'X-Session-Token': config.token
+        },
+        body: {
+            app_id: appId,
+            properties: {
+                name: name
+            }
+        }
+    }).catch(error => {
+        console.error('Failed to create key set'.black.bgRed);
+        throw error.error;
+    });
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Create an app
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function createApp(name) {
+    return http({
+        method: 'POST',
+        json: true,
+        uri: 'https://admin.pubnub.com/api/apps',
+        headers: {
+            'X-Session-Token': config.token
+        },
+        body: {
+            owner_id: config.accId,
+            name: name
+        }
+    }).catch(error => {
+        console.error('Failed to create app'.black.bgRed)
+        throw error.error;
+    });
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Login to PubNub
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function pubnubLogin() {
+    return http({
+        method: 'POST',
+        uri: 'https://admin.pubnub.com/api/me',
+        body: {
+            'email': config.keys.pubnub.email,
+            'password': config.keys.pubnub.password
+        },
+        json: true
+    }).catch(error => {
+        console.error('PubNub Login Failed'.black.bgRed);
+        throw error.error.error;
+    });
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get list of accounts
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function listAccs(userId, token) {
+    return http({
+        method: 'GET',
+        json: true,
+        uri: `https://admin.pubnub.com/api/accounts?user_id=${userId}`,
+        headers: {
+            'X-Session-Token': token
+        }
+    }).catch(error => {
+        console.error('Failed to get account list'.black.bgRed);
+        throw error.error;
+    });
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get list of apps
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function listApps(accId, token) {
+    return http({
+        method: 'GET',
+        json: true,
+        uri: `https://admin.pubnub.com/api/apps?owner_id=${accId}`,
+        headers: {
+            'X-Session-Token': token
+        }
+    }).catch(error => {
+        console.error('Failed to get app list'.black.bgRed);
+        throw error.error;
+    });
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Get user API keys
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+async function getKeys() {
+    let encryptedFileExists = fs.existsSync('keys.aes');
+    let password;
+    if (!encryptedFileExists) {
+        let unencryptedFile = fs.existsSync('keys.json');
+        if (!unencryptedFile) {
+            console.error('No keys files found, please create it from keys.json.example'.black.bgRed);
+            process.exit(); 
+        } else {
+            console.log('Keys file has not been encrypted, encrypting...');
+            password = await encrypt();
+        }
+    } else {
+        console.log('Encrypted keys file found');
+    }
+
+    if (!password) {
+        password = await prompt.password('Encryption Password: ', 'Δ');
+    }
+
+    let keys = await decrypt(password);
+    return keys;
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Determine GOLD (production) or SILVER (testing) deployment
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+async function checkEnvironment() {
+    let env;
+    if (args.includes('--gold')) {
+        console.log('\tDeploying to Gold\t'.black.bgYellow);
+        try {
+            let confirm = await prompt.confirm('Are you sure? ');
+            env = 'Gold';
+        } catch (e) {
+            console.log('\tCancelling Deployment\t'.black.bgRed);
+            process.exit();
+        }
+    } else if (args.includes('--silver')) {
+        env = 'Silver';
+        console.log('\tDeploying to Silver\t'.black.bgWhite);
+    } else {
+        env = 'Bronze';
+        console.log('\tDeploying to Bronze\t'.black.bgGreen);
+    }
+    config.env = env;
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Decrypt the users API key file
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function decrypt(password) {
+    let text = fs.readFileSync('./keys.aes', 'utf8')
     let decipher = crypto.createDecipher('aes-256-ctr', password);
-    let dec = decipher.update(text,'hex','utf8');
+    let dec = decipher.update(text, 'hex', 'utf8');
     dec += decipher.final('utf8');
-    try{
+    try {
         let keys = JSON.parse(dec);
         console.log('Keys Decrypted');
         return keys;
-    } catch(e){
-        console.log('Password Incorrect');
+    } catch (e) {
+        console.error('Failed to decrypt keys, check your password'.black.bgRed);
         process.exit();
     }
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Encrypt the users API key file, return password if running during deploy
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+async function encrypt() {
+    let password = await prompt.password('Enter New Encryption Password: ');
+    prompt.done();
+    console.log('Creating keys.aes from keys.json...')
+    let text = fs.readFileSync('./keys.json', 'utf8')
+    let cipher = crypto.createCipher('aes-256-ctr', password);
+    let crypted = cipher.update(text, 'utf8', 'hex');
+    crypted += cipher.final('hex');
+    fs.writeFileSync('./keys.aes', crypted, 'utf8');
+    return password;
+}
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Pretend we're in the 90s and keygen chiptunes are playing
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function printSplash() {
+    process.stdout.write('\033c');
+    console.log("\n\n                                     .````` ".green);
+    console.log("                                    ://oo+/- ".green);
+    console.log("                                   :++//++++: ".green);
+    console.log("                                  /++++/:++oo: ".green);
+    console.log("                                `/+ooo+++:++/` ".green);
+    console.log("                               `+o+o+/++++:: ".green);
+    console.log("                              `+++++://o++: ".green);
+    console.log("                             .++++/:+o+/o-      .+. ".green);
+    console.log("                            .++++//oooo:.      -+++- ".green);
+    console.log("                           -++++//++++:       -/oooo- ".green);
+    console.log("                          :oooo//++++-       /o+/ooo+: ".green);
+    console.log("                         /oooo/+oooo-       +ooo+/o+oo: ".green);
+    console.log("                       `/++oo/osooo.        .oooo+:++++/ ".green);
+    console.log("                      `/++o+/oooso`          .ooooo:++++/` ".green);
+    console.log("                     `/++++:+ooo+`            .ooooo:++++/` ".green);
+    console.log("                    .+++++:oooo/               `ooooo/++++/` ".green);
+    console.log("                   .++++/:++++::::::::::::::/:::/++++//o+o++. ".green);
+    console.log("                  -++++/:/+++:+++++++++++ooooooooooooooo+++++. ".green);
+    console.log("                 -++++/:////-///++////////++++++++++++++//////.  ".green);
+    console.log("                 ./++/:///+++++++++++++++++oossssossosooo++++/. ".green);
+    console.log("                  `/::/+//+///+++++++oo+++ooosoosssosoooo+++/` ".green);
+    console.log("                    `......................-.---...------...` ".green);
+    console.log("            ____                      ______                   __  __ ".green);
+    console.log("           / __ \\____  ___  ____     / ____/________ _      __/ /_/ /_ ".green);
+    console.log("          / / / / __ \\/ _ \\/ __ \\   / / __/ ___/ __ \\ | /| / / __/ __ \\ ".green);
+    console.log("         / /_/ / /_/ /  __/ / / /  / /_/ / /  / /_/ / |/ |/ / /_/ / / / ".green);
+    console.log("         \\____/ .___/\\___/_/ /_/   \\____/_/   \\____/|__/|__/\\__/_/ /_/ ".green);
+    console.log("             /_/ \n\n".green);
 }
