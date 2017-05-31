@@ -10,7 +10,7 @@ permalink: /getting-started/
 
 The core vision of Open Growth is to automate tedious workforce tasks and give humans more time to work on the big picture. Open Growth’s **Signals** and **Delights** are an excellent resource to automate email correspondence with your vast customer base. A lone developer can get an automatic customer outreach system up and running in a few minutes using Open Growth. There are currently 11 delights under construction in the `open-growth/delights/` directory. This getting started guide will explain how to set up an automatic email to your newest customers when they sign up for your service.
 
-First, there needs to be a source of the emails you send. We will call this a **Signal Generator**. The Signal Generator needs to collect customer information, like email address, and publish the signal to Open Growth. This can be accomplished by a program that automatically runs every so often using a service like [Cron](https://en.wikipedia.org/wiki/Cron). The program can query your customer database for any new sign ups, and publish a message to your PubNub Open Growth instance immediately. You can also accomplish this using PubNub to publish directly from your Web Application.
+First, there needs to be a source of the emails you send. We will call this a **Signal Generator**. The Signal Generator needs to collect customer information, like email address, and publish the signal to Open Growth. This can be accomplished by a program that automatically runs every so often using a service like [Cron](https://en.wikipedia.org/wiki/Cron). The program can query your customer database for any new sign ups, and publish a message to your PubNub Open Growth instance immediately. You can also accomplish this using PubNub to publish directly from your Web Application, Cron script, or even a smart toaster 🍞.
 
 The signal can be published to [PubNub](https://www.pubnub.com/) using one of the [70+ SDKs](https://www.pubnub.com/docs), or with an [HTTP](https://www.pubnub.com/http-rest-push-api/) request. 
 
@@ -27,7 +27,7 @@ We can accomplish automation with an [XHR](https://www.pubnub.com/docs/blocks/xh
 
  * [Clearbit](https://clearbit.com/) is used to find a customer’s name, place of work, industry, and other important details, by **providing only an email address**.
 
- * [MonkeyLearn](http://monkeylearn.com/) is a Machine Learning API which we use to determine a customer’s use case for your service, by using past customer data and ML.
+ * [MonkeyLearn](http://monkeylearn.com/) is a Machine Learning API which we use to determine a customer’s use case for your service, by using past customer data.
 
 * The [SendGrid](https://sendgrid.com/) Delight is used to send the email by plain text, or with a colorful HTML/CSS template.
 

@@ -10,7 +10,7 @@ Open Growth is an open source framework for workforce automation, delighting cus
 
 ## 🤖 Neumann
 
-Neumann is your AI employee. He can send emails, texts, tweets, phone calls, and even a slice of cake 🍰 to your customers at any hour of the day, automatically. Transform sales people into sales heroes. Replace sales outreach with a Machine Learning engine. No sales spam. Open Growth is an open source project for companies looking to delight customers with ML/AI workforce automation. Make Artificial Intelligence to work for you. AI never get's tired, and it's always faster than humans.
+Neumann is your AI employee. He can send emails, texts, tweets, phone calls, and even a slice of cake 🍰 to your customers at any hour of the day, automatically. Transform sales people into sales heroes. Replace sales outreach with a Machine Learning engine. No sales spam. Open Growth is an open source project for companies looking to delight customers with ML/AI workforce automation. Make Artificial Intelligence to work for you. AI never gets tired, and it's always faster than humans.
 
 ## ❤️  Delight Your Customers
 

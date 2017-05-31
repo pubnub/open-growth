@@ -10,7 +10,7 @@ To deploy your instance of Open Growth today, be sure to check out the [Getting 
 
 ## Services
 
-First, sign up and retrieve your API keys for any services you want to include in your instance. The current Open Growth release uses [PubNub](https://www.pubnub.com/), [Librato](https://www.librato.com/), [SendGrid](https://sendgrid.com/), [MonkeyLearn](https://monkeylearn.com/) and [Clearbit](https://clearbit.com/). Open Growth can function with a minimum of PubNub however you will not be able to send any delights to customers. If you intend to use any message API services with Open Growth that are not referenced in `open-growth/delights/` you can write your own delight!
+First, sign up and retrieve your API keys for any services you want to include in your instance. The current Open Growth release uses [PubNub](https://www.pubnub.com/), [Librato](https://www.librato.com/), [SendGrid](https://sendgrid.com/), [MonkeyLearn](https://monkeylearn.com/) and [Clearbit](https://clearbit.com/) by default. If you do not want to use those services, you will need to make changes to Event Handlers and Signal Handlers. Open Growth can function with a minimum of PubNub however you will not be able to send any delights to customers. If you intend to use any message API services with Open Growth that are not referenced in `open-growth/delights/` you can write your own delight!
 
 ## Keys
 
