@@ -2,20 +2,11 @@
 // Analytical Tracking of Delights
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.track = {};
-const track = (key) => {
-    // Counter Key
-    const time = new Date();
-    const y    = time.getFullYear();
-    const m    = time.getMonth();
-    const d    = time.getDate();
-    const h    = time.getHours();
-    const min  = time.getMinutes();
-
+const track = ( key ) => {
     // Increment KV Counters
-    let count = opengrowth.libratoUpdates[`opengrowth.${key}`];
-    opengrowth.libratoUpdates[`opengrowth.${key}`] = count ? count+1 : 1;
+    let count = opengrowth.rtmUpdates[`opengrowth.${key}`];
+    opengrowth.rtmUpdates[`opengrowth.${key}`] = count ? count+1 : 1;
 };
-
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Track Signals Received
@@ -39,4 +30,12 @@ opengrowth.track.delight = ( delight, signal, data ) => {
 opengrowth.track.reaction = ( reaction, data ) => {
     opengrowth.log(reaction, "reaction", data);
     return track(`reactions.${reaction}`);
+};
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Track Errors
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+opengrowth.track.error = ( type, error ) => {
+	opengrowth.log(type, "error", error, true);
+    return track(`error.${type}`);
 };

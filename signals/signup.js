@@ -1,59 +1,42 @@
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Handles a Signup email, sends with SendWithUs Template
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 opengrowth.signals.signup = ( request, customer ) => {
-    const user = request.message;
-    const csm  = user.csm || {};
-    const csm_bccs = csm && csm.bccs ? csm.bccs : [];
-    let email  = user.litmus || 'open-growth-activity+silver@pubnub.com';
-    // @if GOLD
-    email = user.email;
-    // @endif
+    const message = request.message;
+    let email  = customer.email || message.email;
+    // Set to your SalesForce tracking BCC or your company tracking BCC
+    let bcc    = "email-tracking@mycompany.com";
 
-    let firstName    = opengrowth.customer.getFirstName(customer);
-    let lastName     = opengrowth.customer.getLastName(customer);
-    let company_name = opengrowth.customer.getCompany(customer);
+    let product = "Product";
+    let tutorial = "Tutorial";
 
-    let display_url = `https://admin.pubnub.com/#/user/${user.user_id}/` +
-                      `account/${user.account_id}/` +
-                      `app/${user.app_id}/key/${user.key_id}/`;
-    let anchor_url  = display_url +
-                      `?utm_source=EmailBlasts%20&utm_medium=` +
-                      `Open-Growth&utm_campaign=` +
-                      `EB-CY16-Q4-Open-Growth-01&utm_term=link2` +
-                      `&utm_content=api-keys`;
+    // Send email with SendGrid
+    let sendgridPostBody = {
+        "email"        : email
+      , "name"         : customer.firstName
+      , "subject"      : "Welcome!"
+      , "sender_email" : "neumann@mycompany.com"
+      , "reply_email"  : "support@mycompany.com"
+      , "categories"   : [ "og_signup" ]
+      , "bccs"         : [ { "email" : bcc } ]
 
-    var template_data = {
-        "customer_first_name" : firstName
-      , "customer_last_name"  : lastName
-      , "company_name"        : company_name
-      , "csm_first_name"      : csm.first_name
-      , "csm_last_name"       : csm.last_name
-      , "csm_email"           : csm.email
-      , "csm_phone"           : csm.phone
-      , "csm_bccs"            : csm_bccs
-      , "display_url"         : display_url //signup
-      , "anchor_url"          : anchor_url  //signup
+      // Include these if you choose to use SendGrid's templates
+      // , "template_id"   : opengrowth.keys.sendgrid.templates.signup
+      // , "substitutions" : {
+      //     "name"    : customer.firstName,
+      //     "company" : customer.company
+      // }
     };
 
-    let lw = opengrowth.keys.sendgrid.group.limit_warning;
-    let df = opengrowth.keys.sendgrid.group.default;
-    let fe = opengrowth.keys.sendgrid.group.feature_enable;
-    let ug = opengrowth.keys.sendgrid.group.usage_info;
+    // Plain text email with SendGrid (remove this if you're using a template)
+    sendgridPostBody.message = '' +
+      `Hi ${customer.firstName || 'there'}!\n` +
+      `Thanks for signing up for our service!\n` +
+      `We see you are a ${customer.title } and you work at ${customer.company}.\n` +
+      `Here is a link to our ${product} and here is a link to an ${tutorial}.\n` +
+      `Welcome!\n` +
+      `Neumann`;
 
-    let header = `{\"asm_group_id\":${df},\"asm_groups_to_display\": [${lw},${df},${fe},${ug}],\"category\":[\"og_signup\"]}`;
-    
-    var sendWithUsPostBody = {
-      "template": opengrowth.keys.swu.templates.signup,
-      "recipient": {
-        "name": firstName,
-        "address": email
-      },
-      "template_data": template_data,
-      "bcc": csm_bccs,
-      "tags" : [ "og_signup" ],
-      "headers" : {
-        "x-smtpapi" : header
-      }
-    };
-
-    // Send Email and Track Delight in Librato
-    return opengrowth.delight.sendwithus.email(sendWithUsPostBody);
+    // Send Email!
+    return opengrowth.delight.sendgrid.email(sendgridPostBody);
 };

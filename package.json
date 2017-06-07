@@ -1,6 +1,9 @@
 {
   "name": "opengrowth",
   "version": "0.0.1",
+  "engines" : {
+    "node" : ">=7.6.0"
+  },
   "description": "Open Growth - An open source project for developers at API companies to delight your customers with ML/AI.",
   "main": "index.js",
   "scripts": {
@@ -32,10 +35,11 @@
   },
   "homepage": "https://github.com/pubnub/open-growth#readme",
   "dependencies": {
-    "request": "latest",
-    "request-promise": "latest",
+    "colors": "^1.1.2",
     "gulp": "latest",
     "gulp-preprocess": "latest",
-    "prompt-promise": "latest"
+    "prompt-promise": "latest",
+    "request": "latest",
+    "request-promise": "latest"
   }
 }
